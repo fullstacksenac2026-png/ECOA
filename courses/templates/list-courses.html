@@ -1,0 +1,429 @@
+{% extends 'app-base.html' %}
+
+{% block title %}<title>Cursos</title>{% endblock %}
+
+{% block content %}
+<style>
+    /* ===== COURSES CONTAINER ===== */
+    .courses-container {
+        background: #fff;
+        transition: background-color 0.3s ease;
+    }
+
+    body.dark-mode .courses-container {
+        background: #1a1a1a;
+    }
+
+    /* ===== SECTION HEADER ===== */
+    .section-header {
+        background: linear-gradient(135deg, #20c997 0%, #198754 100%);
+        color: white;
+        padding: 1.5rem 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 2rem;
+        transition: background 0.3s ease;
+    }
+
+    body.dark-mode .section-header {
+        background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .section-title {
+        color: white;
+        margin-bottom: 0.5rem;
+        font-size: 1.5rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .section-title i {
+        font-size: 1.8rem;
+    }
+
+    .section-subtitle {
+        color: rgba(255, 255, 255, 0.92);
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    /* ===== COURSE IMAGE ===== */
+    .course-image-wrapper {
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+        background: #f0f0f0;
+        transition: all 0.3s ease;
+    }
+
+    body.dark-mode .course-image-wrapper {
+        background: #252525;
+    }
+
+    .course-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .course-image-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #20c997 0%, #198754 100%);
+    }
+
+    body.dark-mode .course-image-placeholder {
+        background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
+    }
+
+
+    /* ===== SECTIONS ===== */
+    .categories-section,
+    .courses-section {
+        padding: 1rem;
+        margin-bottom: 3rem;
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: #f8f9fa;
+        border-radius: 0.5rem;
+        transition: background-color 0.3s ease;
+    }
+
+    body.dark-mode .empty-state {
+        background: #252525;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        color: #20c997;
+        margin-bottom: 1rem;
+        transition: color 0.3s ease;
+    }
+
+    body.dark-mode .empty-state i {
+        color: #4cdf7f;
+    }
+
+    .empty-text {
+        color: #495057;
+        font-size: 1.05rem;
+        margin-bottom: 0;
+        transition: color 0.3s ease;
+    }
+
+    body.dark-mode .empty-text {
+        color: #b0b0b0;
+    }
+
+    /* ===== PAGINATION ===== */
+    .pagination-nav {
+        margin-top: 2.5rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .pagination {
+        gap: 0.25rem;
+        flex-wrap: wrap;
+    }
+
+    .page-item .page-link {
+        color: #20c997;
+        border-color: #e9ecef;
+        background-color: white;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+        padding: 0.5rem 0.75rem;
+        min-width: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    body.dark-mode .page-item .page-link {
+        background-color: #252525;
+        border-color: #333;
+        color: #4cdf7f;
+    }
+
+    .page-item .page-link:hover {
+        background-color: #20c997;
+        color: white;
+        border-color: #20c997;
+    }
+
+    body.dark-mode .page-item .page-link:hover {
+        background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
+        border-color: #1a7f54;
+        color: white;
+    }
+
+    .page-item.disabled .page-link {
+        background-color: #f0f0f0;
+        color: #20c997;
+        cursor: not-allowed;
+        border-color: #e9ecef;
+    }
+
+    body.dark-mode .page-item.disabled .page-link {
+        background-color: #1e1e1e;
+        color: #4cdf7f;
+        border-color: #333;
+    }
+
+    .page-item.active .page-link {
+        background: linear-gradient(135deg, #20c997 0%, #198754 100%);
+        color: white;
+        border-color: #198754;
+    }
+
+    body.dark-mode .page-item.active .page-link {
+        background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
+        border-color: #0f4e2a;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (min-width: 480px) {
+        .categories-section,
+        .courses-section {
+            padding: 1.5rem;
+        }
+
+        .section-header {
+            padding: 2rem 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.65rem;
+        }
+
+        .section-title i {
+            font-size: 2rem;
+        }
+
+        .section-subtitle {
+            font-size: 1rem;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .categories-section,
+        .courses-section {
+            padding: 2rem;
+        }
+
+        .section-header {
+            padding: 2.5rem 2rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+        }
+
+        .empty-state {
+            padding: 4rem 2rem;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .categories-section,
+        .courses-section {
+            padding: 2.5rem;
+        }
+
+        .section-header {
+            padding: 3rem 2.5rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .pagination {
+            gap: 0.5rem;
+        }
+    }
+</style>
+<main class="courses-container">
+    <!-- Seção de Categorias -->
+    <section class="categories-section mt-4 mb-5">
+        <div class="section-header mb-4">
+            <h1 class="section-title">
+                <i class="bi bi-tag-fill"></i> Categorias
+            </h1>
+            <p class="section-subtitle">Explore nossos cursos por categoria</p>
+        </div>
+
+        {% if categories %}
+            <div class="categories-grid">
+                {% for category in categories %}
+                    <article class="category-card">
+                        <div class="category-card-body">
+                            <div class="category-icon">
+                                <i class="bi bi-folder-fill"></i>
+                            </div>
+                            <h3 class="category-name">{{ category.name }}</h3>
+                            <p class="category-description">{{ category.description }}</p>
+                            <a href="{% url 'courses:list-courses-by-category' category.id %}" class="btn btn-custom-green btn-sm w-100">
+                                Ver Cursos
+                                <i class="bi bi-arrow-right ms-2"></i>
+                            </a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+
+            <!-- Paginação de Categorias -->
+            {% if page_obj.paginator.num_pages > 1 %}
+                <nav aria-label="Paginação de categorias" class="pagination-nav mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1" aria-label="Primeira página">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Página anterior">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item disabled">
+                            <span class="page-link">
+                                {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Próxima página">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Última página">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <p class="empty-text">Nenhuma categoria disponível no momento.</p>
+            </div>
+        {% endif %}
+    </section>
+
+    <!-- Seção de Cursos -->
+    <section class="courses-section">
+        <div class="section-header mb-4">
+            <h1 class="section-title">
+                <i class="bi bi-book-fill"></i> Cursos
+            </h1>
+            <p class="section-subtitle">Encontre o curso perfeito para você</p>
+        </div>
+
+        {% if courses %}
+            <div class="courses-grid">
+                {% for course in courses %}
+                    <article class="course-card">
+                        <div class="course-card-header">
+                            <div class="course-status-badge">
+                                <span class="badge bg-custom-green">Disponível</span>
+                            </div>
+                        </div>
+
+                        <div class="course-image-wrapper">
+                            {% if course.image %}
+                                <img src="{{ course.image.url }}" alt="{{ course.name }}" class="course-image">
+                            {% else %}
+                                <div class="course-image-placeholder">
+                                    <i class="bi bi-image" style="font-size: 3rem; color: white; opacity: 0.5;"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="course-card-body">
+                            <h3 class="course-title">{{ course.name }}</h3>
+                            <p class="course-description">{{ course.description }}</p>
+                            
+                            <div class="course-meta">
+                                <div class="meta-item">
+                                    <i class="bi bi-clock"></i>
+                                    <span class="meta-text">{{ course.time }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="course-card-footer">
+                            <a href="{% url 'courses:course-detail' course.id %}" class="btn btn-custom-green w-100">
+                                Ver Detalhes
+                                <i class="bi bi-arrow-right ms-2"></i>
+                            </a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+
+            <!-- Paginação de Cursos -->
+            {% if page_obj.paginator.num_pages > 1 %}
+                <nav aria-label="Paginação de cursos" class="pagination-nav mt-5">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1" aria-label="Primeira página">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Página anterior">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item disabled">
+                            <span class="page-link">
+                                {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Próxima página">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Última página">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="empty-state">
+                <i class="bi bi-search"></i>
+                <p class="empty-text">Nenhum curso disponível no momento.</p>
+            </div>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}

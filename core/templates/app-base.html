@@ -1,0 +1,320 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}App{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+</head>
+<body style="padding-top: 70px; padding-bottom: 80px; transition: background-color 0.3s, color 0.3s;" id="appBody">
+
+    <!-- Top Bar -->
+    <div class="fixed-top d-flex justify-content-between align-items-center px-3 shadow-sm" 
+         style="height: 60px; background-color: #fff; z-index: 1000; transition: background-color 0.3s;" id="topBar">
+        <a href="/" class="text-decoration-none fw-bold fs-5 align-self-start" style="color: #20c997;"><img src="{% static 'assets/logo.png' %}" alt="Logo" style="height: 80px;"></a>
+        <div class="d-flex align-items-center gap-3">
+            <i class="bi bi-moon-fill fs-5" id="themeToggle" style="cursor: pointer; transition: transform 0.5s;"></i>
+            <div class="position-relative fs-5" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#notificationModal">
+                <i class="bi bi-bell-fill"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                    3
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mt-3 mb-5">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="fixed-bottom d-flex justify-content-around align-items-center shadow-lg" 
+         style="height: 70px; background-color: #fff; z-index: 1000; transition: background-color 0.3s;" id="bottomBar">
+        
+        <a href="{% url 'pictures:historic-pictures' %}" class="d-flex flex-column align-items-center text-decoration-none nav-icon" 
+           style="color: {% if request.resolver_match.app_name == 'pictures' %}#20c997{% else %}#6c757d{% endif %}; font-size: 0.8rem; transition: color 0.3s;">
+            <i class="bi bi-camera fs-4 mb-0"></i>
+            <span>Câmera</span>
+        </a>
+        
+        <a href="{% url 'courses:list-courses-and-categories' %}" class="d-flex flex-column align-items-center text-decoration-none nav-icon" 
+           style="color: {% if request.resolver_match.app_name == 'courses' %}#20c997{% else %}#6c757d{% endif %}; font-size: 0.8rem; transition: color 0.3s;">
+            <i class="bi bi-book fs-4 mb-0"></i>
+            <span>Cursos</span>
+        </a>
+        
+        <div class="position-relative" style="top: -25px;">
+            <div class="rounded-circle d-flex justify-content-center align-items-center text-white shadow" 
+                 data-bs-toggle="modal" data-bs-target="#actionModal"
+                 style="width: 60px; height: 60px; background-color: #20c997; border: 4px solid #fff; font-size: 2rem; cursor: pointer; transition: transform 0.2s;"
+                 onmouseover="this.style.transform='scale(1.1)'" 
+                 onmouseout="this.style.transform='scale(1)'"
+                 id="fabButton">
+                <i class="bi bi-plus"></i>
+            </div>
+        </div>
+
+        <a href="{% url 'forum:forum-list' %}" class="d-flex flex-column align-items-center text-decoration-none nav-icon" 
+           style="color: {% if request.resolver_match.app_name == 'forum' %}#20c997{% else %}#6c757d{% endif %}; font-size: 0.8rem; transition: color 0.3s;">
+            <i class="bi bi-chat-dots fs-4 mb-0"></i>
+            <span>Fórum</span>
+        </a>
+        
+        <a href="{% url 'authorization:profile' %}" class="d-flex flex-column align-items-center text-decoration-none nav-icon" 
+           style="color: {% if request.resolver_match.url_name == 'profile' %}#20c997{% else %}#6c757d{% endif %}; font-size: 0.8rem; transition: color 0.3s;">
+            <i class="bi bi-person fs-4 mb-0"></i>
+            <span>Perfil</span>
+        </a>
+    </div>
+
+    <!-- Action Modal -->
+    <div class="modal fade" id="actionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 text-center" id="modalContent">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title w-100">O que deseja fazer?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pb-4">
+                    <div class="d-flex flex-column gap-3 px-3">
+                        <a href="#" class="d-flex align-items-center justify-content-start p-3 text-decoration-none rounded-3 action-btn w-100" 
+                           style="border: 2px solid #20c997; color: #20c997; transition: all 0.3s; height: 70px;"
+                           onmouseover="this.style.backgroundColor='#20c997'; this.style.color='white';" 
+                           onmouseout="this.style.backgroundColor='transparent'; this.style.color='#20c997';">
+                            <i class="bi bi-camera-fill fs-2 me-3 ms-2"></i>
+                            <span class="fs-5">Tirar Foto</span>
+                        </a>
+                        
+                        <a href="#" class="d-flex align-items-center justify-content-start p-3 text-decoration-none rounded-3 action-btn w-100" 
+                           style="border: 2px solid #20c997; color: #20c997; transition: all 0.3s; height: 70px;"
+                           onmouseover="this.style.backgroundColor='#20c997'; this.style.color='white';" 
+                           onmouseout="this.style.backgroundColor='transparent'; this.style.color='#20c997';">
+                            <i class="bi bi-pencil-square fs-2 me-3 ms-2"></i>
+                            <span class="fs-5">Escrever no Fórum</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div class="modal fade" id="notificationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content rounded-4 border-0" id="notificationModalContent">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title w-100 fw-bold">Notificações</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pb-4 pt-0">
+                    <div class="list-group list-group-flush gap-2">
+                        <!-- Red: Risk/Punishment -->
+                        <a href="#" class="list-group-item list-group-item-action border-start border-5 border-danger rounded shadow-sm p-3">
+                            <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                                <h6 class="mb-0 text-danger fw-bold"><i class="bi bi-exclamation-octagon-fill me-2"></i>Punição Aplicada</h6>
+                                <small class="text-body-secondary" style="font-size: 0.75rem;">3 min</small>
+                            </div>
+                            <p class="mb-1 text-body-secondary small">Você recebeu uma punição por violar as regras da comunidade.</p>
+                        </a>
+
+                        <!-- Yellow: Warning -->
+                        <a href="#" class="list-group-item list-group-item-action border-start border-5 border-warning rounded shadow-sm p-3">
+                            <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                                <h6 class="mb-0 text-warning fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>Aviso de Conduta</h6>
+                                <small class="text-body-secondary" style="font-size: 0.75rem;">1 hora</small>
+                            </div>
+                            <p class="mb-1 text-body-secondary small">Sua postagem recente foi sinalizada como imprópria.</p>
+                        </a>
+
+                        <!-- Green: Reply/Response -->
+                        <a href="#" class="list-group-item list-group-item-action border-start border-5 border-success rounded shadow-sm p-3">
+                            <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                                <h6 class="mb-0 text-success fw-bold"><i class="bi bi-check-circle-fill me-2"></i>Resposta Recebida</h6>
+                                <small class="text-body-secondary" style="font-size: 0.75rem;">2 horas</small>
+                            </div>
+                            <p class="mb-1 text-body-secondary small">O órgão responsável respondeu à sua solicitação.</p>
+                        </a>
+                        
+                        <!-- Green: Reply/Response -->
+                        <a href="#" class="list-group-item list-group-item-action border-start border-5 border-success rounded shadow-sm p-3">
+                            <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                                <h6 class="mb-0 text-success fw-bold"><i class="bi bi-chat-quote-fill me-2"></i>Novo Comentário</h6>
+                                <small class="text-body-secondary" style="font-size: 0.75rem;">5 horas</small>
+                            </div>
+                            <p class="mb-1 text-body-secondary small">Alguém respondeu ao seu comentário no fórum.</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Elements
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.getElementById('appBody');
+        const topBar = document.getElementById('topBar');
+        const bottomBar = document.getElementById('bottomBar');
+        const fabButton = document.getElementById('fabButton');
+        const modalContent = document.getElementById('modalContent');
+        const notificationModalContent = document.getElementById('notificationModalContent');
+        
+        // Apply Dark Mode Styles
+        function applyDarkMode() {
+            // Body
+            body.style.backgroundColor = '#121212';
+            body.style.color = '#e0e0e0';
+            
+            // Top Bar
+            topBar.style.backgroundColor = '#1e1e1e';
+            topBar.style.borderColor = '#333';
+            topBar.classList.remove('shadow-sm');
+            topBar.style.boxShadow = '0 2px 10px rgba(0,0,0,0.5)';
+            
+            // Bottom Bar
+            bottomBar.style.backgroundColor = '#1e1e1e';
+            bottomBar.style.borderColor = '#333';
+            bottomBar.classList.remove('shadow-lg');
+            bottomBar.style.boxShadow = '0 -2px 10px rgba(0,0,0,0.5)';
+            
+            // FAB Button border
+            fabButton.style.borderColor = '#1e1e1e';
+            
+            // Modal
+            if(modalContent) {
+                modalContent.style.backgroundColor = '#1e1e1e';
+                modalContent.style.color = '#fff';
+            }
+            if(notificationModalContent) {
+                notificationModalContent.style.backgroundColor = '#1e1e1e';
+                notificationModalContent.style.color = '#fff';
+                
+                // List items in notification modal
+                const listItems = notificationModalContent.querySelectorAll('.list-group-item');
+                listItems.forEach(item => {
+                    item.style.backgroundColor = '#2c2c2c';
+                    item.style.color = '#e0e0e0';
+                    item.style.borderColor = '#444';
+                    // Update text-muted/text-body-secondary
+                    const mutedTexts = item.querySelectorAll('.text-body-secondary');
+                    mutedTexts.forEach(t => t.classList.replace('text-body-secondary', 'text-light'));
+                });
+                
+                // Close button
+                const closeBtn = notificationModalContent.querySelector('.btn-close');
+                if(closeBtn) closeBtn.style.filter = 'invert(1)';
+            }
+            
+            // Update course gradients
+            updateCourseGradients('dark');
+            
+            // Toggle Icon
+            themeToggle.classList.replace('bi-moon-fill', 'bi-sun-fill');
+            themeToggle.style.transform = 'rotate(180deg)';
+        }
+
+        // Apply Light Mode Styles
+        function applyLightMode() {
+            // Body
+            body.style.backgroundColor = '';
+            body.style.color = '';
+            
+            // Top Bar
+            topBar.style.backgroundColor = '#fff';
+            topBar.style.borderColor = '';
+            topBar.style.boxShadow = '';
+            topBar.classList.add('shadow-sm');
+            
+            // Bottom Bar
+            bottomBar.style.backgroundColor = '#fff';
+            bottomBar.style.borderColor = '';
+            bottomBar.style.boxShadow = '';
+            bottomBar.classList.add('shadow-lg');
+            
+            // FAB Button border
+            fabButton.style.borderColor = '#fff';
+            
+            // Modal
+            if(modalContent) {
+                modalContent.style.backgroundColor = '';
+                modalContent.style.color = '';
+            }
+            if(notificationModalContent) {
+                notificationModalContent.style.backgroundColor = '';
+                notificationModalContent.style.color = '';
+                
+                // List items in notification modal
+                const listItems = notificationModalContent.querySelectorAll('.list-group-item');
+                listItems.forEach(item => {
+                    item.style.backgroundColor = '';
+                    item.style.color = '';
+                    item.style.borderColor = '';
+                    // Update text-muted/text-body-secondary
+                    const mutedTexts = item.querySelectorAll('.text-light');
+                    mutedTexts.forEach(t => t.classList.replace('text-light', 'text-body-secondary'));
+                });
+                
+                // Close button
+                const closeBtn = notificationModalContent.querySelector('.btn-close');
+                if(closeBtn) closeBtn.style.filter = '';
+            }
+            
+            // Update course gradients
+            updateCourseGradients('light');
+            
+            // Toggle Icon
+            themeToggle.classList.replace('bi-sun-fill', 'bi-moon-fill');
+            themeToggle.style.transform = 'rotate(0deg)';
+        }
+        
+        // Update course gradient colors based on theme
+        function updateCourseGradients(theme) {
+            // Update course hero
+            const courseHero = document.querySelector('.course-hero');
+            if(courseHero) {
+                if(theme === 'dark') {
+                    courseHero.style.background = 'linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%)';
+                } else {
+                    courseHero.style.background = 'linear-gradient(135deg, #20c997 0%, #198754 100%)';
+                }
+            }
+            
+            // Update header gradients
+            const headers = document.querySelectorAll('[style*="linear-gradient(135deg, #20c997"]');
+            headers.forEach(header => {
+                if(theme === 'dark') {
+                    header.style.background = 'linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%)';
+                } else {
+                    header.style.background = 'linear-gradient(135deg, #20c997 0%, #198754 100%)';
+                }
+            });
+        }
+
+        // Check local storage
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'dark-mode') {
+            applyDarkMode();
+        }
+
+        // Event Listener
+        themeToggle.addEventListener('click', () => {
+            if (themeToggle.classList.contains('bi-moon-fill')) {
+                applyDarkMode();
+                localStorage.setItem('theme', 'dark-mode');
+            } else {
+                applyLightMode();
+                localStorage.setItem('theme', '');
+            }
+        });
+    </script>
+</body>
+</html>

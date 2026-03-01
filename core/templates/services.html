@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Serviços - ECOÁ{% endblock %}
+
+{% block content %}
+<main class="container py-5 mt-5">
+    
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold mb-3">Nossos Serviços</h1>
+        <p class="lead text-muted mx-auto" style="max-width: 700px;">
+            Tecnologia e comunidade unidas para transformar o meio ambiente. Conheça as ferramentas que oferecemos para você fazer a diferença.
+        </p>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon bg-soft-green text-soft-green rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                        <i class="bi bi-camera-fill fs-3"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Denúncias Ambientais</h5>
+                    <p class="card-text text-muted small">
+                        Registre queixas de poluição ambiental através de fotos. Encaminhamos automaticamente para os órgãos responsáveis do estado.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon bg-soft-green text-soft-green rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                        <i class="bi bi-cpu-fill fs-3"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Análise Inteligente</h5>
+                    <p class="card-text text-muted small">
+                        Nossa IA analisa as fotos enviadas para identificar o tipo de poluição e estimar a gravidade, agilizando o processo.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon bg-soft-green text-soft-green rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                        <i class="bi bi-book-fill fs-3"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Cursos e Educação</h5>
+                    <p class="card-text text-muted small">
+                        Acesse conteúdos educativos e cursos sobre preservação ambiental e práticas sustentáveis para a comunidade.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon bg-soft-green text-soft-green rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                        <i class="bi bi-chat-square-text-fill fs-3"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Fórum Comunitário</h5>
+                    <p class="card-text text-muted small">
+                        Um espaço para debater problemas locais, propor soluções e engajar a comunidade em ações ambientais.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="py-5">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Como funciona a Denúncia?</h2>
+            <p class="text-muted">Da captura da imagem até a ação das autoridades</p>
+        </div>
+
+        <div class="position-relative">
+            <div class="d-none d-md-block position-absolute top-50 start-0 w-100 translate-middle-y" style="height: 2px; background-color: #e9ecef; z-index: -1;"></div>
+
+            <div class="row g-4 text-center">
+                <div class="col-md-3">
+                    <div class="bg-white p-3 d-inline-block rounded-circle shadow-sm mb-3">
+                        <span class="d-flex align-items-center justify-content-center bg-soft-green text-soft-green rounded-circle fw-bold fs-4" style="width: 50px; height: 50px;">1</span>
+                    </div>
+                    <h5 class="fw-bold">Captura</h5>
+                    <p class="text-muted small">Tire uma foto clara do problema ambiental encontrado.</p>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="bg-white p-3 d-inline-block rounded-circle shadow-sm mb-3">
+                        <span class="d-flex align-items-center justify-content-center bg-soft-green text-soft-green rounded-circle fw-bold fs-4" style="width: 50px; height: 50px;">2</span>
+                    </div>
+                    <h5 class="fw-bold">Análise IA</h5>
+                    <p class="text-muted small">Nossa IA processa a imagem para validar e categorizar.</p>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="bg-white p-3 d-inline-block rounded-circle shadow-sm mb-3">
+                        <span class="d-flex align-items-center justify-content-center bg-soft-green text-soft-green rounded-circle fw-bold fs-4" style="width: 50px; height: 50px;">3</span>
+                    </div>
+                    <h5 class="fw-bold">Aprovação</h5>
+                    <p class="text-muted small">Validação técnica da denúncia para garantir precisão.</p>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="bg-white p-3 d-inline-block rounded-circle shadow-sm mb-3">
+                        <span class="d-flex align-items-center justify-content-center bg-soft-green text-soft-green rounded-circle fw-bold fs-4" style="width: 50px; height: 50px;">4</span>
+                    </div>
+                    <h5 class="fw-bold">Registro</h5>
+                    <p class="text-muted small">A queixa é salva e enviada ao órgão competente.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<style>
+    .hover-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+</style>
+{% endblock %}

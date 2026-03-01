@@ -1,0 +1,376 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block header_class %}header-transparent{% endblock %}
+
+{% block title %}ECOÁ - Início{% endblock title %}
+
+{% block content %}
+<style>
+    /* Homepage has a transparent header overlaying the hero section, so we remove the top padding */
+    body {
+        padding-top: 0 !important;
+    }
+</style>
+<main>
+    <!-- Hero Section -->
+    <section id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+            <!-- Slide 1 -->
+            <div class="carousel-item active vh-100">
+                <div class="overlay position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
+                <img src="https://picsum.photos/1920/1080?random=1" class="d-block w-100 h-100" style="object-fit: cover;" alt="Natureza e Sustentabilidade">
+                <div class="carousel-caption d-flex flex-column justify-content-center h-100 pb-5">
+                    <h1 class="display-3 fw-bold text-uppercase mb-3">Bem-vindo ao ECOÁ</h1>
+                    <p class="lead fs-3 mb-4">Sustentabilidade e inovação para um futuro melhor.</p>
+                    <div>
+                        <a href="{% url 'about' %}" class="btn btn-eco-primary btn-lg px-5 rounded-pill shadow-lg border-0">Saiba Mais</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 2 -->
+            <div class="carousel-item vh-100">
+                <div class="overlay position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
+                <img src="https://picsum.photos/1920/1080?random=2" class="d-block w-100 h-100" style="object-fit: cover;" alt="Educação Ambiental">
+                <div class="carousel-caption d-flex flex-column justify-content-center h-100 pb-5">
+                    <h1 class="display-3 fw-bold text-uppercase mb-3">Educação Ambiental</h1>
+                    <p class="lead fs-3 mb-4">Transformando o mundo através do conhecimento.</p>
+                    <div>
+                        <a href="{% url 'services' %}" class="btn btn-light btn-lg px-5 rounded-pill shadow-lg text-soft-green fw-bold">Nossos Projetos</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 3 -->
+            <div class="carousel-item vh-100">
+                <div class="overlay position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
+                <img src="https://picsum.photos/1920/1080?random=3" class="d-block w-100 h-100" style="object-fit: cover;" alt="Comunidade e Ação">
+                <div class="carousel-caption d-flex flex-column justify-content-center h-100 pb-5">
+                    <h1 class="display-3 fw-bold text-uppercase mb-3">Junte-se a Nós</h1>
+                    <p class="lead fs-3 mb-4">Seja um voluntário e faça a diferença na sua comunidade.</p>
+                    <div>
+                        <a href="{% url 'authorization:register' %}" class="btn btn-outline-light btn-lg px-5 rounded-pill shadow-lg">Participe</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Próximo</span>
+        </button>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5 bg-white">
+        <div class="container py-5">
+            <div class="row g-4 text-center">
+                <div class="col-md-4">
+                    <div class="p-4 rounded-3 shadow-sm h-100 border hover-shadow transition-all bg-white">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-soft-green text-soft-green rounded-circle mb-4" style="width: 80px; height: 80px;">
+                            <i class="bi bi-tree fs-1"></i>
+                        </div>
+                        <h3 class="h4 fw-bold mb-3">Sustentabilidade</h3>
+                        <p class="text-muted mb-0">Promovemos práticas que respeitam o meio ambiente e garantem recursos para as futuras gerações.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 rounded-3 shadow-sm h-100 border hover-shadow transition-all">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-4" style="width: 80px; height: 80px;">
+                            <i class="bi bi-book fs-1"></i>
+                        </div>
+                        <h3 class="h4 fw-bold mb-3">Educação</h3>
+                        <p class="text-muted mb-0">Oferecemos cursos e workshops para conscientizar e capacitar a comunidade sobre questões ambientais.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 rounded-3 shadow-sm h-100 border hover-shadow transition-all">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-warning bg-opacity-10 text-warning rounded-circle mb-4" style="width: 80px; height: 80px;">
+                            <i class="bi bi-people fs-1"></i>
+                        </div>
+                        <h3 class="h4 fw-bold mb-3">Comunidade</h3>
+                        <p class="text-muted mb-0">Fomentamos a união e o engajamento social para construir soluções coletivas e impactantes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="py-5 bg-soft-green">
+        <div class="container py-5">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <div class="position-relative">
+                        <img src="{% static 'assets/home-card-image.jpg' %}" class="img-fluid rounded-4 shadow-lg" alt="Sobre o ECOÁ">
+                        <div class="position-absolute bottom-0 end-0 bg-white p-4 rounded-top-4 shadow-sm d-none d-md-block" style="max-width: 200px; margin-right: -20px; margin-bottom: -20px;">
+                            <p class="mb-0 fw-bold text-soft-green text-center">
+                                <span class="display-4 d-block">0+</span>
+                                Usuários Ativos
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <h6 class="text-soft-green fw-bold text-uppercase letter-spacing-2">Sobre Nós</h6>
+                    <h2 class="display-5 fw-bold mb-4">Transformando ideias em ações sustentáveis</h2>
+                    <p class="lead text-muted mb-4">O ECOÁ é mais do que um projeto, é um movimento. Trabalhamos incansavelmente para conectar pessoas, natureza e tecnologia em busca de soluções inovadoras.</p>
+                    <p class="text-muted mb-4">Nossa missão é clara: educar, engajar e transformar. Através de parcerias estratégicas e voluntariado ativo, já impactamos milhares de vidas e continuamos crescendo.</p>
+                    <a href="{% url 'about' %}" class="btn btn-dark btn-lg rounded-pill px-4">Conheça Nossa História</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="py-5 bg-white">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h6 class="text-soft-green fw-bold text-uppercase letter-spacing-2">Nossa Equipe</h6>
+                <h2 class="fw-bold display-6">Quem faz acontecer</h2>
+            </div>
+            
+            <div id="carouselTeam" class="carousel carousel-dark slide" data-bs-ride="carousel">
+                <div class="carousel-inner pb-5">
+                    <!-- Slide 1 -->
+                    <div class="carousel-item active">
+                        <div class="row g-4 justify-content-center">
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm hover-lift transition-all text-center p-3">
+                                    <div class="position-relative mx-auto mt-3" style="width: 120px; height: 120px;">
+                                        <img src="https://ui-avatars.com/api/?name=Ana+Silva&background=0D6EFD&color=fff&size=256" class="rounded-circle w-100 h-100 object-fit-cover shadow-sm" alt="Ana Silva">
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">Ana Silva</h5>
+                                        <p class="text-primary small fw-semibold text-uppercase mb-3">Diretora Geral</p>
+                                        <p class="card-text text-muted small">Liderança visionária com foco em expansão e impacto social sustentável.</p>
+                                        <div class="d-flex justify-content-center gap-3 mt-3">
+                                            <a href="#" class="text-secondary hover-primary"><i class="bi bi-linkedin fs-5"></i></a>
+                                            <a href="#" class="text-secondary hover-danger"><i class="bi bi-envelope fs-5"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm hover-lift transition-all text-center p-3">
+                                    <div class="position-relative mx-auto mt-3" style="width: 120px; height: 120px;">
+                                        <img src="https://ui-avatars.com/api/?name=Carlos+Souza&background=20C997&color=fff&size=256" class="rounded-circle w-100 h-100 object-fit-cover shadow-sm" alt="Carlos Souza">
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">Carlos Souza</h5>
+                                        <p class="text-soft-green small fw-semibold text-uppercase mb-3">Gerente de Projetos</p>
+                                        <p class="card-text text-muted small">Especialista em gestão ágil e execução de iniciativas ambientais complexas.</p>
+                                        <div class="d-flex justify-content-center gap-3 mt-3">
+                                            <a href="#" class="text-secondary hover-primary"><i class="bi bi-linkedin fs-5"></i></a>
+                                            <a href="#" class="text-secondary hover-danger"><i class="bi bi-envelope fs-5"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm hover-lift transition-all text-center p-3">
+                                    <div class="position-relative mx-auto mt-3" style="width: 120px; height: 120px;">
+                                        <img src="https://ui-avatars.com/api/?name=Mariana+O&background=FFC107&color=000&size=256" class="rounded-circle w-100 h-100 object-fit-cover shadow-sm" alt="Mariana Oliveira">
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">Mariana Oliveira</h5>
+                                        <p class="text-warning small fw-semibold text-uppercase mb-3">Especialista em Sustentabilidade</p>
+                                        <p class="card-text text-muted small">Consultora técnica focada em inovação e redução de pegada de carbono.</p>
+                                        <div class="d-flex justify-content-center gap-3 mt-3">
+                                            <a href="#" class="text-secondary hover-primary"><i class="bi bi-linkedin fs-5"></i></a>
+                                            <a href="#" class="text-secondary hover-danger"><i class="bi bi-envelope fs-5"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Slide 2 -->
+                    <div class="carousel-item">
+                        <div class="row g-4 justify-content-center">
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm hover-lift transition-all text-center p-3">
+                                    <div class="position-relative mx-auto mt-3" style="width: 120px; height: 120px;">
+                                        <img src="https://ui-avatars.com/api/?name=Pedro+Santos&background=DC3545&color=fff&size=256" class="rounded-circle w-100 h-100 object-fit-cover shadow-sm" alt="Pedro Santos">
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">Pedro Santos</h5>
+                                        <p class="text-danger small fw-semibold text-uppercase mb-3">Coord. Voluntariado</p>
+                                        <p class="card-text text-muted small">Apaixonado por pessoas e por conectar talentos a causas nobres.</p>
+                                        <div class="d-flex justify-content-center gap-3 mt-3">
+                                            <a href="#" class="text-secondary hover-primary"><i class="bi bi-linkedin fs-5"></i></a>
+                                            <a href="#" class="text-secondary hover-danger"><i class="bi bi-envelope fs-5"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm hover-lift transition-all text-center p-3">
+                                    <div class="position-relative mx-auto mt-3" style="width: 120px; height: 120px;">
+                                        <img src="https://ui-avatars.com/api/?name=Fernanda+L&background=6610F2&color=fff&size=256" class="rounded-circle w-100 h-100 object-fit-cover shadow-sm" alt="Fernanda Lima">
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">Fernanda Lima</h5>
+                                        <p class="text-info small fw-semibold text-uppercase mb-3">Marketing</p>
+                                        <p class="card-text text-muted small">Criativa e estrategista, leva nossa mensagem para o mundo digital.</p>
+                                        <div class="d-flex justify-content-center gap-3 mt-3">
+                                            <a href="#" class="text-secondary hover-primary"><i class="bi bi-linkedin fs-5"></i></a>
+                                            <a href="#" class="text-secondary hover-danger"><i class="bi bi-envelope fs-5"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm hover-lift transition-all text-center p-3">
+                                    <div class="position-relative mx-auto mt-3" style="width: 120px; height: 120px;">
+                                        <img src="https://ui-avatars.com/api/?name=Roberto+A&background=20C997&color=fff&size=256" class="rounded-circle w-100 h-100 object-fit-cover shadow-sm" alt="Roberto Alves">
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">Roberto Alves</h5>
+                                        <p class="text-soft-green small fw-semibold text-uppercase mb-3">Financeiro</p>
+                                        <p class="card-text text-muted small">Garante a saúde financeira e a transparência em todas as operações.</p>
+                                        <div class="d-flex justify-content-center gap-3 mt-3">
+                                            <a href="#" class="text-secondary hover-primary"><i class="bi bi-linkedin fs-5"></i></a>
+                                            <a href="#" class="text-secondary hover-danger"><i class="bi bi-envelope fs-5"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselTeam" data-bs-slide="prev" style="width: 5%;">
+                    <span class="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselTeam" data-bs-slide="next" style="width: 5%;">
+                    <span class="carousel-control-next-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+                    <span class="visually-hidden">Próximo</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-5 bg-soft-green">
+        <div class="container py-5">
+            <h2 class="text-center mb-5 fw-bold display-6">O que dizem sobre nós</h2>
+            <div id="carouselTestimonials" class="carousel carousel-dark slide" data-bs-ride="carousel">
+                <div class="carousel-inner text-center">
+                    <!-- Item 1 -->
+                    <div class="carousel-item active" data-bs-interval="6000">
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <div class="card border-0 shadow-sm p-5 rounded-4">
+                                    <img src="https://ui-avatars.com/api/?name=Joao&background=random&size=128" class="rounded-circle mx-auto mb-4 shadow-sm" width="80" height="80" alt="João">
+                                    <i class="bi bi-quote fs-1 text-soft-green mb-3"></i>
+                                    <p class="lead fst-italic mb-4">"O ECOÁ mudou minha percepção sobre como pequenas ações podem gerar grandes impactos. Aprendi muito e hoje sou um multiplicador dessas ideias."</p>
+                                    <h5 class="fw-bold mb-1">João Silva</h5>
+                                    <span class="text-muted small text-uppercase ls-1">Aluno</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Item 2 -->
+                    <div class="carousel-item" data-bs-interval="6000">
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <div class="card border-0 shadow-sm p-5 rounded-4">
+                                    <img src="https://ui-avatars.com/api/?name=Kaio&background=random&size=128" class="rounded-circle mx-auto mb-4 shadow-sm" width="80" height="80" alt="Kaio">
+                                    <i class="bi bi-quote fs-1 text-success mb-3"></i>
+                                    <p class="lead fst-italic mb-4">"Ser voluntário no ECOÁ é uma experiência enriquecedora. A equipe é fantástica e ver o resultado do nosso trabalho na comunidade é gratificante."</p>
+                                    <h5 class="fw-bold mb-1">Kaio Mendes</h5>
+                                    <span class="text-muted small text-uppercase ls-1">Voluntário</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Item 3 -->
+                    <div class="carousel-item" data-bs-interval="6000">
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <div class="card border-0 shadow-sm p-5 rounded-4">
+                                    <img src="https://ui-avatars.com/api/?name=Maria&background=random&size=128" class="rounded-circle mx-auto mb-4 shadow-sm" width="80" height="80" alt="Maria">
+                                    <i class="bi bi-quote fs-1 text-success mb-3"></i>
+                                    <p class="lead fst-italic mb-4">"A parceria com o ECOÁ trouxe uma nova visão de sustentabilidade para nossa empresa. Juntos estamos construindo um legado verde."</p>
+                                    <h5 class="fw-bold mb-1">Maria Fernandes</h5>
+                                    <span class="text-muted small text-uppercase ls-1">Parceira</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselTestimonials" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon bg-dark bg-opacity-25 rounded-circle p-3" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselTestimonials" data-bs-slide="next">
+                    <span class="carousel-control-next-icon bg-dark bg-opacity-25 rounded-circle p-3" aria-hidden="true"></span>
+                    <span class="visually-hidden">Próximo</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-5 bg-soft-green text-center">
+        <div class="container py-4">
+            <h2 class="display-5 fw-bold mb-3 text-dark-green">Pronto para fazer a diferença?</h2>
+            <p class="lead mb-4 text-dark-green opacity-75">Junte-se a nós e comece a transformar o mundo hoje mesmo.</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'authorization:register' %}" class="btn btn-eco-primary btn-lg rounded-pill px-5 shadow-lg border-0">Quero Participar</a>
+                <a href="{% url 'authorization:login' %}" class="btn btn-outline-success btn-lg rounded-pill px-5">Fazer Login</a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<style>
+    /* Custom Styles for Index */
+    .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
+    }
+
+    .hover-shadow {
+        transition: box-shadow 0.3s ease;
+    }
+    .hover-shadow:hover {
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+    
+    .letter-spacing-2 {
+        letter-spacing: 2px;
+    }
+    
+    .carousel-caption {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding-bottom: 3rem;
+        background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+    }
+
+    /* Fix for carousel images on mobile */
+    @media (max-width: 768px) {
+        .carousel-item {
+            height: 100vh; 
+        }
+        .carousel-item img {
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+</style>
+{% endblock content %}

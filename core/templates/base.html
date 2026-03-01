@@ -1,0 +1,615 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Website{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">    <style>
+        :root {
+            /* Paleta de Cores Suaves e Harmoniosas */
+            --brand-color: #20c997; /* Teal Vibrante (Mantido para consistência) */
+            --brand-color-hover: #198754;
+            
+            /* Novos Tons Suaves */
+            --soft-green-bg: #e6fffa; /* Fundo muito suave (Mint Cream) */
+            --soft-green-text: #0f5132; /* Texto escuro para contraste (Forest Green) */
+            --soft-green-accent: #20c997; /* Acentos visuais */
+            --soft-green-element: #a3cfbb; /* Elementos decorativos suaves */
+            
+            /* Header Height Calculation
+               Logo: 85px
+               Nav padding: 0.5rem top + 0.5rem bottom = 1rem (16px)
+               Header padding: 1rem top + 1rem bottom = 2rem (32px)
+               Total Height: 85 + 16 + 32 = 133px
+               Offset applied: 140px to be safe
+            */
+            --header-height-offset: 140px;
+        }
+
+        body {
+            padding-top: var(--header-height-offset) !important;
+        }
+
+        /* Classes Utilitárias Personalizadas */
+        .bg-soft-green {
+            background-color: var(--soft-green-bg) !important;
+        }
+
+        .text-soft-green {
+            color: var(--soft-green-accent) !important;
+        }
+        
+        .text-dark-green {
+            color: var(--soft-green-text) !important;
+        }
+
+        .icon-soft-green {
+            color: var(--soft-green-accent) !important;
+        }
+
+        /* Botão Chatbot Harmonizado */
+        #chatbot-toggler {
+            background: linear-gradient(135deg, var(--brand-color) 0%, var(--brand-color-hover) 100%);
+            border: none;
+            box-shadow: 0 4px 15px rgba(32, 201, 151, 0.4);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        #chatbot-toggler:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 6px 20px rgba(32, 201, 151, 0.5);
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--brand-color) 0%, var(--brand-color-hover) 100%);
+            color: white;
+            border: none;
+        }
+        
+        /* Botão Primário do Tema */
+        .btn-eco-primary {
+            background-color: var(--brand-color);
+            border-color: var(--brand-color);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-eco-primary:hover {
+            background-color: var(--brand-color-hover);
+            border-color: var(--brand-color-hover);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(32, 201, 151, 0.3);
+        }
+
+        #main-header {
+            transition: all 0.4s ease-in-out;
+            background-color: #212529; /* Default dark background for visibility */
+            padding: 1rem 0;
+        }
+
+        #main-header.header-transparent {
+            background-color: rgba(255, 255, 255, 0) !important;
+            box-shadow: none;
+        }
+
+        #main-header.scrolled {
+            background-color: rgba(33, 37, 41, 0.9) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 0.5rem 0;
+        }
+
+        /* Enhanced Contrast for Navigation Links */
+        .navbar-collapse .navbar-nav .nav-link {
+            position: relative;
+            color: rgba(255, 255, 255, 0.95) !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6); /* Stronger shadow for better contrast */
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .navbar-collapse .navbar-nav .nav-link:hover,
+        .navbar-collapse .navbar-nav .nav-link.active {
+            color: var(--brand-color) !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+            transform: translateY(-2px);
+        }
+        
+        /* Logo Contrast */
+        .navbar-brand img {
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover img {
+            transform: scale(1.05);
+        }
+
+        .navbar-collapse .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--brand-color);
+            transition: width 0.4s ease-in-out;
+        }
+
+        .navbar-collapse .navbar-nav .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Botão Login Aprimorado */
+        .btn-login-enhanced {
+            background: linear-gradient(135deg, var(--brand-color) 0%, var(--brand-color-hover) 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 2rem;
+            color: white !important;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 15px rgba(32, 201, 151, 0.35);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .btn-login-enhanced:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(32, 201, 151, 0.45);
+        }
+
+        .btn-login-enhanced:active {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(32, 201, 151, 0.35);
+        }
+
+        .btn-login-enhanced i {
+            transition: transform 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .btn-login-enhanced:hover i {
+            transform: translateX(4px);
+        }
+
+        /* Efeito de brilho (Shine Effect) */
+        .btn-login-enhanced::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(
+                120deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transform: skewX(-25deg);
+            transition: 0.5s;
+        }
+
+        .btn-login-enhanced:hover::before {
+            left: 125%;
+            transition: 0.7s ease-in-out;
+        }
+
+        .offcanvas-body .nav-link {
+            transition: transform 0.3s ease;
+        }
+        .offcanvas-body .nav-link:hover {
+            transform: translateX(10px);
+        }
+
+        .navbar-toggler {
+            border: none;
+            padding: 0;
+            width: 30px;
+            height: 24px;
+            position: relative;
+            transition: .5s ease-in-out;
+            cursor: pointer;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+
+        .navbar-toggler .toggler-icon {
+            display: block;
+            position: absolute;
+            height: 3px;
+            width: 100%;
+            background: white;
+            border-radius: 1px;
+            opacity: 1;
+            left: 0;
+            transform: rotate(0deg);
+            transition: .25s ease-in-out;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.5); /* Added shadow for contrast */
+        }
+
+        .navbar-toggler .toggler-icon:nth-child(1) {
+            top: 0px;
+        }
+
+        .navbar-toggler .toggler-icon:nth-child(2) {
+            top: 10px;
+        }
+
+        .navbar-toggler .toggler-icon:nth-child(3) {
+            top: 20px;
+        }
+
+        
+        .navbar-toggler:not(.collapsed) .toggler-icon:nth-child(1) {
+            top: 10px;
+            transform: rotate(135deg);
+        }
+
+        .navbar-toggler:not(.collapsed) .toggler-icon:nth-child(2) {
+            opacity: 0;
+            left: -60px;
+        }
+
+        .navbar-toggler:not(.collapsed) .toggler-icon:nth-child(3) {
+            top: 10px;
+            transform: rotate(-135deg);
+        }
+
+        @media (max-width: 767.98px) {
+            .offcanvas {
+                width: 50% !important;
+            }
+        }
+        
+        .hover-opacity {
+            transition: opacity 0.2s ease;
+            opacity: 0.8;
+        }
+        .hover-opacity:hover {
+            opacity: 1;
+        }
+
+        /* Chatbot Animations */
+        #chatbot-toggler {
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #chatbot-toggler:hover {
+            transform: scale(1.1);
+        }
+        #chatbot-toggler.rotate-icon {
+            transform: rotate(90deg);
+        }
+        #chatbot-toggler.rotate-icon:hover {
+            transform: rotate(90deg) scale(1.1);
+        }
+        #chatbot-window {
+            animation: slideIn 0.3s ease-out;
+        }
+        #chatbot-send:hover {
+            transform: scale(1.1);
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="m-0 p-0" style="font-family: 'Ubuntu', sans-serif;">
+    
+<header class="fixed-top {% block header_class %}{% endblock %} bg-transparent" id="main-header">
+    <nav class="navbar navbar-expand-md navbar-dark bg-transparent py-2">
+        <div class="container">
+
+            <!-- Logo -->
+            <a class="navbar-brand fw-bold" href="#">
+                <img src="{% static 'assets/logo.png' %}" width="85" height="85" class="me-2">
+            </a>
+
+            <!-- Hamburger -->
+            <button class="navbar-toggler border-0" type="button"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#offcanvasNavbar"
+                aria-controls="offcanvasNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Menu Desktop -->
+            <div class="collapse navbar-collapse d-none d-md-flex justify-content-center">
+                <ul class="navbar-nav gap-4">
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold" href="{% url 'home' %}">Início</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold" href="{% url 'about' %}">Sobre</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold" href="{% url 'services' %}">Serviços</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold" href="{% url 'faq' %}">FAQ</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Botão Login Desktop -->
+            <div class="d-none d-md-block btn-login-container">
+                <a href="{% url 'authorization:login' %}" class="btn-login-enhanced text-decoration-none">
+                    <span>Login</span>
+                    <i class="bi bi-box-arrow-in-right"></i>
+                </a>
+            </div>
+
+        </div>
+    </nav>
+</header>
+
+
+<!-- SIDEBAR MOBILE -->
+<div class="offcanvas offcanvas-start text-bg-dark"
+     tabindex="-1"
+     id="offcanvasNavbar"
+     aria-labelledby="offcanvasNavbarLabel">
+
+    <div class="offcanvas-header border-bottom border-secondary">
+        <h5 class="offcanvas-title fw-bold" id="offcanvasNavbarLabel">
+            Menu
+        </h5>
+        <button type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="offcanvas">
+        </button>
+    </div>
+
+    <div class="offcanvas-body d-flex flex-column">
+
+        <ul class="navbar-nav gap-3">
+
+            <li class="nav-item">
+                <a class="nav-link fs-5 fw-semibold" href="{% url 'home' %}">Início</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link fs-5 fw-semibold" href="{% url 'about' %}">Sobre</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link fs-5 fw-semibold" href="{% url 'services' %}">Serviços</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link fs-5 fw-semibold" href="{% url 'faq' %}">FAQ</a>
+            </li>
+
+        </ul>
+
+        <!-- Botão Login -->
+        <div class="mt-auto pt-4">
+            <a href="{% url 'authorization:login' %}" class="btn btn-light w-100 fw-semibold">
+                Login
+            </a>
+        </div>
+
+    </div>
+</div>
+
+    {% block content %}
+    <section>
+        <i class="bi bi-people-fill"></i>
+    </section>
+    {% endblock %}
+    
+    <footer class="bg-black text-white pt-5 pb-4">
+        <div class="container">
+            <div class="row g-4 justify-content-center">
+                <div class="col-12 col-md-6 col-lg-3">
+                    <h5 class="fw-bold mb-3 text-uppercase">Páginas Iniciais</h5>
+                    <ul class="list-unstyled d-flex flex-column gap-2">
+                        <li><a href="{% url 'home' %}" class="text-white text-decoration-none hover-opacity">Início</a></li>
+                        <li><a href="{% url 'about' %}" class="text-white text-decoration-none hover-opacity">Sobre</a></li>
+                        <li><a href="{% url 'services' %}" class="text-white text-decoration-none hover-opacity">Serviços</a></li>
+                        <li><a href="{% url 'faq' %}" class="text-white text-decoration-none hover-opacity">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <h5 class="fw-bold mb-3 text-uppercase">Políticas de Uso</h5>
+                    <ul class="list-unstyled d-flex flex-column gap-2">
+                        <li><a href="{% url 'terms_of_use' %}" class="text-white text-decoration-none hover-opacity">Termos de Uso</a></li>
+                        <li><a href="{% url 'privacy_policy' %}" class="text-white text-decoration-none hover-opacity">Política de Privacidade</a></li>
+                    </ul>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <h5 class="fw-bold mb-3 text-uppercase">Conheça nossos cursos</h5>
+                    <ul class="list-unstyled d-flex flex-column gap-2">
+                        <li><a href="#" class="text-white text-decoration-none hover-opacity">Educação Ambiental</a></li>
+                        <li><a href="#" class="text-white text-decoration-none hover-opacity">Desenvolvimento Sustentável</a></li>
+                    </ul>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <h5 class="fw-bold mb-3 text-uppercase">Redes Sociais</h5>
+                    <ul class="list-unstyled d-flex flex-column gap-2">
+                        <li>
+                            <a href="#" class="text-white text-decoration-none hover-opacity d-flex align-items-center gap-2">
+                                <i class="bi bi-instagram"></i> Instagram
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-white text-decoration-none hover-opacity d-flex align-items-center gap-2">
+                                <i class="bi bi-whatsapp"></i> WhatsApp
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <hr class="my-4 border-secondary">
+            
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="mb-0 small text-white-50">&copy; 2026 ECOÁ. Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chatbot Button -->
+    <button id="chatbot-toggler" class="rounded-circle d-flex align-items-center justify-content-center text-white" style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; z-index: 1050; transition: transform 0.3s;">
+        <i class="bi bi-chat-dots-fill fs-3"></i>
+    </button>
+
+    <!-- Chatbot Window -->
+    <div id="chatbot-window" class="card shadow-lg" style="display: none; position: fixed; bottom: 90px; right: 20px; width: 350px; max-width: 90%; z-index: 1050; height: 450px; border-radius: 15px; overflow: hidden; border: none;">
+        <div class="card-header card-header-custom d-flex justify-content-between align-items-center py-3">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-robot fs-4"></i>
+                <h5 class="mb-0 fs-6 fw-bold">Assistente Virtual</h5>
+            </div>
+            <button type="button" class="btn-close btn-close-white" id="chatbot-close"></button>
+        </div>
+        <div class="card-body overflow-auto" id="chatbot-messages" style="background-color: var(--soft-green-bg);">
+            <!-- Example Messages -->
+            <div class="d-flex flex-column gap-3">
+                <div class="align-self-start bg-white p-3 rounded-4 shadow-sm border border-light" style="max-width: 85%; border-bottom-left-radius: 0 !important;">
+                    <p class="mb-0 text-success small fw-bold">EcoBot</p>
+                    <p class="mb-0 text-dark">Olá! Bem-vindo ao ECOÁ. Como posso ajudar você a transformar o mundo hoje?</p>
+                </div>
+                <!-- User message example (visually hidden but ready for structure)
+                <div class="align-self-end bg-success text-white p-3 rounded-4 shadow-sm" style="max-width: 85%; border-bottom-right-radius: 0 !important;">
+                    <p class="mb-0">Gostaria de saber mais sobre os cursos.</p>
+                </div>
+                -->
+            </div>
+        </div>
+        <div class="card-footer bg-white p-2 border-top-0">
+            <div class="d-flex align-items-center gap-2 bg-light rounded-pill px-3 py-2 border shadow-sm">
+                <input type="text" class="form-control border-0 bg-transparent shadow-none p-0" placeholder="Digite sua mensagem..." id="chatbot-input" style="font-size: 0.95rem;">
+                <button class="btn btn-sm text-soft-green p-0 border-0" type="button" id="chatbot-send" style="transition: transform 0.2s;">
+                    <i class="bi bi-send-fill fs-5"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var header = document.getElementById("main-header");
+
+            function maskCPF(value) {
+                return value
+                    .replace(/\D/g, "")
+                    .replace(/(\d{3})(\d)/, "$1.$2")
+                    .replace(/(\d{3})(\d)/, "$1.$2")
+                    .replace(/(\d{3})(\d{1,2})/, "$1-$2")
+                    .replace(/(-\d{2})\d+?$/, "$1");
+            }
+
+            function maskCEP(value) {
+                return value
+                    .replace(/\D/g, "")
+                    .replace(/(\d{5})(\d)/, "$1-$2")
+                    .replace(/(-\d{3})\d+?$/, "$1");
+            }
+
+            var cpfInputs = document.querySelectorAll('input[name="cpf"]');
+            cpfInputs.forEach(function(input) {
+                input.addEventListener("input", function(e) {
+                    e.target.value = maskCPF(e.target.value);
+                });
+            });
+
+            var cepInputs = document.querySelectorAll('input[name="cep"]');
+            cepInputs.forEach(function(input) {
+                input.addEventListener("input", function(e) {
+                    e.target.value = maskCEP(e.target.value);
+                });
+            });
+
+            function updateHeader() {
+                if (header) {
+                    if (window.scrollY > 50) {
+                        header.classList.add("scrolled");
+                    } else {
+                        header.classList.remove("scrolled");
+                    }
+                }
+            }
+
+            // Chatbot Logic
+            const chatbotToggler = document.getElementById('chatbot-toggler');
+            const chatbotWindow = document.getElementById('chatbot-window');
+            const chatbotClose = document.getElementById('chatbot-close');
+            const chatbotIcon = chatbotToggler.querySelector('i');
+
+            function toggleChatbot() {
+                if (chatbotWindow.style.display === 'none' || chatbotWindow.style.display === '') {
+                    chatbotWindow.style.display = 'flex';
+                    chatbotWindow.classList.add('flex-column');
+                    chatbotIcon.classList.remove('bi-chat-dots-fill');
+                    chatbotIcon.classList.add('bi-x-lg');
+                    chatbotToggler.classList.add('rotate-icon');
+                } else {
+                    chatbotWindow.style.display = 'none';
+                    chatbotIcon.classList.remove('bi-x-lg');
+                    chatbotIcon.classList.add('bi-chat-dots-fill');
+                    chatbotToggler.classList.remove('rotate-icon');
+                }
+            }
+
+            if (chatbotToggler) {
+                chatbotToggler.addEventListener('click', toggleChatbot);
+            }
+
+            if (chatbotClose) {
+                chatbotClose.addEventListener('click', function() {
+                    chatbotWindow.style.display = 'none';
+                    chatbotIcon.classList.remove('bi-x-lg');
+                    chatbotIcon.classList.add('bi-chat-dots-fill');
+                });
+            }
+
+            // Check on scroll
+            window.addEventListener("scroll", updateHeader);
+            
+            // Check on load
+            updateHeader();
+
+            // Hamburger Animation Sync
+            var offcanvasElement = document.getElementById('offcanvasNavbar');
+            var offcanvasBtn = document.querySelector('.navbar-toggler');
+
+            if (offcanvasElement && offcanvasBtn) {
+                offcanvasElement.addEventListener('show.bs.offcanvas', function () {
+                    offcanvasBtn.classList.remove('collapsed');
+                });
+
+                offcanvasElement.addEventListener('hide.bs.offcanvas', function () {
+                    offcanvasBtn.classList.add('collapsed');
+                });
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

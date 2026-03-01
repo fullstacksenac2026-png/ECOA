@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}FAQ - Perguntas Frequentes{% endblock %}
+
+{% block content %}
+    <main class="container py-5 mt-5">
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold mb-3">Perguntas Frequentes</h1>
+            <p class="lead text-muted mx-auto" style="max-width: 700px;">
+                Tire suas dúvidas sobre nossos serviços, denúncias e como você pode contribuir para um meio ambiente mais limpo.
+            </p>
+        </div>
+
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8">
+                <div class="accordion custom-accordion" id="faqAccordion">
+                    
+                    <div class="accordion-item border-0 shadow-sm mb-3 rounded overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button fw-bold py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                <i class="bi bi-question-circle-fill me-2 text-soft-green"></i>
+                                Como faço para registrar uma denúncia?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-muted py-3">
+                                Para registrar uma denúncia, acesse a página de Serviços, clique na opção "Denúncias Ambientais" e siga o passo a passo. Você precisará tirar uma foto do problema e nossa IA ajudará na classificação antes do envio para o órgão responsável.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-3 rounded overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                <i class="bi bi-robot me-2 text-soft-green"></i>
+                                Como funciona a análise por Inteligência Artificial?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-muted py-3">
+                                Nossa IA analisa a imagem enviada para identificar padrões de poluição (como lixo em rios, queimadas, etc.). Ela categoriza a gravidade e o tipo de infração, agilizando a triagem e garantindo que as denúncias mais urgentes sejam priorizadas.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-3 rounded overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                <i class="bi bi-shield-check me-2 text-soft-green"></i>
+                                Minha identidade será preservada ao fazer uma denúncia?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-muted py-3">
+                                Sim, a segurança e privacidade dos nossos usuários são prioridade. Você pode optar por realizar denúncias anônimas. Seus dados pessoais não serão compartilhados publicamente em nenhuma circunstância.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-3 rounded overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                <i class="bi bi-people-fill me-2 text-soft-green"></i>
+                                Quem pode participar do fórum comunitário?
+                            </button>
+                        </h2>
+                        <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-muted py-3">
+                                O fórum é aberto a todos os cidadãos interessados em discutir questões ambientais locais. Basta criar uma conta gratuita na plataforma para começar a interagir, propor soluções e organizar ações coletivas.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center py-5">
+            <h3 class="fw-bold mb-3">Ainda tem dúvidas?</h3>
+            <p class="text-muted mb-4">Entre em contato com nossa equipe de suporte.</p>
+            <a href="#" class="btn btn-eco-primary px-5 py-3 rounded-pill fw-bold shadow-sm hover-scale border-0">
+                <i class="bi bi-envelope-fill me-2"></i> Fale Conosco
+            </a>
+        </div>
+
+    </main>
+
+    <style>
+        .custom-accordion .accordion-button:not(.collapsed) {
+            background-color: #f8f9fa;
+            color: #000;
+            box-shadow: none;
+        }
+        .custom-accordion .accordion-button:focus {
+            box-shadow: none;
+            border-color: rgba(0,0,0,.125);
+        }
+        .custom-accordion .accordion-button::after {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+        }
+        .hover-scale {
+            transition: transform 0.2s ease;
+        }
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+    </style>
+{% endblock %}

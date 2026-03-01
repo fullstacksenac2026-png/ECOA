@@ -1,0 +1,47 @@
+{% extends 'app-base.html' %}
+
+{% block title %}<title>Cursos por Categoria</title>{% endblock %}
+
+{% block content %}
+<style>
+    .category-header {
+        background: linear-gradient(135deg, #20c997 0%, #198754 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    body.dark-mode .category-header {
+        background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
+    }
+    
+    .courses-by-category-title {
+        color: white;
+        margin-bottom: 0.5rem;
+    }
+</style>
+<main class="courses-by-category-container">
+    <div class="category-header">
+        <h1 class="courses-by-category-title">Cursos por Categoria</h1>
+    </div>
+    <div class="courses-grid">
+        {% for course in courses %}
+            <div class="course-card">
+                {% if course.image %}
+                    <img src="{{ course.image.url }}" alt="{{ course.name }}" class="course-thumbnail">
+                {% else %}
+                    <div class="course-thumbnail-placeholder">
+                        <i class="bi bi-image" style="font-size: 3rem; color: white; opacity: 0.5;"></i>
+                    </div>
+                {% endif %}
+                <div class="course-card-content">
+                    <h2 class="course-card-title">{{ course.name }}</h2>
+                    <p class="course-card-category">{{ course.category.name }}</p>
+                    <a href="{% url 'courses:course-detail' course.id %}" class="btn btn-primary">Ver Detalhes</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</main>
+{% endblock %}

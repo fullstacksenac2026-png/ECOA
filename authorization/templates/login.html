@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<main class="container py-5 mt-5 pt-5 d-flex flex-column align-items-center justify-content-center min-vh-75">
+    <div class="col-lg-5 col-md-8 col-sm-10">
+        <div class="card shadow-lg border-0 rounded-4 card-custom-green">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <div class="bg-custom-green text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-person-fill fs-2"></i>
+                    </div>
+                    <h2 class="fw-bold text-secondary">Bem-vindo de volta!</h2>
+                    <p class="text-muted">Por favor, faça login na sua conta.</p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if message %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+
+                    <div class="form-floating mb-3">
+                        {{ login_form.cpf }}
+                        {{ login_form.cpf.label_tag }}
+                    </div>
+
+                    <div class="form-floating mb-4">
+                        {{ login_form.password }}
+                        {{ login_form.password.label_tag}}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        {{ login_form.remember_me.label_tag }}
+                        {{ login_form.remember_me }}
+                        <a href="{% url 'authorization:password-reset' %}" class="text-decoration-none text-custom-green small fw-semibold">Esqueceu a senha?</a>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-login-enhanced w-100 justify-content-center">
+                            <span>Entrar</span>
+                            <i class="bi bi-box-arrow-in-right"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer bg-light border-0 py-3 text-center rounded-bottom-4">
+                <p class="mb-0 text-muted small">Não tem uma conta? <a href="{% url 'authorization:register' %}" class="text-decoration-none text-custom-green fw-bold">Cadastre-se</a></p>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
