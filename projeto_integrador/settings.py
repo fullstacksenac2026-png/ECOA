@@ -20,12 +20,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-eg7$e41o7=(byz!50d&u5nv@a4iacqg63z)j6tt!a&a0r8o54h'
+# pulled from environment for deploy platforms like Render
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-eg7$e41o7=(byz!50d&u5nv@a4iacqg63z)j6tt!a&a0r8o54h')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# configure via environment variable, treat 'False' string as False
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') != 'False'
 
-ALLOWED_HOSTS = []
+# allow hosts from comma-separated env var, default localhost
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost').split(',')
 
 
 # Application definition
@@ -47,6 +50,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # enable Whitenoise to serve static files in production
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -78,11 +83,14 @@ WSGI_APPLICATION = 'projeto_integrador.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# default local sqlite; override with DATABASE_URL env var on Render or other hosts
+import dj_database_url
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+        ssl_require=not DEBUG,
+    )
 }
 
 #cache
@@ -134,9 +142,15 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# path where collectstatic will collect files for production
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
+
+# whitenoise storage compresses and caches files
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
