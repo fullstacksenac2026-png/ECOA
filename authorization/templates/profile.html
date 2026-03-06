@@ -599,7 +599,7 @@
                     <label>Telefone</label>
                     <p>
                         {% if user.phones.all.0 %}
-                            (+{{ user.phones.all.0.ddi }}) {{ user.phones.all.0.ddd }} {{ user.phones.all.0.phone_number }}
+                            ({{ user.phones.all.0.ddi }}) {{ user.phones.all.0.ddd }} {{ user.phones.all.0.phone_number }}
                         {% else %}
                             <span class="text-muted">Não informado</span>
                         {% endif %}

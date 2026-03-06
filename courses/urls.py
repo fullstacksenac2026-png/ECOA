@@ -3,7 +3,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('courses/', views.list_courses_and_categories, name='list-courses-and-categories'),
+    path('', views.list_courses_and_categories, name='list-courses-and-categories'),
     # view to show courses filtered by category
     path('courses/category/<int:category_id>/', views.list_courses_by_category, name='list-courses-by-category'),
     # course detail now only requires course_id
@@ -16,4 +16,9 @@ urlpatterns = [
     path('quiz/<int:quiz_id>/', views.course_quiz, name='course-quiz'),
     path('quiz/<int:quiz_id>/results/', views.quiz_results, name='quiz-results'),
     path('quiz/<int:quiz_id>/results/<int:result_id>/', views.quiz_results, name='quiz-results-detail'),
+    # payment/checkout
+    path('courses/<int:course_id>/checkout/', views.course_checkout, name='course-checkout'),
+    path('payment/success/', views.payment_success, name='payment_success'),
+    path('payment/failure/', views.payment_failure, name='payment_failure'),
+    path('payment/pending/', views.payment_pending, name='payment_pending'),
 ]

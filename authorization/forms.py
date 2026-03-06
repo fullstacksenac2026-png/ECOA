@@ -4,8 +4,6 @@ import re
 from django import forms
 from .models import User, Phone, Address, GENDER_CHOICES, SEXUALITY_CHOICES
 from django.core.validators import RegexValidator
-from br_utils.forms import BRCPFField, BRPostalCodeField
-
 
 
 # login does not create or modify a User instance, so use simple Form
@@ -69,7 +67,7 @@ class UserLoginForm(forms.Form):
 
 class UserRegisterForm(forms.ModelForm):
     
-    cpf = BRCPFField(
+    cpf = forms.CharField(
         label='CPF',
         widget=forms.TextInput(attrs={
             'class': 'form-control',
@@ -199,11 +197,11 @@ class PhoneRegisterForm(forms.ModelForm):
 
 
 class AddressRegisterForm(forms.ModelForm):
-    cep = BRPostalCodeField(
+    cep = forms.CharField(
         label='CEP',
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': '00000-000'
+            'placeholder': '000.000.000-00'
         })
     )
 
@@ -299,10 +297,8 @@ class PasswordResetForm(forms.ModelForm):
         return cleaned_data
 
 class UserUpdateForm(forms.ModelForm):
-    cpf = BRCPFField(
+    cpf = forms.CharField(
         label='CPF',
-        disabled=True,
-        required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': '000.000.000-00'
@@ -322,7 +318,7 @@ class UserUpdateForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'password', 'cpf', 'birth_date', 'gender', 'sexuality']
+        fields = ['first_name', 'last_name', 'email', 'password', 'birth_date', 'gender', 'sexuality']
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'},),
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sobrenome'},),

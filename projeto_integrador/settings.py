@@ -27,8 +27,8 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-eg7$e41o7=(byz
 # configure via environment variable, treat 'False' string as False
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') != 'False'
 
-# allow hosts from comma-separated env var, default localhost
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost').split(',')
+# allow hosts from comma-separated env var, default localhost and local IP
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'courses',
     'forum',
     'authorization',
-    'br_utils',
+    'payments',
+    'notifications',
 ]
 
 MIDDLEWARE = [
@@ -72,6 +73,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.notifications',
             ],
         },
     },
@@ -121,9 +123,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'authorization.User'
 
-Login_url = 'login'
-Login_redirect_url = 'profile'
-Logout_redirect_url = 'login'
+# authentication redirects (namespaced URLs)
+LOGIN_URL = 'authorization:login'
+LOGIN_REDIRECT_URL = 'authorization:profile'
+LOGOUT_REDIRECT_URL = 'authorization:login'
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
@@ -136,6 +139,11 @@ USE_I18N = True
 
 USE_TZ = True
 
+
+# Mercado Pago configuration (public key used in frontend, access token used server-side)
+# these should be provided via environment variables for security
+MERCADO_PAGO_PUBLIC_KEY = os.environ.get('MERCADO_PAGO_PUBLIC_KEY', '')
+MERCADO_PAGO_ACCESS_TOKEN = os.environ.get('MERCADO_PAGO_ACCESS_TOKEN', '')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/

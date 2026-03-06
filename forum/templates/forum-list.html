@@ -1,7 +1,122 @@
 {% extends 'app-base.html' %}
+{% load static %}
 
-{% block title %}<title>Fórum</title>{% endblock %}
+{% block title %}
+  Fórum
+{% endblock %}
 
 {% block content %}
-    <h1>Fórum</h1>
+  <main class="container py-5 mt-5">
+    <div class="row mb-5">
+      <div class="col-lg-12">
+        <div class="text-center mb-5">
+          <div class="bg-custom-green text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+            <i class="bi bi-chat-dots-fill fs-2"></i>
+          </div>
+          <h1 class="fw-bold text-secondary mb-2">Fórum de Discussão</h1>
+          <p class="text-muted">Compartilhe suas ideias e tire dúvidas com a comunidade</p>
+        </div>
+
+        <div class="card shadow-lg border-0 rounded-4 mb-5">
+          <div class="card-body p-4">
+            <form method="post" class="row g-3">
+              {% csrf_token %}
+              <div class="col-md-10">
+                <div class="input-group">
+                  <input type="search" name="search_post" class="form-control form-control-lg rounded-start-4" placeholder="Pesquisar posts no fórum..." />
+                </div>
+              </div>
+              <div class="col-md-2">
+                <button type="submit" class="btn btn-login-enhanced w-100 h-100">
+                  <i class="bi bi-search"></i> Pesquisar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      {% for post in page_obj_post %}
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card shadow-lg border-0 rounded-4 h-100 overflow-hidden">
+            <div class="position-relative" style="height: 200px; overflow: hidden;">
+              {% if post.image %}
+                <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-100 h-100 object-fit-cover" />
+              {% else %}
+                <div class="bg-light w-100 h-100 d-flex align-items-center justify-content-center">
+                  <i class="bi bi-image" style="font-size:3rem;color:#ccc;"></i>
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title fw-bold text-secondary mb-2">{{ post.title }}</h5>
+
+              <p class="card-text text-muted flex-grow-1" style="max-height: 100px; overflow: hidden;">
+                {{ post.content|truncatewords:20 }}
+              </p>
+
+              <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                <span class="small text-muted">
+                  <i class="bi bi-calendar3"></i> {{ post.created_at|date:"d/m/Y" }}
+                </span>
+                <a href="{% url 'forum-post-detail' post.id %}" class="btn btn-sm btn-outline-custom-green rounded-3">Ver mais</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12">
+          <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-body p-5 text-center">
+              <i class="bi bi-chat-dots" style="font-size:3rem;color:#ccc;margin-bottom:1rem;"></i>
+              <h3 class="text-secondary fw-bold">Nenhum post no fórum</h3>
+              <p class="text-muted">Seja o primeiro a iniciar uma discussão!</p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- PAGINAÇÃO -->
+    {% if page_obj_post.paginator.num_pages > 1 %}
+      <nav aria-label="Paginação" class="mt-5">
+        <ul class="pagination justify-content-center">
+          {% if page_obj_post.has_previous %}
+            <li class="page-item">
+              <a class="page-link rounded-3" href="?page=1">
+                <i class="bi bi-chevron-double-left"></i> Primeira
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link rounded-3" href="?page={{ page_obj_post.previous_page_number }}">
+                <i class="bi bi-chevron-left"></i> Anterior
+              </a>
+            </li>
+          {% endif %}
+
+          <li class="page-item active">
+            <span class="page-link rounded-3 bg-custom-green border-custom-green">
+              Página {{ page_obj_post.number }} de {{ page_obj_post.paginator.num_pages }}
+            </span>
+          </li>
+
+          {% if page_obj_post.has_next %}
+            <li class="page-item">
+              <a class="page-link rounded-3" href="?page={{ page_obj_post.next_page_number }}">
+                Próxima <i class="bi bi-chevron-right"></i>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link rounded-3" href="?page={{ page_obj_post.paginator.num_pages }}">
+                Última <i class="bi bi-chevron-double-right"></i>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% endif %}
+  </main>
 {% endblock %}

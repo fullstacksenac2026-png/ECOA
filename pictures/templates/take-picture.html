@@ -1,0 +1,178 @@
+{% extends "app-base.html" %}
+
+{% block title %}Captura de Foto{% endblock %}
+
+{% block content %}
+<main class="container-fluid">
+    <section class="py-4">
+        <h1 class="text-center mb-4">Captura de Foto</h1>
+
+        <form method="POST" enctype="multipart/form-data" class="d-flex flex-column align-items-center">
+            {% csrf_token %}
+
+            <!-- Camera Section -->
+            <div class="camera-container mb-4 position-relative">
+                <video id="camera" autoplay class="img-fluid rounded shadow" style="max-width: 100%; height: auto;"></video>
+                <canvas id="canvas" style="display: none;"></canvas>
+
+                <!-- Capture Button -->
+                <button type="button" onclick="takePicture()" class="btn btn-primary position-absolute bottom-0 start-50 translate-middle-x mb-3 rounded-circle" style="width: 60px; height: 60px; z-index: 10;">
+                    <i class="bi bi-camera-fill fs-4"></i>
+                </button>
+            </div>
+
+            <!-- Preview Image (if exists) -->
+            {% if picture.image %}
+            <div class="mb-4">
+                <img src="{{ picture.image.url }}" alt="Imagem capturada" class="img-fluid rounded shadow" style="max-width: 100%; height: auto;">
+            </div>
+            {% endif %}
+
+            <!-- AI Result -->
+            {% if resultado_ia %}
+            <div class="mb-4 w-100">
+                <h3 class="text-center">Resultado da IA</h3>
+                <pre class="bg-light p-3 rounded border">{{ resultado_ia }}</pre>
+            </div>
+            {% endif %}
+
+            <!-- Hidden Inputs -->
+            <input type="hidden" name="image" id="image_input">
+            <input type="hidden" name="latitude" id="latitude">
+            <input type="hidden" name="longitude" id="longitude">
+
+            <!-- Map -->
+            {% if geolocation %}
+            <div id="map" style="height: 300px; width: 100%;" class="rounded shadow">
+
+            </div>
+            {% endif %}
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-success btn-lg w-100" style="max-width: 300px;">Enviar</button>
+        </form>
+    </section>
+</main>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+<script>
+    const video = document.getElementById('camera');
+    const canvas = document.getElementById('canvas');
+    const imageInput = document.getElementById('image_input');
+
+    // Request camera access
+    async function startCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: 'environment', // Use back camera on mobile
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            });
+            video.srcObject = stream;
+        } catch (error) {
+            console.error('Error accessing camera:', error);
+            alert('Erro ao acessar a câmera. Verifique as permissões.');
+        }
+    }
+
+    // Get geolocation
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    document.getElementById('latitude').value = position.coords.latitude;
+                    document.getElementById('longitude').value = position.coords.longitude;
+                },
+                function(error) {
+                    console.error('Error getting location:', error);
+                    alert('Não foi possível obter localização. Verifique as permissões.');
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 300000
+                }
+            );
+        } else {
+            alert('Geolocalização não é suportada neste navegador.');
+        }
+    }
+
+    // Take picture function
+    function takePicture() {
+        const context = canvas.getContext('2d');
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        context.drawImage(video, 0, 0);
+
+        const imageBase64 = canvas.toDataURL('image/png');
+        imageInput.value = imageBase64;
+
+        // Optional: Show preview
+        const preview = document.createElement('img');
+        preview.src = imageBase64;
+        preview.className = 'img-fluid rounded shadow mt-3';
+        preview.style.maxWidth = '100%';
+        preview.style.height = 'auto';
+
+        // Replace or add preview
+        const existingPreview = document.querySelector('.preview-image');
+        if (existingPreview) {
+            existingPreview.replaceWith(preview);
+        } else {
+            preview.classList.add('preview-image');
+            video.parentNode.insertBefore(preview, video.nextSibling);
+        }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        startCamera();
+        getLocation();
+    });
+</script>
+
+<script>
+
+const latitude = {{ geolocation.latitude|default:0 }};
+const longitude = {{ geolocation.longitude|default:0 }};
+
+const map = L.map('map').setView([latitude, longitude], 15);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+}).addTo(map);
+
+L.marker([latitude, longitude])
+    .addTo(map)
+    .bindPopup("Local da captura")
+    .openPopup();
+
+</script>
+
+<style>
+    .camera-container {
+        position: relative;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    @media (max-width: 576px) {
+        .camera-container {
+            max-width: 100%;
+        }
+
+        video {
+            width: 100% !important;
+            height: auto !important;
+        }
+    }
+</style>
+{% endblock %}

@@ -3,5 +3,326 @@
 <title>{% block title %}Histórico de Imagens{% endblock %}</title>
 
 {% block content %}
-    <h1>Histórico de Imagens</h1>
+    <style>
+        /* Header com Gradiente da Marca */
+        .pictures-header {
+            background: linear-gradient(135deg, #20c997 0%, #198754 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(32, 201, 151, 0.2);
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .pictures-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .pictures-header p {
+            font-size: 0.95rem;
+            opacity: 0.95;
+            margin: 0;
+        }
+
+        /* Grid de Imagens */
+        .pictures-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Card de Imagem */
+        .picture-card {
+            position: relative;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            height: 200px;
+        }
+
+        .picture-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 24px rgba(32, 201, 151, 0.25);
+        }
+
+        .picture-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .picture-card:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Overlay com Informações */
+        .picture-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+            padding: 1rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .picture-card:hover .picture-overlay {
+            transform: translateY(0);
+        }
+
+        .picture-overlay-title {
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+            line-height: 1.3;
+        }
+
+        .picture-overlay-content {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.75rem;
+            line-height: 1.2;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Placeholder com Ícone */
+        .picture-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e6fffa 0%, #d1f0ea 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .picture-placeholder::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 30%, rgba(32, 201, 151, 0.1), transparent);
+        }
+
+        .picture-placeholder i {
+            font-size: 3rem;
+            color: #20c997;
+            opacity: 0.4;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Estado Vazio */
+        .empty-state {
+            background: #f8f9fa;
+            border: 2px dashed #20c997;
+            border-radius: 1rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #20c997;
+            opacity: 0.3;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            color: #6c757d;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        /* Paginação */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .pagination-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            border: 2px solid #d1f0ea;
+            background: white;
+            color: #20c997;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .pagination-btn:hover {
+            background: #20c997;
+            color: white;
+            border-color: #20c997;
+            transform: translateY(-2px);
+        }
+
+        .pagination-info {
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            color: #6c757d;
+            font-weight: 500;
+            background: #f8f9fa;
+            border-radius: 0.5rem;
+            height: 40px;
+        }
+
+        /* Animações */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .picture-card {
+            animation: slideDown 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .picture-card:nth-child(1) { animation-delay: 0.05s; }
+        .picture-card:nth-child(2) { animation-delay: 0.1s; }
+        .picture-card:nth-child(3) { animation-delay: 0.15s; }
+        .picture-card:nth-child(4) { animation-delay: 0.2s; }
+        .picture-card:nth-child(n+5) { animation-delay: 0.25s; }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .pictures-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .pictures-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 1rem;
+            }
+
+            .picture-card {
+                height: 170px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .pictures-grid {
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+                gap: 0.75rem;
+            }
+
+            .picture-card {
+                height: 140px;
+            }
+
+            .pictures-header {
+                padding: 1.5rem 1rem;
+            }
+
+            .pictures-header h1 {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+
+    <main>
+        <!-- Header com Gradiente -->
+        <div class="pictures-header">
+            <h1>
+                <i class="bi bi-camera-fill"></i>
+                Histórico de Imagens
+            </h1>
+            <p>{% if pictures|length %}{{ pictures|length }} foto{{ pictures|length|pluralize:"s" }} salva{{ pictures|length|pluralize:"s" }}{% else %}Nenhuma foto capturada ainda{% endif %}</p>
+        </div>
+
+        <!-- Grid de Imagens -->
+        {% if pictures %}
+            <section class="pictures-grid">
+                {% for picture in pictures %}
+                    <a href='{% url "pictures:details-picture" picture.id %}' class="picture-card">
+                        {% if picture.image %}
+                            <img src="{{ picture.image.url }}" alt="{{ picture.title }}">
+                        {% else %}
+                            <div class="picture-placeholder">
+                                <i class="bi bi-image"></i>
+                            </div>
+                        {% endif %}
+                        <div class="picture-overlay">
+                            <div class="picture-overlay-title">{{ picture.title }}</div>
+                            {% if picture.content %}
+                                <div class="picture-overlay-content">{{ picture.content|truncatewords:5 }}</div>
+                            {% endif %}
+                        </div>
+                    </a>
+                {% endfor %}
+            </section>
+
+            <!-- Paginação -->
+            {% if page_obj.paginator.num_pages > 1 %}
+                <div class="pagination-container">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1" class="pagination-btn" aria-label="Primeira página" title="Primeira página">
+                            <i class="bi bi-chevron-double-left"></i>
+                        </a>
+                        <a href="?page={{ page_obj.previous_page_number }}" class="pagination-btn" aria-label="Página anterior" title="Anterior">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    {% endif %}
+
+                    <div class="pagination-info">
+                        {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </div>
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="pagination-btn" aria-label="Próxima página" title="Próxima">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-btn" aria-label="Última página" title="Última página">
+                            <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <!-- Estado Vazio -->
+            <div class="empty-state">
+                <i class="bi bi-camera-off"></i>
+                <p>Nenhuma imagem encontrada no histórico</p>
+                <p style="font-size: 0.9rem; color: #adb5bd; margin-top: 0.5rem;">Comece a capturar fotos agora!</p>
+            </div>
+        {% endif %}
+    </main>
 {% endblock %}

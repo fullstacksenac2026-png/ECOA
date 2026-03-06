@@ -20,9 +20,11 @@
             <i class="bi bi-moon-fill fs-5" id="themeToggle" style="cursor: pointer; transition: transform 0.5s;"></i>
             <div class="position-relative fs-5" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#notificationModal">
                 <i class="bi bi-bell-fill"></i>
+                {% if notifications %}
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
-                    3
+                    {{ notifications|length }}
                 </span>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -83,7 +85,7 @@
                 </div>
                 <div class="modal-body pb-4">
                     <div class="d-flex flex-column gap-3 px-3">
-                        <a href="#" class="d-flex align-items-center justify-content-start p-3 text-decoration-none rounded-3 action-btn w-100" 
+                        <a href="{% url 'pictures:take-picture' %}" class="d-flex align-items-center justify-content-start p-3 text-decoration-none rounded-3 action-btn w-100" 
                            style="border: 2px solid #20c997; color: #20c997; transition: all 0.3s; height: 70px;"
                            onmouseover="this.style.backgroundColor='#20c997'; this.style.color='white';" 
                            onmouseout="this.style.backgroundColor='transparent'; this.style.color='#20c997';">
@@ -91,7 +93,7 @@
                             <span class="fs-5">Tirar Foto</span>
                         </a>
                         
-                        <a href="#" class="d-flex align-items-center justify-content-start p-3 text-decoration-none rounded-3 action-btn w-100" 
+                        <a href="{% url 'forum:post-create' %}" class="d-flex align-items-center justify-content-start p-3 text-decoration-none rounded-3 action-btn w-100" 
                            style="border: 2px solid #20c997; color: #20c997; transition: all 0.3s; height: 70px;"
                            onmouseover="this.style.backgroundColor='#20c997'; this.style.color='white';" 
                            onmouseout="this.style.backgroundColor='transparent'; this.style.color='#20c997';">
@@ -114,41 +116,25 @@
                 </div>
                 <div class="modal-body pb-4 pt-0">
                     <div class="list-group list-group-flush gap-2">
-                        <!-- Red: Risk/Punishment -->
-                        <a href="#" class="list-group-item list-group-item-action border-start border-5 border-danger rounded shadow-sm p-3">
+                        {% for notification in notifications %}
+                        <a href="#" class="list-group-item list-group-item-action border-start border-5 
+                           {% if notification.type_message == 'ERROR' %}border-danger{% elif notification.type_message == 'WARNING' %}border-warning{% else %}border-success{% endif %} 
+                           rounded shadow-sm p-3">
                             <div class="d-flex w-100 justify-content-between align-items-center mb-1">
-                                <h6 class="mb-0 text-danger fw-bold"><i class="bi bi-exclamation-octagon-fill me-2"></i>Punição Aplicada</h6>
-                                <small class="text-body-secondary" style="font-size: 0.75rem;">3 min</small>
+                                <h6 class="mb-0 
+                                   {% if notification.type_message == 'ERROR' %}text-danger{% elif notification.type_message == 'WARNING' %}text-warning{% else %}text-success{% endif %} 
+                                   fw-bold">
+                                    <i class="bi 
+                                       {% if notification.type_message == 'ERROR' %}bi-exclamation-octagon-fill{% elif notification.type_message == 'WARNING' %}bi-exclamation-triangle-fill{% else %}bi-check-circle-fill{% endif %} 
+                                       me-2"></i>{{ notification.title }}
+                                </h6>
+                                <small class="text-body-secondary" style="font-size: 0.75rem;">{{ notification.created_at|timesince }}</small>
                             </div>
-                            <p class="mb-1 text-body-secondary small">Você recebeu uma punição por violar as regras da comunidade.</p>
+                            <p class="mb-1 text-body-secondary small">{{ notification.content }}</p>
                         </a>
-
-                        <!-- Yellow: Warning -->
-                        <a href="#" class="list-group-item list-group-item-action border-start border-5 border-warning rounded shadow-sm p-3">
-                            <div class="d-flex w-100 justify-content-between align-items-center mb-1">
-                                <h6 class="mb-0 text-warning fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>Aviso de Conduta</h6>
-                                <small class="text-body-secondary" style="font-size: 0.75rem;">1 hora</small>
-                            </div>
-                            <p class="mb-1 text-body-secondary small">Sua postagem recente foi sinalizada como imprópria.</p>
-                        </a>
-
-                        <!-- Green: Reply/Response -->
-                        <a href="#" class="list-group-item list-group-item-action border-start border-5 border-success rounded shadow-sm p-3">
-                            <div class="d-flex w-100 justify-content-between align-items-center mb-1">
-                                <h6 class="mb-0 text-success fw-bold"><i class="bi bi-check-circle-fill me-2"></i>Resposta Recebida</h6>
-                                <small class="text-body-secondary" style="font-size: 0.75rem;">2 horas</small>
-                            </div>
-                            <p class="mb-1 text-body-secondary small">O órgão responsável respondeu à sua solicitação.</p>
-                        </a>
-                        
-                        <!-- Green: Reply/Response -->
-                        <a href="#" class="list-group-item list-group-item-action border-start border-5 border-success rounded shadow-sm p-3">
-                            <div class="d-flex w-100 justify-content-between align-items-center mb-1">
-                                <h6 class="mb-0 text-success fw-bold"><i class="bi bi-chat-quote-fill me-2"></i>Novo Comentário</h6>
-                                <small class="text-body-secondary" style="font-size: 0.75rem;">5 horas</small>
-                            </div>
-                            <p class="mb-1 text-body-secondary small">Alguém respondeu ao seu comentário no fórum.</p>
-                        </a>
+                        {% empty %}
+                        <p class="text-center text-muted mt-3">Nenhuma notificação no momento.</p>
+                        {% endfor %}
                     </div>
                 </div>
             </div>

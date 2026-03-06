@@ -20,6 +20,7 @@ def build_cpf_candidates(cpf_raw):
     cpf_digits = re.sub(r'\D', '', cpf_raw or '')
     cpf_formatted = format_cpf(cpf_digits)
     return [value for value in [cpf_raw, cpf_digits, cpf_formatted] if value]
+
 def register(request):
     if request.method == 'POST':
         user_form = UserRegisterForm(request.POST)

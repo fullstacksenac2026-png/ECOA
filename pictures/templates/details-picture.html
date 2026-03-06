@@ -1,0 +1,72 @@
+{% extends 'app-base.html' %}
+
+{% block title %}Detalhes da Foto{% endblock %}
+
+{% block content %}
+    <main>
+        <section>
+            <article>
+                {% if picture %}
+                    <a href="{% url 'pictures:update-picture' picture.id %}">Atualizar a queixa</a>
+                    <a href="{% url 'pictures:delete-picture' picture.id %}">Excluir a queixa</a>
+                    <figure>
+                        {% if picture.image %}
+                            <img src="{{ picture.image.url }}" alt="{{ picture.title }}">
+                        {% else %}
+                            <p>Imagem não encontrada</p>
+                        {% endif %}
+                    </figure>
+                {% else %}
+                    <p>Nenhuma foto com queixa encontrada no sistema</p>
+                {% endif %}
+            </article>
+
+            {% if complaint %}
+            <article>
+                <section>
+                    <article>
+                        <h3>{{ complaint.title }}</h3>
+                    </article>
+                    
+                    <article>
+                        <p>{{ complaint.content }}</p>
+                    </article>
+                </section>
+            </article>
+            {% endif %}
+
+            {% if geolocation %}
+            <article>
+                <section>
+                    <article>
+                        <p>Latitude: {{ geolocation.latitude }}</p>
+                    </article>
+                    
+                    <article>
+                        <p>Longitude: {{ geolocation.longitude }}</p>
+                    </article>
+                </section>
+                <div id="map" style="height: 400px; width: 100%;"></div>
+            </article>
+            {% endif %}
+        </section>
+    </main>
+
+    {% if geolocation %}
+    <script>
+        function initMap() {
+            var location = {lat: parseFloat({{ geolocation.latitude }}), lng: parseFloat({{ geolocation.longitude }})};
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 15,
+                center: location
+            });
+            var marker = new google.maps.Marker({
+                position: location,
+                map: map
+            });
+        }
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
+    {% endif %}
+{% endblock content %}
+

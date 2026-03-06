@@ -1,12 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q, Avg, Count
 from django.utils import timezone
 from datetime import timedelta
 import json
 import time
+import os
+from django.urls import reverse
+
+# third party SDK (install mercadopago in requirements)
+import mercadopago
+
+from payments.models import Payment
 
 from .models import (
     Course, Enrollment, Teacher, VideoCourse, CourseMaterial, 
@@ -15,8 +22,9 @@ from .models import (
     UserLessonProgress, UserQuizAnswer
 )
 from django.core.paginator import Paginator
-
+from django.contrib.auth.decorators import login_required
 # Create your views here.
+@login_required
 def list_courses_and_categories(request):
     category = Category.objects.all()
     course = Course.objects.all()
@@ -31,7 +39,7 @@ def list_courses_and_categories(request):
     
     return render(request, 'list-courses.html', {'categories': page_obj_category, 'courses': page_obj_course})
 
-
+@login_required
 def course_detail(request, course_id):
     """Página inicial do curso com descrição geral"""
     course = get_object_or_404(Course, id=course_id)
@@ -43,6 +51,8 @@ def course_detail(request, course_id):
     is_enrolled = False
     if request.user.is_authenticated:
         is_enrolled = Enrollment.objects.filter(user=request.user, course=course).exists()
+
+    # if course has price and user is not enrolled we will show purchase link in template
     
     # Calcular estatísticas
     total_lessons = Lesson.objects.filter(section__course=course).count()
@@ -62,6 +72,113 @@ def course_detail(request, course_id):
     return render(request, 'course-detail.html', context)
 
 
+# ------------------------------------------------------------------
+# Mercado Pago / checkout
+# ------------------------------------------------------------------
+
+@login_required
+def course_checkout(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    if Enrollment.objects.filter(user=request.user, course=course).exists():
+        # already enrolled
+        return redirect('courses:course-lessons', course_id=course.id)
+
+    if course.price <= 0:
+        # free course, just enroll
+        Enrollment.objects.create(user=request.user, course=course)
+        return redirect('courses:course-lessons', course_id=course.id)
+
+    # configure Mercado Pago
+    mp_access = os.environ.get('MERCADO_PAGO_ACCESS_TOKEN')
+    mp_public = os.environ.get('MERCADO_PAGO_PUBLIC_KEY')
+
+    if not mp_access or not mp_public:
+        return HttpResponseBadRequest('Mercado Pago keys not configured')
+
+    sdk = mercadopago.SDK(mp_access)
+    preference_data = {
+        "items": [
+            {
+                "title": course.name,
+                "quantity": 1,
+                "unit_price": float(course.price),
+                "currency_id": "BRL",
+            }
+        ],
+        "back_urls": {
+            "success": request.build_absolute_uri(reverse('courses:payment_success')),
+            "failure": request.build_absolute_uri(reverse('courses:payment_failure')),
+            "pending": request.build_absolute_uri(reverse('courses:payment_pending')),
+        },
+        "auto_return": "approved",
+        "metadata": {"course_id": course.id},
+        # you can also set notification_url for webhooks if needed
+    }
+    preference_response = sdk.preference().create(preference_data)
+    preference_id = preference_response['response'].get('id')
+
+    context = {
+        'course': course,
+        'preference_id': preference_id,
+        'public_key': mp_public,
+    }
+    return render(request, 'course-checkout.html', context)
+
+
+@login_required
+@require_http_methods(['GET'])
+def payment_success(request):
+    # Mercado Pago will redirect with payment_id, status, preference_id
+    payment_id = request.GET.get('payment_id')
+    status = request.GET.get('status')
+    preference_id = request.GET.get('preference_id')
+    if not payment_id:
+        return HttpResponseBadRequest('Missing payment_id')
+
+    mp_access = os.environ.get('MERCADO_PAGO_ACCESS_TOKEN')
+    sdk = mercadopago.SDK(mp_access)
+    payment_info = sdk.payment().get(payment_id)
+    response = payment_info.get('response', {})
+
+    # metadata may contain course_id
+    metadata = response.get('metadata', {})
+    course_id = metadata.get('course_id')
+    course = None
+    if course_id:
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            course = None
+
+    # record payment and enroll user if not already
+    if course:
+        Enrollment.objects.get_or_create(user=request.user, course=course)
+        # create payment record if not exist
+        Payment.objects.get_or_create(
+            course=course,
+            user=request.user,
+            transaction_id=payment_id,
+            defaults={
+                'amount': response.get('transaction_amount', course.price),
+                'payment_method': response.get('payment_type_id', ''),
+            }
+        )
+
+    return render(request, 'payment-success.html', {'course': course, 'status': status, 'payment': response})
+
+
+@login_required
+@require_http_methods(['GET'])
+def payment_failure(request):
+    return render(request, 'payment-failure.html')
+
+
+@login_required
+@require_http_methods(['GET'])
+def payment_pending(request):
+    return render(request, 'payment-pending.html')
+
+@login_required
 def list_courses_by_category(request, category_id):
     """Return list of courses filtered by category if the relation exists.
     """

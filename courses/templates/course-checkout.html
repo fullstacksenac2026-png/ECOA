@@ -1,0 +1,26 @@
+{% extends 'app-base.html' %}
+
+{% block title %}<title>Checkout - {{ course.name }}</title>{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4">Pagamento do curso: {{ course.name }}</h2>
+    <p>Valor: <strong>R$ {{ course.price }}</strong></p>
+    <div id="wallet_container"></div>
+    <p class="mt-4">
+        <a href="{% url 'courses:course-detail' course.id %}" class="btn btn-secondary">Voltar para o curso</a>
+    </p>
+</div>
+
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mp = new MercadoPago("{{ public_key }}", { locale: 'pt-BR' });
+        mp.bricks().create('wallet', 'wallet_container', {
+            initialization: {
+                preferenceId: '{{ preference_id }}'
+            }
+        });
+    });
+</script>
+{% endblock %}

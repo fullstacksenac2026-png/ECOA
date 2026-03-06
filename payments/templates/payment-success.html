@@ -1,0 +1,14 @@
+{% extends 'app-base.html' %}
+
+{% block title %}<title>Pagamento Concluído</title>{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <h2 class="text-success mb-3">Pagamento realizado com sucesso!</h2>
+    {% if course %}
+        <p>Você foi matriculado no curso <strong>{{ course.name }}</strong>.</p>
+        <a href="{% url 'courses:course-lessons' course.id %}" class="btn btn-primary mt-3">Ir para as aulas</a>
+    {% endif %}
+    <p class="mt-4"><small>Status: {{ status }}</small></p>
+</div>
+{% endblock %}
