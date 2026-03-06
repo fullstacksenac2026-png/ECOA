@@ -11,6 +11,12 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 import os
 from pathlib import Path
+import django_mongodb_backend.fields
+from django.db import models
+
+# Patch models to use MongoDB ObjectId for all automatic IDs (Admin, Auth, etc)
+models.AutoField = django_mongodb_backend.fields.ObjectIdAutoField
+models.BigAutoField = django_mongodb_backend.fields.ObjectIdAutoField
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,6 +53,7 @@ INSTALLED_APPS = [
     'authorization',
     'payments',
     'notifications',
+    'django_mongodb_backend',
 ]
 
 MIDDLEWARE = [
@@ -85,17 +92,16 @@ WSGI_APPLICATION = 'projeto_integrador.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-# Use MongoDB with Djongo
+# Use MongoDB with django-mongodb-backend (compatible with Django 6.0+)
 DATABASES = {
     'default': {
-        'ENGINE': 'djongo',
+        'ENGINE': 'django_mongodb_backend',
         'NAME': 'projeto_integrador',
-        'ENFORCE_SCHEMA': False,
-        'CLIENT': {
-            'host': os.environ.get('DATABASE_URL', 'mongodb+srv://Santana:123sdf45@cluster0.ioua4vr.mongodb.net/?appName=Cluster0'),
-        }
+        'HOST': os.environ.get('DATABASE_URL', 'mongodb+srv://Santana:123sdf45@cluster0.ioua4vr.mongodb.net/?appName=Cluster0'),
     }
 }
+
+DEFAULT_AUTO_FIELD = 'django_mongodb_backend.fields.ObjectIdAutoField'
 
 #cache
 CACHES = {

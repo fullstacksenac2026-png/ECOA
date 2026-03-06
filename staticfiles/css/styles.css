@@ -1,0 +1,841 @@
+:root {
+    --custom-green: #20c997; /* Teal-like green */
+    --custom-green-hover: #198754; /* Darker green for hover */
+    --custom-green-light: #e6fffa; /* Very light background */
+    --gradient-brand: linear-gradient(135deg, #20c997 0%, #198754 100%);
+    --gradient-brand-dark: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
+}
+
+/* Brand Gradient Classes */
+.bg-gradient-brand {
+    background: var(--gradient-brand) !important;
+    color: white;
+}
+
+body.dark-mode .bg-gradient-brand {
+    background: var(--gradient-brand-dark) !important;
+}
+
+.course-header-gradient {
+    background: var(--gradient-brand);
+    color: white;
+    transition: background 0.3s ease;
+}
+
+body.dark-mode .course-header-gradient {
+    background: var(--gradient-brand-dark);
+}
+
+/* Course Hero and Gradient Headers */
+.course-hero[style*="linear-gradient"] {
+    filter: none !important;
+    transition: filter 0.3s ease;
+}
+
+body.dark-mode .course-hero[style*="linear-gradient"] {
+    filter: brightness(0.8) !important;
+}
+
+/* Headers with inline gradients */
+[style*="linear-gradient(135deg, #20c997"][style*="198754"] {
+    transition: filter 0.3s ease, background 0.3s ease;
+}
+
+body.dark-mode [style*="linear-gradient(135deg, #20c997"][style*="198754"] {
+    filter: brightness(0.8) !important;
+}
+
+.text-custom-green {
+    color: var(--custom-green) !important;
+}
+
+.bg-custom-green {
+    background-color: var(--custom-green) !important;
+}
+
+.btn-custom-green {
+    background-color: var(--custom-green);
+    border-color: var(--custom-green);
+    color: #fff;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-custom-green:hover {
+    background-color: var(--custom-green-hover);
+    border-color: var(--custom-green-hover);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(32, 201, 151, 0.2);
+}
+
+.card-custom-green {
+    border-top: 4px solid var(--custom-green);
+}
+
+.form-control {
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: var(--custom-green);
+    box-shadow: 0 0 0 0.25rem rgba(32, 201, 151, 0.25);
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label,
+.form-floating > .form-select ~ label {
+    color: var(--custom-green);
+    opacity: 0.85;
+}
+
+.form-floating > .form-control:focus,
+.form-floating > .form-control:not(:placeholder-shown) {
+    padding-top: 1.625rem;
+    padding-bottom: 0.625rem;
+}
+
+.form-floating > .form-control:-webkit-autofill {
+    box-shadow: 0 0 0 100px white inset !important;
+    -webkit-text-fill-color: inherit !important;
+}
+
+/* Custom link style */
+a.text-custom-green:hover {
+    color: var(--custom-green-hover) !important;
+    text-decoration: underline !important;
+}
+
+/* Checkbox and Radio styling */
+.form-check-input {
+    border-width: 2px;
+    border-color: #adb5bd; /* Darker gray for better visibility */
+    width: 1.2em;
+    height: 1.2em;
+    margin-top: 0.15em;
+}
+
+.form-check-input:checked {
+    background-color: var(--custom-green);
+    border-color: var(--custom-green);
+}
+
+.form-check-input:focus {
+    border-color: var(--custom-green);
+    box-shadow: 0 0 0 0.25rem rgba(32, 201, 151, 0.25);
+}
+
+/* App Layout - Top and Bottom Bars */
+body {
+    padding-top: 70px; /* Space for top bar */
+    padding-bottom: 80px; /* Space for bottom bar */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Dark Mode Variables */
+body.dark-mode {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+body.dark-mode .top-bar,
+body.dark-mode .bottom-bar {
+    background-color: #1e1e1e;
+    border-color: #333;
+}
+
+body.dark-mode .card {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border-color: #333;
+}
+
+.register-progress {
+    height: 0.4rem;
+    background-color: #e9ecef;
+    border-radius: 999px;
+}
+
+.register-progress-bar {
+    background-color: #6c757d;
+    transition: width 0.4s ease;
+}
+
+/* default state: show first step only so form never disappears
+   and let JS manage the rest */
+.register-step {
+    display: none;
+    opacity: 0;
+    transform: translateY(12px);
+}
+
+.register-step:first-of-type {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* additional class for users with JS active; JS will control visibility
+   but this rule prevents a flash of all steps during load */
+.js-enabled .register-step {
+    display: none;
+}
+
+.js-enabled .register-step.is-active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.register-step.is-animating {
+    animation: registerStepIn 0.45s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+@keyframes registerStepIn {
+    0% {
+        opacity: 0;
+        transform: translateY(12px);
+        box-shadow: 0 0 0 0 rgba(32, 201, 151, 0.0);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        box-shadow: 0 0 0 0.35rem rgba(32, 201, 151, 0.08);
+    }
+}
+
+.btn-step {
+    background-color: #f8f9fa;
+    border-color: #ced4da;
+    color: #495057;
+    font-weight: 600;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-step:hover,
+.btn-step:focus-visible {
+    border-color: var(--custom-green);
+    color: #212529;
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 0.2rem rgba(32, 201, 151, 0.2);
+}
+
+.btn-step:disabled {
+    opacity: 0.6;
+    transform: none;
+    box-shadow: none;
+}
+
+.register-feedback {
+    min-height: 1.5rem;
+}
+
+.register-icon {
+    width: 64px;
+    height: 64px;
+}
+
+/* Top Bar */
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    transition: background-color 0.3s;
+}
+
+.top-bar .logo {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: var(--custom-green);
+    text-decoration: none;
+}
+
+.top-bar-icons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.notification-icon {
+    position: relative;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 5px;
+    font-size: 0.7rem;
+}
+
+/* Bottom Bar */
+.bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    transition: background-color 0.3s;
+}
+
+.nav-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #6c757d;
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: color 0.3s;
+}
+
+.nav-icon i {
+    font-size: 1.5rem;
+    margin-bottom: 2px;
+}
+
+.nav-icon.active, .nav-icon:hover {
+    color: var(--custom-green);
+}
+
+/* Floating Action Button (FAB) */
+.fab-container {
+    position: relative;
+    top: -25px; /* Pull up to float */
+}
+
+.fab-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--custom-green);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    box-shadow: 0 4px 10px rgba(32, 201, 151, 0.4);
+    border: 4px solid #fff; /* Border to separate from bar */
+    transition: transform 0.2s, background-color 0.3s;
+    cursor: pointer;
+}
+
+body.dark-mode .fab-button {
+    border-color: #1e1e1e;
+}
+
+.fab-button:hover {
+    transform: scale(1.1);
+    background-color: var(--custom-green-hover);
+}
+
+/* Theme Toggle Animation */
+.theme-toggle {
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: transform 0.5s;
+}
+
+.theme-toggle:hover {
+    transform: rotate(180deg);
+}
+
+/* Modal Customization */
+.action-modal .modal-content {
+    border-radius: 20px;
+    text-align: center;
+}
+
+body.dark-mode .action-modal .modal-content {
+    background-color: #1e1e1e;
+    color: #fff;
+    border-color: #333;
+}
+
+body.dark-mode .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid var(--custom-green);
+    background-color: transparent;
+    color: var(--custom-green);
+    transition: all 0.3s;
+    width: 100%;
+    margin-bottom: 15px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.action-btn i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.action-btn:hover {
+    background-color: var(--custom-green);
+    color: white;
+}
+/* ============================================
+   COURSES PAGE STYLES
+   ============================================ */
+
+.courses-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Section Headers */
+.section-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--custom-green);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.section-title i {
+    font-size: 2.8rem;
+}
+
+.section-subtitle {
+    font-size: 1.1rem;
+    color: #6c757d;
+    margin: 0;
+}
+
+/* ============================================
+   CATEGORIES SECTION
+   ============================================ */
+
+.categories-section {
+    margin-bottom: 4rem;
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.category-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(32, 201, 151, 0.08);
+    transition: all 0.3s ease;
+    display: flex;
+    height: 100%;
+}
+
+.category-card:hover {
+    box-shadow: 0 8px 24px rgba(32, 201, 151, 0.15);
+    transform: translateY(-4px);
+}
+
+.category-card-body {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.category-icon {
+    font-size: 3rem;
+    color: var(--custom-green);
+    margin-bottom: 1rem;
+}
+
+.category-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 0.75rem;
+}
+
+.category-description {
+    color: #6c757d;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+}
+
+/* ============================================
+   COURSES SECTION
+   ============================================ */
+
+.courses-section {
+    margin-bottom: 3rem;
+}
+
+.courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.course-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e9ecef;
+}
+
+.course-card:hover {
+    box-shadow: 0 12px 24px rgba(32, 201, 151, 0.15);
+    transform: translateY(-6px);
+    border-color: var(--custom-green);
+}
+
+.course-card-header {
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--custom-green-light) 0%, #f0f9f8 100%);
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+}
+
+.course-status-badge {
+    width: 100%;
+}
+
+.course-card-body {
+    padding: 1.5rem;
+    flex-grow: 1;
+}
+
+.course-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+
+.course-description {
+    color: #6c757d;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.course-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.meta-item i {
+    color: var(--custom-green);
+    font-size: 1rem;
+}
+
+.course-card-footer {
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    margin-top: 2rem;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #ccc;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.empty-text {
+    color: #6c757d;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* ============================================
+   PAGINATION
+   ============================================ */
+
+.pagination-nav {
+    margin: 2rem 0;
+}
+
+.pagination {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.page-link {
+    color: var(--custom-green);
+    border-color: #dee2e6;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    padding: 0.5rem 0.75rem;
+}
+
+.page-link:hover {
+    color: #fff;
+    background-color: var(--custom-green);
+    border-color: var(--custom-green);
+}
+
+.page-item.disabled .page-link {
+    color: var(--custom-green);
+    background-color: transparent;
+    border: none;
+    cursor: default;
+    font-weight: 500;
+}
+
+/* ============================================
+   DARK MODE SUPPORT
+   ============================================ */
+
+body.dark-mode .section-title {
+    color: var(--custom-green);
+}
+
+body.dark-mode .section-subtitle {
+    color: #b0b0b0;
+}
+
+body.dark-mode .category-card,
+body.dark-mode .course-card {
+    background-color: #1e1e1e;
+    border-color: #333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .category-card:hover,
+body.dark-mode .course-card:hover {
+    box-shadow: 0 12px 24px rgba(32, 201, 151, 0.2);
+}
+
+body.dark-mode .category-name,
+body.dark-mode .course-title {
+    color: #e0e0e0;
+}
+
+body.dark-mode .category-description,
+body.dark-mode .course-description,
+body.dark-mode .meta-item {
+    color: #b0b0b0;
+}
+
+body.dark-mode .course-card-header {
+    background: linear-gradient(135deg, rgba(32, 201, 151, 0.1) 0%, rgba(32, 201, 151, 0.05) 100%);
+}
+
+body.dark-mode .course-card-footer {
+    background-color: #252525;
+    border-color: #333;
+}
+
+body.dark-mode .course-card-body {
+    border-color: #333;
+}
+
+body.dark-mode .empty-state {
+    background-color: #252525;
+}
+
+body.dark-mode .empty-state i {
+    color: #555;
+}
+
+body.dark-mode .page-link {
+    color: var(--custom-green);
+    background-color: #252525;
+    border-color: #333;
+}
+
+body.dark-mode .page-link:hover {
+    color: #fff;
+    background-color: var(--custom-green);
+    border-color: var(--custom-green);
+}
+
+body.dark-mode .page-item.disabled .page-link {
+    color: var(--custom-green);
+    background-color: #1e1e1e;
+    border: none;
+}
+
+body.dark-mode .page-item.active .page-link {
+    background-color: var(--custom-green);
+    border-color: var(--custom-green);
+    color: white;
+}
+
+body.dark-mode .pagination-nav {
+    border-top: 1px solid #333;
+    padding-top: 1.5rem;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+/* Tablets (768px and below) */
+@media (max-width: 768px) {
+    .courses-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+
+    .section-title i {
+        font-size: 2rem;
+    }
+
+    .section-subtitle {
+        font-size: 1rem;
+    }
+
+    .categories-grid,
+    .courses-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+
+    .category-card-body,
+    .course-card-body {
+        padding: 1rem;
+    }
+
+    .course-card-header,
+    .course-card-footer {
+        padding: 1rem;
+    }
+
+    .category-icon {
+        font-size: 2.5rem;
+    }
+
+    .category-name {
+        font-size: 1.2rem;
+    }
+
+    .course-title {
+        font-size: 1.1rem;
+    }
+}
+
+/* Mobile (480px and below) */
+@media (max-width: 480px) {
+    .courses-container {
+        padding: 1rem 0.75rem;
+    }
+
+    .section-title {
+        font-size: 1.75rem;
+    }
+
+    .section-title i {
+        font-size: 1.75rem;
+    }
+
+    .section-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .categories-grid,
+    .courses-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .category-card-body,
+    .course-card-body {
+        padding: 1rem;
+    }
+
+    .course-meta {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .category-icon {
+        font-size: 2rem;
+    }
+
+    .category-name {
+        font-size: 1.1rem;
+    }
+
+    .course-title {
+        font-size: 1rem;
+    }
+
+    .pagination {
+        gap: 0.25rem;
+    }
+
+    .page-link {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.9rem;
+    }
+}

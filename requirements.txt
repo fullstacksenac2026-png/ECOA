@@ -13,7 +13,7 @@ cycler
 Django
 django-br-utils
 djlint
-djongo
+django-mongodb-backend
 EditorConfig
 fastapi
 fonttools

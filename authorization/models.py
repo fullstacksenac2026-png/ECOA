@@ -23,7 +23,7 @@ SEXUALITY_CHOICES = [
 class User(AbstractUser):
     username = None
     email = models.EmailField()
-    cpf = models.CharField(unique=True)
+    cpf = models.CharField(max_length=14, unique=True)
     birth_date = models.DateField()
     gender = models.CharField(max_length=20, choices=GENDER_CHOICES)
     sexuality = models.CharField(max_length=20, choices=SEXUALITY_CHOICES)
@@ -42,7 +42,7 @@ class Phone(models.Model):
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses')
 
-    cep = models.CharField()
+    cep = models.CharField(max_length=9)
     residence_number = models.CharField(max_length=10)
     complement = models.CharField(max_length=255, blank=True, null=True)
     street = models.CharField(max_length=255)
