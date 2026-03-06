@@ -7,15 +7,18 @@ from django.db.models import Count
 
 @login_required
 def forum_list(request):
+    search_query = request.GET.get('search_post', '')
+    if search_query:
+        posts = Post.objects.filter(title__icontains=search_query)
+    else:
+        posts = Post.objects.all()
 
-    posts = Post.objects.annotate(
+    posts = posts.annotate(
         total_views=Count('views', distinct=True),
-        total_comments=Count('comments', distinct=True),
-        total_likes=Count('likes', distinct=True),
-        total_dislikes=Count('dislikes', distinct=True)
+        total_comments=Count('comments', distinct=True)
     ).order_by('-created_at')
 
-    paginator = Paginator(posts, 10)
+    paginator = Paginator(posts, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -26,30 +29,34 @@ def forum_list(request):
 
 @login_required
 def forum_post_detail(request, post_id):
-
     post = get_object_or_404(Post, id=post_id)
+    
+    # View tracking
+    View.objects.get_or_create(post=post, user=request.user.username)
+
+    if request.method == 'POST':
+        content = request.POST.get('comment_content')
+        if content:
+            Comment.objects.create(post=post, content=content)
 
     comments = Comment.objects.filter(post=post).order_by('-created_at')
-
     paginator = Paginator(comments, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    comment_view = View.objects.filter(post=post)
-    comment_like = CommentLike.objects.filter(comment__in=comments)
-    comment_dislike = CommentDislike.objects.filter(comment__in=comments)
-
     return render(request, 'forum-details.html', {
         'post': post,
         'page_obj_comments': page_obj,
-        'comment_view': comment_view,
-        'comment_like': comment_like,
-        'comment_dislike': comment_dislike,
     })
 
 @login_required
 def post_create(request):
-
     if request.method == 'POST':
-        return render(request, 'forum-details.html', )
-    return render(request, 'forum-create.html', )
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        image = request.FILES.get('image')
+        if title and content:
+            post = Post.objects.create(user=request.user, title=title, content=content, image=image)
+            from django.shortcuts import redirect
+            return redirect('forum:forum-post-detail', post_id=post.id)
+    return render(request, 'forum-create.html')

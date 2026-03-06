@@ -1,9 +1,137 @@
 {% extends "app-base.html" %}
+{% load static %}
 
-<title>{% block title %}Criação de Posts{% endblock %}</title>
+{% block title %}
+  Criar Post - ECOA
+{% endblock %}
 
 {% block content %}
-    <main>
+<main class="container py-4">
+    <!-- Back Button -->
+    <div class="mb-4">
+        <a href="{% url 'forum:forum-list' %}" class="text-decoration-none text-custom-green fw-semibold">
+            <i class="bi bi-arrow-left me-1"></i> Voltar para o Fórum
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <!-- Header with Brand Gradient -->
+                <div class="bg-gradient-brand p-4 p-md-5 text-white text-center">
+                    <i class="bi bi-pencil-square display-4 mb-3 d-block"></i>
+                    <h2 class="fw-bold mb-0">Nova Discussão</h2>
+                    <p class="opacity-75 mb-0">Compartilhe seu conhecimento ou peça ajuda à comunidade</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Title Input -->
+                        <div class="mb-4">
+                            <label for="title" class="form-label fw-bold text-dark">Título da Discussão</label>
+                            <input type="text" name="title" id="title" class="form-control form-control-lg border-2 rounded-3 shadow-none focus-custom-green" placeholder="Ex: Melhores práticas para..." required>
+                            <div class="form-text">Seja claro e objetivo para atrair mais pessoas.</div>
+                        </div>
+
+                        <!-- Content Textarea -->
+                        <div class="mb-4">
+                            <label for="content" class="form-label fw-bold text-dark">Conteúdo</label>
+                            <textarea name="content" id="content" class="form-control border-2 rounded-3 shadow-none focus-custom-green" rows="8" placeholder="Escreva aqui sua dúvida ou compartilhamento..." required></textarea>
+                        </div>
+
+                        <!-- Image Upload -->
+                        <div class="mb-5">
+                            <label for="image" class="form-label fw-bold text-dark">Imagem de Capa (Opcional)</label>
+                            <div class="image-upload-wrapper border-dashed rounded-4 p-4 text-center position-relative transition-hover" id="dropzone">
+                                <input type="file" name="image" id="image" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" accept="image/*" onchange="previewImage(this)">
+                                <div id="preview-placeholder">
+                                    <i class="bi bi-cloud-arrow-up display-6 text-custom-green mb-2 d-block"></i>
+                                    <p class="mb-0 text-muted">Arraste uma imagem ou clique para selecionar</p>
+                                    <small class="text-muted opacity-75">PNG, JPG até 5MB</small>
+                                </div>
+                                <div id="preview-container" class="d-none">
+                                    <img id="image-preview" src="#" alt="Preview" class="img-fluid rounded-3 mb-2" style="max-height: 200px;">
+                                    <p class="small text-custom-green mb-0 fw-bold">Imagem selecionada!</p>
+                                    <button type="button" class="btn btn-sm btn-link text-danger text-decoration-none" onclick="removeImage()">Remover</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-grid gap-3 d-md-flex justify-content-md-end pt-4 border-top">
+                            <a href="{% url 'forum:forum-list' %}" class="btn btn-light rounded-pill px-5 py-2 fw-semibold">Cancelar</a>
+                            <button type="submit" class="btn btn-custom-green rounded-pill px-5 py-2 fw-bold shadow-sm">
+                                Publicar Discussão <i class="bi bi-send-fill ms-2"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<style>
+    .focus-custom-green:focus {
+        border-color: var(--custom-green);
+        box-shadow: 0 0 0 0.25rem rgba(32, 201, 151, 0.15);
+    }
+    .border-dashed {
+        border: 2px dashed #dee2e6;
+        transition: all 0.3s ease;
+    }
+    .image-upload-wrapper:hover {
+        border-color: var(--custom-green);
+        background-color: rgba(32, 201, 151, 0.05);
+    }
+    .cursor-pointer {
+        cursor: pointer;
+    }
+    .bg-gradient-brand {
+        background: linear-gradient(135deg, #20c997 0%, #198754 100%);
+    }
+    .text-custom-green {
+        color: var(--custom-green) !important;
+    }
+    .btn-custom-green {
+        background-color: var(--custom-green);
+        border-color: var(--custom-green);
+        color: white;
+    }
+    .btn-custom-green:hover {
+        background-color: var(--custom-green-hover);
+        border-color: var(--custom-green-hover);
+        color: white;
+    }
+</style>
+
+<script>
+    function previewImage(input) {
+        const placeholder = document.getElementById('preview-placeholder');
+        const container = document.getElementById('preview-container');
+        const preview = document.getElementById('image-preview');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                placeholder.classList.add('d-none');
+                container.classList.remove('d-none');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function removeImage() {
+        const input = document.getElementById('image');
+        const placeholder = document.getElementById('preview-placeholder');
+        const container = document.getElementById('preview-container');
         
-    </main>
-{% endblock content %}
+        input.value = '';
+        placeholder.classList.remove('d-none');
+        container.classList.add('d-none');
+    }
+</script>
+{% endblock %}

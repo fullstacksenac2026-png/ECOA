@@ -1,9 +1,213 @@
 {% extends "app-base.html" %}
+{% load static %}
 
-<title>{% block title %}Detalhes do Posts{% endblock %}</title>
+{% block title %}
+  {{ post.title }} - ECOA
+{% endblock %}
 
 {% block content %}
-    <main>
-        
-    </main>
-{% endblock content %}
+<main class="container py-4">
+    <!-- Back Button -->
+    <div class="mb-4">
+        <a href="{% url 'forum:forum-list' %}" class="text-decoration-none text-custom-green fw-semibold">
+            <i class="bi bi-arrow-left me-1"></i> Voltar para o Fórum
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <!-- Main Post Card -->
+            <article class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5">
+                {% if post.image %}
+                <div class="post-hero-image" style="height: 400px; overflow: hidden;">
+                    <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-100 h-100 object-fit-cover">
+                </div>
+                {% endif %}
+
+                <div class="card-body p-4 p-md-5">
+                    <!-- Post Header -->
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-gradient-brand rounded-circle p-1 me-3 shadow-sm" style="width: 48px; height: 48px;">
+                                {% if post.user.profile_picture %}
+                                    <img src="{{ post.user.profile_picture.url }}" class="w-100 h-100 object-fit-cover rounded-circle">
+                                {% else %}
+                                    <i class="bi bi-person-fill text-white w-100 h-100 d-flex justify-content-center align-items-center"></i>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">@{{ post.user.username }}</h6>
+                                <small class="text-muted">{{ post.created_at|date:"d de F \a\s H:i" }}</small>
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown">
+                                <i class="bi bi-three-dots-vertical fs-5"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3">
+                                <li><a class="dropdown-item small" href="#"><i class="bi bi-flag me-2"></i>Denunciar</a></li>
+                                {% if request.user == post.user %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item small text-danger" href="#"><i class="bi bi-trash me-2"></i>Excluir</a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Post Content -->
+                    <h1 class="fw-bold text-dark mb-4">{{ post.title }}</h1>
+                    <div class="post-text fs-5 text-secondary lh-base mb-5" style="white-space: pre-wrap;">{{ post.content }}</div>
+
+                    <!-- Post Stats & Actions -->
+                    <div class="d-flex align-items-center justify-content-between pt-4 border-top">
+                        <div class="d-flex gap-4">
+                            <button class="btn btn-link text-decoration-none p-0 post-stat-btn">
+                                <i class="bi bi-heart me-1"></i> <span class="small">{{ post.likes.count|default:0 }}</span>
+                            </button>
+                            <button class="btn btn-link text-decoration-none p-0 post-stat-btn">
+                                <i class="bi bi-chat-dots me-1"></i> <span class="small">{{ post.comments.count|default:0 }}</span>
+                            </button>
+                            <button class="btn btn-link text-decoration-none p-0 post-stat-btn">
+                                <i class="bi bi-share me-1"></i>
+                            </button>
+                        </div>
+                        <div class="text-muted small">
+                            <i class="bi bi-eye me-1"></i> {{ post.views.count|default:0 }} visualizações
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Comments Section -->
+            <section class="comments-section mb-5">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h4 class="fw-bold mb-0">Comentários ({{ page_obj_comments.paginator.count|default:0 }})</h4>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light rounded-pill px-3" data-bs-toggle="dropdown">
+                            Ordenar por <i class="bi bi-chevron-down ms-1"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3">
+                            <li><a class="dropdown-item active" href="#">Mais recentes</a></li>
+                            <li><a class="dropdown-item" href="#">Mais curtidos</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Comment Input -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-3 p-md-4">
+                        <form method="post" action=".">
+                            {% csrf_token %}
+                            <div class="d-flex gap-3">
+                                <div class="bg-light rounded-circle shadow-sm d-none d-md-flex" style="width: 40px; height: 40px; flex-shrink: 0;">
+                                    {% if request.user.profile_picture %}
+                                        <img src="{{ request.user.profile_picture.url }}" class="w-100 h-100 object-fit-cover rounded-circle">
+                                    {% else %}
+                                        <i class="bi bi-person-fill text-muted w-100 h-100 d-flex justify-content-center align-items-center"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="w-100">
+                                    <textarea name="comment_content" class="form-control border-0 shadow-none bg-light rounded-3 p-3 mb-3" rows="3" placeholder="O que você acha disso?"></textarea>
+                                    <div class="d-flex justify-content-end">
+                                        <button type="submit" class="btn btn-custom-green rounded-pill px-4">Comentar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Comments List -->
+                <div class="d-flex flex-column gap-3">
+                    {% for comment in page_obj_comments %}
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-light rounded-circle me-2" style="width: 32px; height: 32px; overflow: hidden;">
+                                        {% if comment.user.profile_picture %}
+                                            <img src="{{ comment.user.profile_picture.url }}" class="w-100 h-100 object-fit-cover">
+                                        {% else %}
+                                            <i class="bi bi-person-fill text-muted w-100 h-100 d-flex justify-content-center align-items-center"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <span class="small fw-bold text-dark">@{{ comment.user.username }}</span>
+                                        <span class="text-muted" style="font-size: 0.7rem;"> • {{ comment.created_at|timesince }} atrás</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-link text-muted p-0"><i class="bi bi-three-dots"></i></button>
+                            </div>
+                            <p class="text-secondary small mb-3 lh-base">
+                                {{ comment.content }}
+                            </p>
+                            <div class="d-flex gap-3 pt-2 border-top">
+                                <button class="btn btn-link text-decoration-none p-0 text-muted small">
+                                    <i class="bi bi-hand-thumbs-up me-1"></i> {{ comment.likes.count|default:0 }}
+                                </button>
+                                <button class="btn btn-link text-decoration-none p-0 text-muted small">
+                                    <i class="bi bi-hand-thumbs-down me-1"></i> {{ comment.dislikes.count|default:0 }}
+                                </button>
+                                <button class="btn btn-link text-decoration-none p-0 text-custom-green small fw-bold ms-auto">
+                                    Responder
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-chat-dots text-muted mb-2" style="font-size: 3rem; opacity: 0.2;"></i>
+                        <p class="text-muted">Nenhum comentário ainda. Inicie a conversa!</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj_comments.paginator.num_pages > 1 %}
+                <div class="mt-4 d-flex justify-content-center">
+                    <nav>
+                        <ul class="pagination pagination-sm gap-2">
+                            {% if page_obj_comments.has_previous %}
+                            <li class="page-item"><a class="page-link border-0 shadow-sm rounded-2" href="?page={{ page_obj_comments.previous_page_number }}"><i class="bi bi-chevron-left"></i></a></li>
+                            {% endif %}
+                            
+                            <li class="page-item active"><span class="page-link bg-custom-green border-0 shadow-sm rounded-2">{{ page_obj_comments.number }}</span></li>
+                            
+                            {% if page_obj_comments.has_next %}
+                            <li class="page-item"><a class="page-link border-0 shadow-sm rounded-2" href="?page={{ page_obj_comments.next_page_number }}"><i class="bi bi-chevron-right"></i></a></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+</main>
+
+<style>
+    .post-stat-btn {
+        color: #6c757d;
+        transition: color 0.2s;
+    }
+    .post-stat-btn:hover {
+        color: var(--custom-green);
+    }
+    .bg-gradient-brand {
+        background: linear-gradient(135deg, #20c997 0%, #198754 100%);
+    }
+    .text-custom-green {
+        color: var(--custom-green) !important;
+    }
+    .btn-custom-green {
+        background-color: var(--custom-green);
+        border-color: var(--custom-green);
+        color: white;
+    }
+    .btn-custom-green:hover {
+        background-color: var(--custom-green-hover);
+        border-color: var(--custom-green-hover);
+        color: white;
+    }
+</style>
+{% endblock %}
