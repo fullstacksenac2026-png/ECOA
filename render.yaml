@@ -5,16 +5,22 @@ services:
     name: django-web
     env: python
     plan: free
-    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput"
-    startCommand: "hypercorn projeto_integrador.asgi:application --bind 0.0.0.0:$PORT"
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn wsgi:application --bind 0.0.0.0:$PORT"
     envVars:
       - key: DJANGO_SECRET_KEY
-        value: "replace-with-secure-value"
+        generateValue: true
       - key: DJANGO_DEBUG
         value: "False"
       - key: DJANGO_ALLOWED_HOSTS
-        value: "your-app.onrender.com"
-      # If using a managed database, set DATABASE_URL accordingly:
-      # - key: DATABASE_URL
-      #   fromDatabase:
-      #     name: your-database-name
+        value: ".onrender.com"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: projeto-db
+          property: connectionString
+
+databases:
+  - name: projeto-db
+    databaseName: projeto_integrador
+    user: projeto_user
+    plan: free

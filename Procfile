@@ -1,1 +1,2 @@
+
 web: hypercorn projeto_integrador.asgi:application --bind 0.0.0.0:$PORT
