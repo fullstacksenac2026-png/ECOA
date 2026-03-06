@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import re
 from django.http import JsonResponse
 from django.urls import reverse
@@ -17,9 +17,18 @@ def format_cpf(cpf_digits):
 
 
 def build_cpf_candidates(cpf_raw):
+
     cpf_digits = re.sub(r'\D', '', cpf_raw or '')
+    if not cpf_digits:
+        return []
+    
     cpf_formatted = format_cpf(cpf_digits)
-    return [value for value in [cpf_raw, cpf_digits, cpf_formatted] if value]
+    
+    candidates = []
+    for val in [cpf_digits, cpf_formatted, cpf_raw]:
+        if val and val not in candidates:
+            candidates.append(val)
+    return candidates
 
 def register(request):
     if request.method == 'POST':
@@ -116,42 +125,27 @@ def login(request):
             cpf_raw = login_form.cleaned_data['cpf']
             password = login_form.cleaned_data['password']
             cpf_candidates = build_cpf_candidates(cpf_raw)
+            
             user = None
-            # attempt authentication with each candidate (plain, digits, formatted)
             for cpf_value in cpf_candidates:
-                user = authenticate(request, username=cpf_value, password=password)
+                # Try authenticate with both 'cpf' and 'username' to be safe across different backends
+                user = authenticate(request, cpf=cpf_value, password=password)
+                if not user:
+                    user = authenticate(request, username=cpf_value, password=password)
+                
                 if user:
-                    break
-            if user is None:
-                # last-resort: fetch user manually to check password for logging
-                user = User.objects.filter(cpf__in=cpf_candidates).first()
-                if user and not user.check_password(password):
-                    user = None
-            if user is None:
-                # DEBUG log - show candidates and whether any user found
-                import logging
-                logger = logging.getLogger(__name__)
-                logger.debug('Login failed for cpf_candidates=%s, user_found=%s', cpf_candidates, bool(User.objects.filter(cpf__in=cpf_candidates).exists()))
+                    login_auth(request, user)
+                    if login_form.cleaned_data.get('remember_me'):
+                        request.session.set_expiry(60 * 60 * 24 * 7) # 1 week
+                    else:
+                        request.session.set_expiry(0) # on browser close
+                    return redirect('authorization:profile')
 
-            if user is None:
-                message = 'Erro: CPF ou senha inválidos.'
-                return render(request, 'login.html', {
-                    'login_form': login_form,
-                    'message': message,
-                    'message_type': 'error',
-                })
-
-            login_auth(request, user)
-
-            if login_form.cleaned_data.get('remember_me'):
-                request.session.set_expiry(60 * 60)
-            else:
-                request.session.set_expiry(0)
-
-            message = 'Login bem-sucedido!'
-            return render(request, 'profile.html', {
+            message = 'Erro: CPF ou senha inválidos.'
+            return render(request, 'login.html', {
+                'login_form': login_form,
                 'message': message,
-                'message_type': 'success',
+                'message_type': 'error',
             })
 
         message = 'Erro ao fazer login. Verifique os dados e tente novamente.'
@@ -224,7 +218,20 @@ def password_reset(request):
 
 @login_required
 def profile(request):
-    return render(request, 'profile.html')
+    from courses.models import Enrollment
+    from payments.models import Payment
+    from pictures.models import Picture
+
+    enrolled_courses = Enrollment.objects.filter(user=request.user).select_related('course')
+    payments = Payment.objects.filter(user=request.user).order_by('-payment_date')
+    pictures_count = Picture.objects.filter(user=request.user).count()
+
+    context = {
+        'enrolled_courses': enrolled_courses,
+        'payments': payments,
+        'pictures_count': pictures_count,
+    }
+    return render(request, 'profile.html', context)
 
 @login_required
 def update_profile(request):

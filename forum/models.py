@@ -16,37 +16,38 @@ class Post(models.Model):
     
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='forum_comments', null=True)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'Comment by {self.author} on {self.post.title}'
+        return f'Comment by {self.author.cpf if self.author else "Anonymous"} on {self.post.title}'
     
 class CommentLike(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='likes')
-    user = models.CharField(max_length=100)  # In a real app, this would be a ForeignKey to the User model
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comment_likes')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'Like by {self.user} on comment {self.comment.id}'
+        return f'Like by {self.user.cpf} on comment {self.comment.id}'
     
 class CommentDislike(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='dislikes')
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='dislikes')
-    user = models.CharField(max_length=100)  # In a real app, this would be a ForeignKey to the User model
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comment_dislikes')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'Dislike by {self.user} on comment {self.comment.id}'
+        return f'Dislike by {self.user.cpf} on comment {self.comment.id}'
     
 class View(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='views')
-    user = models.CharField(max_length=100)  # In a real app, this would be a ForeignKey to the User model
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='post_views')
     viewed_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'View by {self.user} on post {self.post.title} at {self.viewed_at}'
+        return f'View by {self.user.cpf} on post {self.post.title} at {self.viewed_at}'
     
 class Reports(models.Model):
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='reports')

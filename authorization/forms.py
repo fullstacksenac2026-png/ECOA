@@ -34,29 +34,9 @@ class UserLoginForm(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
         password = cleaned_data.get('password') or ''
-        password = password.strip()
-        cleaned_data['password'] = password
-
-        if not password or len(password) < 8:
-            self.add_error('password', 'A senha deve conter pelo menos 8 caracteres.')
-
-        return cleaned_data
-
-    def clean_cpf(self):
-        cpf = self.cleaned_data.get('cpf', '') or ''
-        cpf = cpf.strip()
-        cpf_digits = re.sub(r'\D', '', cpf)
-        if not cpf_digits:
-            raise forms.ValidationError('O campo de CPF é obrigatório.')
-        if len(cpf_digits) != 11:
-            raise forms.ValidationError('O CPF deve conter 11 dígitos.')
-        return cpf_digits
-
-    def clean(self):
-        cleaned_data = super().clean()
-        password = cleaned_data.get('password') or ''
-        # strip whitespace which might come from copy/paste
-        password = password.strip()
+        # We generally should NOT strip the password as it could be intentional,
+        # but if we do, it must be consistent with registration.
+        # Let's keep it as is from the input to avoid issues with specialized passwords.
         cleaned_data['password'] = password
 
         if not password or len(password) < 8:
@@ -98,6 +78,15 @@ class UserRegisterForm(forms.ModelForm):
             'sexuality': 'Sexualidade',
         }
 
+    def clean_cpf(self):
+        cpf = self.cleaned_data.get('cpf', '') or ''
+        cpf_digits = re.sub(r'\D', '', cpf)
+        if not cpf_digits:
+            raise forms.ValidationError('O campo de CPF é obrigatório.')
+        if len(cpf_digits) != 11:
+            raise forms.ValidationError('O CPF deve conter 11 dígitos.')
+        return cpf_digits
+
     def clean(self):
         cleaned_data = super().clean()
         first_name = cleaned_data.get('first_name')
@@ -105,7 +94,7 @@ class UserRegisterForm(forms.ModelForm):
         email = cleaned_data.get('email')
         password = cleaned_data.get('password')
         confirm_password = cleaned_data.get('confirm_password')
-        cpf = cleaned_data.get('cpf')
+        cpf = cleaned_data.get('cpf') # This will be the cleaned digits if clean_cpf ran
         birth_date = cleaned_data.get('birth_date')
         gender = cleaned_data.get('gender')
         sexuality = cleaned_data.get('sexuality')
@@ -128,12 +117,9 @@ class UserRegisterForm(forms.ModelForm):
         if password and confirm_password and password != confirm_password:
             self.add_error('confirm_password', 'As senhas não coincidem.')
 
-        if cpf:
-            cpf_digits = re.sub(r'\D', '', cpf)
-            if len(cpf_digits) != 11:
-                self.add_error('cpf', 'O CPF deve conter 11 dígitos.')
-        else:
-            self.add_error('cpf', 'O campo de CPF é obrigatório.')
+        # Verification already handled in clean_cpf, but we can do a secondary check if needed
+        if not cpf:
+             self.add_error('cpf', 'O campo de CPF é obrigatório.')
 
         if not birth_date:
             self.add_error('birth_date', 'O campo de data de nascimento é obrigatório.')
@@ -318,7 +304,7 @@ class UserUpdateForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'password', 'birth_date', 'gender', 'sexuality']
+        fields = ['first_name', 'last_name', 'email', 'password', 'cpf', 'birth_date', 'gender', 'sexuality']
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'},),
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sobrenome'},),

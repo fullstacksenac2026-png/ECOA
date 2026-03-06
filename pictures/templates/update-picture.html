@@ -1,9 +1,48 @@
 {% extends "app-base.html" %}
 
-<title>{% block title %}Atualizar Queixa{% endblock title %}</title>
+{% block title %}Editar Detalhes da Imagem{% endblock %}
 
 {% block content %}
-<main>
+<main class="container">
+    <section class="py-4">
+        <div class="d-flex align-items-center mb-4">
+            <a href="{% url 'pictures:details-picture' picture.id %}" class="btn btn-outline-secondary rounded-circle me-3" style="width: 40px; height: 40px; padding: 0.5rem 0.2rem;">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <h1 class="h3 mb-0">Editar Detalhes</h1>
+        </div>
 
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="mb-4 text-center">
+                        {% if picture.image %}
+                        <img src="{{ picture.image.url }}" alt="Preview" class="img-fluid rounded-3 shadow-sm border" style="max-height: 250px;">
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_title" class="form-label fw-bold">Título / Classificação</label>
+                        <input type="text" name="title" id="id_title" value="{{ picture.title }}" class="form-control rounded-3 py-2" placeholder="Ex: Poluição Terrestre" required>
+                        <div class="form-text mt-1 small">Tente manter o título relacionado ao tipo de poluição identificado.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="id_content" class="form-label fw-bold">Descrição Adicional</label>
+                        <textarea name="content" id="id_content" rows="4" class="form-control rounded-3" placeholder="Descreva mais detalhes sobre o que foi visto...">{{ picture.content }}</textarea>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'pictures:details-picture' picture.id %}" class="btn btn-outline-secondary btn-lg flex-grow-1 rounded-pill fw-bold py-3">Cancelar</a>
+                        <button type="submit" class="btn btn-success btn-lg flex-grow-1 rounded-pill fw-bold py-3" style="background-color: #20c997; border: none;">
+                            <i class="bi bi-check-circle-fill me-2"></i> Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
 </main>
-{% endblock content %}
+{% endblock %}

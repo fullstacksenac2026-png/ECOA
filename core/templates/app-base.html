@@ -136,6 +136,11 @@
                         <p class="text-center text-muted mt-3">Nenhuma notificação no momento.</p>
                         {% endfor %}
                     </div>
+                    {% if notifications %}
+                    <div class="text-center mt-3">
+                        <a href="{% url 'notifications:notification-list' %}" class="btn btn-sm btn-outline-primary rounded-pill px-4">Ver Todas</a>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

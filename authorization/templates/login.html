@@ -28,11 +28,21 @@
                     <div class="form-floating mb-3">
                         {{ login_form.cpf }}
                         {{ login_form.cpf.label_tag }}
+                        {% if login_form.cpf.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ login_form.cpf.errors }}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="form-floating mb-4">
                         {{ login_form.password }}
-                        {{ login_form.password.label_tag}}
+                        {{ login_form.password.label_tag }}
+                        {% if login_form.password.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ login_form.password.errors }}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center mb-4">

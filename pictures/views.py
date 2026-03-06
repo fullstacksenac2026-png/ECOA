@@ -131,14 +131,95 @@ def take_picture(request):
 
 @login_required
 def create_picture(request):
-    
-    pass
+    if request.method == 'POST':
+        image_file = request.FILES.get('image')
+        latitude = request.POST.get('latitude')
+        longitude = request.POST.get('longitude')
+
+        if not image_file:
+            messages.error(request, 'Imagem não fornecida.')
+            return redirect('pictures:create-picture')
+
+        # AI Classification
+        try:
+            from PIL import Image
+            img = Image.open(image_file)
+            candidate_labels = [choice[1] for choice in TITLE_COMPLAINT_CHOICES]
+            classifier = get_classifier()
+            
+            if classifier:
+                try:
+                    results = classifier(img, candidate_labels=candidate_labels)
+                    top_result = results[0]
+                    resultado_ia = top_result['label']
+                    confidence = top_result['score']
+                except Exception:
+                    resultado_ia = "Indeterminado"
+                    confidence = 0.0
+            else:
+                resultado_ia = "Indeterminado (IA desativada para poupar memória)"
+                confidence = 0.0
+        except Exception:
+            messages.error(request, 'Erro ao processar imagem para classificação.')
+            resultado_ia = "Erro no processamento"
+            confidence = 0.0
+
+        # Find the key for the label
+        title_key = None
+        for key, label in TITLE_COMPLAINT_CHOICES:
+            if label == resultado_ia:
+                title_key = key
+                break
+        if not title_key:
+            title_key = 'POLUICAO_TERRESTRE'
+
+        # Save Picture
+        picture = Picture.objects.create(
+            user=request.user,
+            image=image_file,
+            title=resultado_ia,
+            content=f'Classificado manual como {resultado_ia} com confiança {confidence:.2f}'
+        )
+
+        # Save Geolocation if provided
+        if latitude and longitude:
+            try:
+                Geolocation.objects.create(
+                    picture=picture,
+                    latitude=float(latitude),
+                    longitude=float(longitude)
+                )
+            except (ValueError, TypeError):
+                pass
+
+        # Save Complaint
+        Complaint.objects.create(
+            picture=picture,
+            title=title_key,
+            content=f'Denúncia manual baseada em IA: {resultado_ia}'
+        )
+
+        messages.success(request, 'Imagem enviada e classificada com sucesso.')
+        return redirect('pictures:details-picture', picture_id=picture.id)
+
+    return render(request, 'create-picture.html')
 
 @login_required
 def update_picture(request, picture_id):
     picture = get_object_or_404(Picture, id=picture_id, user=request.user)
     if request.method == 'POST':
-        pass
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        
+        if title:
+            picture.title = title
+            picture.content = content
+            picture.save()
+            messages.success(request, 'Informações da imagem atualizadas.')
+            return redirect('pictures:details-picture', picture_id=picture.id)
+        else:
+            messages.error(request, 'O título é obrigatório.')
+
     return render(request, 'update-picture.html', {'picture': picture})
 
 @login_required

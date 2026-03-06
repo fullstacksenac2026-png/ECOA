@@ -27,6 +27,7 @@ class User(AbstractUser):
     birth_date = models.DateField()
     gender = models.CharField(max_length=20, choices=GENDER_CHOICES)
     sexuality = models.CharField(max_length=20, choices=SEXUALITY_CHOICES)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
     USERNAME_FIELD = 'cpf'
     REQUIRED_FIELDS = []

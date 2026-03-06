@@ -1,0 +1,94 @@
+{% extends "app-base.html" %}
+
+{% block title %}Upload de Imagem{% endblock %}
+
+{% block content %}
+<main class="container">
+    <section class="py-4">
+        <div class="d-flex align-items-center mb-4">
+            <a href="{% url 'pictures:historic-pictures' %}" class="btn btn-outline-secondary rounded-circle me-3" style="width: 40px; height: 40px; padding: 0.5rem 0.2rem;">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <h1 class="h3 mb-0">Enviar Imagem</h1>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-body p-4">
+                <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                    {% csrf_token %}
+
+                    <div class="mb-4 text-center">
+                        <div id="dropZone" class="border border-2 border-dashed rounded-4 p-5 bg-light position-relative" style="cursor: pointer; transition: all 0.3s;">
+                            <i class="bi bi-cloud-arrow-up fs-1 text-primary"></i>
+                            <p class="mt-2 text-muted">Arraste uma imagem ou clique para selecionar</p>
+                            <input type="file" name="image" id="id_image" class="position-absolute top-0 start-0 w-100 h-100 opacity-0" accept="image/*" required>
+                        </div>
+                        <div id="imagePreviewContainer" class="mt-3 d-none">
+                            <img id="imagePreview" src="#" alt="Preview" class="img-fluid rounded-3 shadow-sm" style="max-height: 300px;">
+                            <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="resetImage()">
+                                <i class="bi bi-trash"></i> Remover Imagem
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Inputs for location -->
+                    <input type="hidden" name="latitude" id="latitude">
+                    <input type="hidden" name="longitude" id="longitude">
+
+                    <div class="alert alert-info border-0 rounded-3 small">
+                        <i class="bi bi-robot me-2"></i> Nossa IA irá classificar automaticamente sua imagem para identificar o tipo de poluição.
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill py-3 fw-bold mt-2" style="background-color: #20c997; border: none;">
+                        <i class="bi bi-send-fill me-2"></i> Enviar e Classificar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const imageInput = document.getElementById('id_image');
+    const previewContainer = document.getElementById('imagePreviewContainer');
+    const previewImage = document.getElementById('imagePreview');
+
+    imageInput.onchange = function(e) {
+        const [file] = imageInput.files;
+        if (file) {
+            previewImage.src = URL.createObjectURL(file);
+            previewContainer.classList.remove('d-none');
+            dropZone.classList.add('d-none');
+        }
+    };
+
+    function resetImage() {
+        imageInput.value = '';
+        previewContainer.classList.add('d-none');
+        dropZone.classList.remove('d-none');
+    }
+
+    // Get location
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            document.getElementById('latitude').value = position.coords.latitude;
+            document.getElementById('longitude').value = position.coords.longitude;
+        });
+    }
+
+    // Highlighting drop zone
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.add('bg-secondary-subtle'), false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.remove('bg-secondary-subtle'), false);
+    });
+</script>
+
+<style>
+    .border-dashed {
+        border-style: dashed !important;
+    }
+</style>
+{% endblock %}

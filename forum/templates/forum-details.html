@@ -47,8 +47,9 @@
                             <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3">
                                 <li><a class="dropdown-item small" href="#"><i class="bi bi-flag me-2"></i>Denunciar</a></li>
                                 {% if request.user == post.user %}
+                                <li><a class="dropdown-item small" href="{% url 'forum:forum-post-edit' post.id %}"><i class="bi bi-pencil me-2"></i>Editar</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item small text-danger" href="#"><i class="bi bi-trash me-2"></i>Excluir</a></li>
+                                <li><a class="dropdown-item small text-danger" href="{% url 'forum:forum-post-delete' post.id %}"><i class="bi bi-trash me-2"></i>Excluir</a></li>
                                 {% endif %}
                             </ul>
                         </div>

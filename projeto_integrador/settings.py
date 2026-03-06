@@ -11,13 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 import os
 from pathlib import Path
-import django_mongodb_backend.fields
 from django.db import models
-
-# Patch models to use MongoDB ObjectId for all automatic IDs (Admin, Auth, etc)
-models.AutoField = django_mongodb_backend.fields.ObjectIdAutoField
-models.BigAutoField = django_mongodb_backend.fields.ObjectIdAutoField
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -89,19 +83,29 @@ TEMPLATES = [
 WSGI_APPLICATION = 'projeto_integrador.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
-# Use MongoDB with django-mongodb-backend (compatible with Django 6.0+)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django_mongodb_backend',
-        'NAME': 'projeto_integrador',
-        'HOST': os.environ.get('DATABASE_URL', 'mongodb+srv://Santana:123sdf45@cluster0.ioua4vr.mongodb.net/?appName=Cluster0'),
+# Database configuration and patches
+if DEBUG and not os.environ.get('DATABASE_URL'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+    DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+else:
+    # Patch models to use MongoDB ObjectId for all automatic IDs (Admin, Auth, etc)
+    import django_mongodb_backend.fields
+    models.AutoField = django_mongodb_backend.fields.ObjectIdAutoField
+    models.BigAutoField = django_mongodb_backend.fields.ObjectIdAutoField
 
-DEFAULT_AUTO_FIELD = 'django_mongodb_backend.fields.ObjectIdAutoField'
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django_mongodb_backend',
+            'NAME': 'projeto_integrador',
+            'HOST': os.environ.get('DATABASE_URL', 'mongodb+srv://Santana:123sdf45@cluster0.ioua4vr.mongodb.net/?appName=Cluster0'),
+        }
+    }
+    DEFAULT_AUTO_FIELD = 'django_mongodb_backend.fields.ObjectIdAutoField'
 
 #cache
 CACHES = {

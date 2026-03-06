@@ -29,6 +29,7 @@ urlpatterns = [
     path('courses/', include('courses.urls')),
     path('pictures/', include('pictures.urls')),
     path('forum/', include('forum.urls')),
+    path('notifications/', include('notifications.urls')),
 ]
 
 if settings.DEBUG:

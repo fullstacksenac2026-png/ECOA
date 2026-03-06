@@ -1,0 +1,29 @@
+{% extends "app-base.html" %}
+
+{% block title %}Confirmar Exclusão{% endblock %}
+
+{% block content %}
+<main class="container">
+    <section class="py-5 d-flex align-items-center justify-content-center" style="min-height: 70vh;">
+        <div class="card border-0 shadow rounded-4 overflow-hidden text-center p-4" style="max-width: 450px;">
+            <div class="card-body">
+                <i class="bi bi-exclamation-triangle-fill text-danger display-1 mb-3"></i>
+                <h2 class="h4 fw-bold text-dark mb-3">Tem certeza?</h2>
+                <p class="text-muted mb-4">
+                    Você está prestes a excluir a postagem <strong>"{{ post.title }}"</strong>. Esta ação não pode ser desfeita.
+                </p>
+
+                <div class="d-flex gap-2 flex-column flex-sm-row">
+                    <a href="{% url 'forum:forum-post-detail' post.id %}" class="btn btn-outline-secondary btn-lg flex-grow-1 rounded-pill fw-bold py-3">Cancelar</a>
+                    <form action="{% url 'forum:post-delete' post.id %}" method="POST" class="flex-grow-1">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-lg w-100 rounded-pill fw-bold py-3 shadow-sm">
+                            <i class="bi bi-trash-fill me-2"></i> Excluir Agora
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

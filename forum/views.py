@@ -32,12 +32,12 @@ def forum_post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     
     # View tracking
-    View.objects.get_or_create(post=post, user=request.user.username)
+    View.objects.get_or_create(post=post, user=request.user)
 
     if request.method == 'POST':
         content = request.POST.get('comment_content')
         if content:
-            Comment.objects.create(post=post, content=content)
+            Comment.objects.create(post=post, author=request.user, content=content)
 
     comments = Comment.objects.filter(post=post).order_by('-created_at')
     paginator = Paginator(comments, 10)
@@ -59,4 +59,30 @@ def post_create(request):
             post = Post.objects.create(user=request.user, title=title, content=content, image=image)
             from django.shortcuts import redirect
             return redirect('forum:forum-post-detail', post_id=post.id)
-    return render(request, 'forum-create.html')
+    return render(request, 'forum-create.html')
+
+@login_required
+def post_update(request, post_id):
+    from django.shortcuts import redirect
+    post = get_object_or_404(Post, id=post_id, user=request.user)
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        image = request.FILES.get('image')
+        if title and content:
+            post.title = title
+            post.content = content
+            if image:
+                post.image = image
+            post.save()
+            return redirect('forum:forum-post-detail', post_id=post.id)
+    return render(request, 'forum-edit.html', {'post': post})
+
+@login_required
+def post_delete(request, post_id):
+    from django.shortcuts import redirect
+    post = get_object_or_404(Post, id=post_id, user=request.user)
+    if request.method == 'POST':
+        post.delete()
+        return redirect('forum:forum-list')
+    return render(request, 'forum-confirm-delete.html', {'post': post})
