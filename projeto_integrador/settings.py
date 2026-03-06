@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-eg7$e41o7=(byz
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') != 'False'
 
 # allow hosts from comma-separated env var, default localhost and local IP
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,ecoa.onrender.com').split(',')
 
 
 # Application definition
@@ -85,14 +85,16 @@ WSGI_APPLICATION = 'projeto_integrador.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-# default local sqlite; override with DATABASE_URL env var on Render or other hosts
-import dj_database_url
+# Use MongoDB with Djongo
 DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-        ssl_require=not DEBUG,
-    )
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'projeto_integrador',
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': os.environ.get('DATABASE_URL', 'mongodb+srv://Santana:123sdf45@cluster0.ioua4vr.mongodb.net/?appName=Cluster0'),
+        }
+    }
 }
 
 #cache

@@ -9,8 +9,15 @@ from PIL import Image
 from transformers import pipeline
 import torch
 from django.core.files.base import ContentFile
-# Load the model once
-classifier = pipeline("zero-shot-image-classification", model="openai/clip-vit-base-patch32")
+# Lazy load the model to avoid OOM on startup
+_classifier = None
+
+def get_classifier():
+    global _classifier
+    if _classifier is None:
+        # Load the model only when needed
+        _classifier = pipeline("zero-shot-image-classification", model="openai/clip-vit-base-patch32")
+    return _classifier
 
 @login_required
 def historic_pictures(request):
@@ -59,6 +66,7 @@ def take_picture(request):
 
         # AI Classification
         candidate_labels = [choice[1] for choice in TITLE_COMPLAINT_CHOICES]
+        classifier = get_classifier()
         results = classifier(image, candidate_labels=candidate_labels)
         top_result = results[0]
         resultado_ia = top_result['label']
