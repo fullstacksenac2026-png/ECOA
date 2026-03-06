@@ -6,8 +6,6 @@ from authorization.models import User
 import base64
 from io import BytesIO
 from PIL import Image
-from transformers import pipeline
-import torch
 from django.core.files.base import ContentFile
 # Lazy load the model to avoid OOM on startup
 _classifier = None
@@ -15,8 +13,13 @@ _classifier = None
 def get_classifier():
     global _classifier
     if _classifier is None:
-        # Load the model only when needed
-        _classifier = pipeline("zero-shot-image-classification", model="openai/clip-vit-base-patch32")
+        try:
+            from transformers import pipeline
+            import torch
+            # Load the model only when needed
+            _classifier = pipeline("zero-shot-image-classification", model="openai/clip-vit-base-patch32")
+        except ImportError:
+            return None
     return _classifier
 
 @login_required
@@ -67,10 +70,19 @@ def take_picture(request):
         # AI Classification
         candidate_labels = [choice[1] for choice in TITLE_COMPLAINT_CHOICES]
         classifier = get_classifier()
-        results = classifier(image, candidate_labels=candidate_labels)
-        top_result = results[0]
-        resultado_ia = top_result['label']
-        confidence = top_result['score']
+        
+        if classifier:
+            try:
+                results = classifier(image, candidate_labels=candidate_labels)
+                top_result = results[0]
+                resultado_ia = top_result['label']
+                confidence = top_result['score']
+            except Exception as e:
+                resultado_ia = "Indeterminado"
+                confidence = 0.0
+        else:
+            resultado_ia = "Indeterminado (IA desativada para poupar memória)"
+            confidence = 0.0
 
         # Find the key for the label
         title_key = None
