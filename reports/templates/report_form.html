@@ -1,0 +1,50 @@
+{% extends "app-base.html" %}
+
+{% block title %}Denunciar {% if type == 'picture' %}Imagem{% elif type == 'forum_post' %}Post do Fórum{% else %}Comentário{% endif %} | ECOA{% endblock %}
+
+{% block content %}
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5 text-center">
+            <div class="card border-0 shadow-lg p-4">
+                <div class="text-warning mb-4">
+                    <i class="bi bi-flag-fill display-1"></i>
+                </div>
+                <h2 class="fw-bold mb-3">Reportar Problema</h2>
+                <p class="text-muted mb-4">
+                    Ajude-nos a manter a plataforma segura denunciando conteúdo inadequado ou abusivo.
+                </p>
+                <div class="alert alert-secondary border small text-start">
+                    <strong>Alvo:</strong> {% if type == 'picture' or type == 'forum_post' %}{{ target.title }}{% else %}{{ target.content|truncatechars:30 }}{% endif %}
+                </div>
+                
+                <form method="POST" class="d-grid gap-3 text-start">
+                    {% csrf_token %}
+                    <div>
+                        <label class="form-label fw-bold">{{ form.reason.label }}</label>
+                        {{ form.reason }}
+                        {% if form.reason.errors %}
+                            <div class="text-danger small">{{ form.reason.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label class="form-label fw-bold">{{ form.description.label }}</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-danger small">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-warning btn-lg shadow-sm mt-2 fw-bold">
+                        <i class="bi bi-send-fill"></i> Enviar Denúncia
+                    </button>
+                    <a href="{% if type == 'picture' %}{% url 'pictures:details-picture' target.id %}{% elif type == 'comment' %}{% url 'pictures:details-picture' target.picture.id %}{% elif type == 'forum_post' %}{% url 'forum:forum-post-detail' target.id %}{% elif type == 'forum_comment' %}{% url 'forum:forum-post-detail' target.post.id %}{% endif %}" class="btn btn-outline-secondary">
+                        Cancelar
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock content %}

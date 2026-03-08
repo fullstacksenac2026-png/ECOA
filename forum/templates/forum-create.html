@@ -30,20 +30,20 @@
                         
                         <!-- Title Input -->
                         <div class="mb-4">
-                            <label for="title" class="form-label fw-bold text-dark">Título da Discussão</label>
+                            <label for="title" class="form-label fw-bold text-body-emphasis">Título da Discussão</label>
                             <input type="text" name="title" id="title" class="form-control form-control-lg border-2 rounded-3 shadow-none focus-custom-green" placeholder="Ex: Melhores práticas para..." required>
                             <div class="form-text">Seja claro e objetivo para atrair mais pessoas.</div>
                         </div>
 
                         <!-- Content Textarea -->
                         <div class="mb-4">
-                            <label for="content" class="form-label fw-bold text-dark">Conteúdo</label>
+                            <label for="content" class="form-label fw-bold text-body-emphasis">Conteúdo</label>
                             <textarea name="content" id="content" class="form-control border-2 rounded-3 shadow-none focus-custom-green" rows="8" placeholder="Escreva aqui sua dúvida ou compartilhamento..." required></textarea>
                         </div>
 
                         <!-- Image Upload -->
                         <div class="mb-5">
-                            <label for="image" class="form-label fw-bold text-dark">Imagem de Capa (Opcional)</label>
+                            <label for="image" class="form-label fw-bold text-body-emphasis">Imagem de Capa (Opcional)</label>
                             <div class="image-upload-wrapper border-dashed rounded-4 p-4 text-center position-relative transition-hover" id="dropzone">
                                 <input type="file" name="image" id="image" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" accept="image/*" onchange="previewImage(this)">
                                 <div id="preview-placeholder">
@@ -61,7 +61,7 @@
 
                         <!-- Actions -->
                         <div class="d-grid gap-3 d-md-flex justify-content-md-end pt-4 border-top">
-                            <a href="{% url 'forum:forum-list' %}" class="btn btn-light rounded-pill px-5 py-2 fw-semibold">Cancelar</a>
+                            <a href="{% url 'forum:forum-list' %}" class="btn btn-secondary rounded-pill px-5 py-2 fw-semibold">Cancelar</a>
                             <button type="submit" class="btn btn-custom-green rounded-pill px-5 py-2 fw-bold shadow-sm">
                                 Publicar Discussão <i class="bi bi-send-fill ms-2"></i>
                             </button>
@@ -96,14 +96,18 @@
         color: var(--custom-green) !important;
     }
     .btn-custom-green {
+        background-color: #20c997; /* Fallback for when var is not loaded */
         background-color: var(--custom-green);
+        border-color: #20c997;
         border-color: var(--custom-green);
-        color: white;
+        color: white !important;
     }
     .btn-custom-green:hover {
+        background-color: #198754;
         background-color: var(--custom-green-hover);
+        border-color: #198754;
         border-color: var(--custom-green-hover);
-        color: white;
+        color: white !important;
     }
 </style>
 

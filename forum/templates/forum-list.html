@@ -13,8 +13,15 @@
         <div class="d-inline-block p-3 rounded-circle bg-gradient-brand shadow-sm mb-3">
           <i class="bi bi-chat-left-quote-fill text-white fs-1"></i>
         </div>
-        <h1 class="fw-bold text-dark mb-1">Fórum de Comunidade</h1>
-        <p class="text-muted">Conecte-se, compartilhe e aprenda com outros entusiastas</p>
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+          <div>
+            <h1 class="fw-bold text-body-emphasis mb-1">Fórum da Comunidade</h1>
+            <p class="text-muted mb-0">Conecte-se, compartilhe e aprenda com outros entusiastas</p>
+          </div>
+          <a href="{% url 'forum:post-create' %}" class="btn btn-custom-green rounded-pill px-4 fw-bold shadow-sm">
+            <i class="bi bi-pencil-square me-2"></i> Nova Discussão
+          </a>
+        </div>
       </div>
     </div>
 
@@ -62,24 +69,26 @@
                 </div>
               </div>
             {% else %}
-              <div class="bg-gradient-brand-light d-flex align-items-center justify-content-center" style="height: 120px; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);">
-                <i class="bi bi-card-text text-custom-green" style="font-size: 3rem; opacity: 0.5;"></i>
+              <div class="bg-success-subtle d-flex align-items-center justify-content-center" style="height: 180px;">
+                <i class="bi bi-card-text text-success" style="font-size: 3rem; opacity: 0.5;"></i>
               </div>
             {% endif %}
 
             <div class="card-body p-4 d-flex flex-column">
               <div class="d-flex align-items-center mb-3">
-                <div class="bg-light rounded-circle p-1 me-2 shadow-sm" style="width: 32px; height: 32px; overflow: hidden;">
+                <div class="bg-body-secondary rounded-circle p-1 me-2 shadow-sm" style="width: 32px; height: 32px; overflow: hidden;">
                     {% if post.user.profile_picture %}
                         <img src="{{ post.user.profile_picture.url }}" class="w-100 h-100 object-fit-cover rounded-circle">
                     {% else %}
                         <i class="bi bi-person-fill text-muted w-100 h-100 d-flex justify-content-center align-items-center"></i>
                     {% endif %}
                 </div>
-                <span class="small fw-semibold text-secondary">@{{ post.user.username }}</span>
+                <div class="user-info">
+                    <span class="small fw-semibold text-body-emphasis d-block">{{ post.user.first_name }} {{ post.user.last_name|default:"" }}</span>
+                </div>
               </div>
 
-              <h5 class="card-title fw-bold text-dark mb-2">{{ post.title }}</h5>
+              <h5 class="card-title fw-bold text-body-emphasis mb-2">{{ post.title }}</h5>
               <p class="card-text text-muted small mb-4 flex-grow-1">
                 {{ post.content|truncatewords:20 }}
               </p>
@@ -131,7 +140,7 @@
                 </li>
             {% elif num > page_obj_post.number|add:'-3' and num < page_obj_post.number|add:'3' %}
                 <li class="page-item">
-                    <a class="page-link border-0 shadow-sm rounded-3 text-dark" href="?page={{ num }}{% if request.GET.search_post %}&search_post={{ request.GET.search_post }}{% endif %}">{{ num }}</a>
+                    <a class="page-link border-0 shadow-sm rounded-3 text-body" href="?page={{ num }}{% if request.GET.search_post %}&search_post={{ request.GET.search_post }}{% endif %}">{{ num }}</a>
                 </li>
             {% endif %}
           {% endfor %}

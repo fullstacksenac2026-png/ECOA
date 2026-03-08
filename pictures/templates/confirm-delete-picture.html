@@ -1,9 +1,35 @@
 {% extends "app-base.html" %}
 
-<title>{% block title %}Atualizar Queixa{% endblock title %}</title>
+{% block title %}Confirmar Desativação | ECOA{% endblock title %}
 
 {% block content %}
-<main>
-    
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5 text-center">
+            <div class="card border-0 shadow-lg p-4">
+                <div class="text-danger mb-4">
+                    <i class="bi bi-exclamation-triangle-fill display-1"></i>
+                </div>
+                <h2 class="fw-bold mb-3">Confirmar Desativação</h2>
+                <p class="text-muted mb-4">
+                    Você está prestes a desativar esta imagem. Ela deixará de ser visível no sistema para todos os usuários, mas os dados originais serão mantidos de forma privada no banco de dados.
+                </p>
+                <div class="alert alert-secondary border small text-start">
+                    <strong>Item:</strong> {{ picture.title }}<br>
+                    <strong>ID:</strong> #{{ picture.id }}
+                </div>
+                
+                <form method="POST" class="d-grid gap-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-lg shadow-sm">
+                        <i class="bi bi-eye-slash-fill"></i> Sim, Desativar Imagem
+                    </button>
+                    <a href="{% url 'pictures:details-picture' picture.id %}" class="btn btn-outline-secondary">
+                        Cancelar e Voltar
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
 </main>
 {% endblock content %}

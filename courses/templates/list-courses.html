@@ -6,12 +6,8 @@
 <style>
     /* ===== COURSES CONTAINER ===== */
     .courses-container {
-        background: #fff;
+        background: var(--bs-body-bg);
         transition: background-color 0.3s ease;
-    }
-
-    body.dark-mode .courses-container {
-        background: #1a1a1a;
     }
 
     /* ===== SECTION HEADER ===== */
@@ -24,7 +20,7 @@
         transition: background 0.3s ease;
     }
 
-    body.dark-mode .section-header {
+    [data-bs-theme=dark] .section-header {
         background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
@@ -54,12 +50,8 @@
         width: 100%;
         height: 200px;
         overflow: hidden;
-        background: #f0f0f0;
+        background: var(--bs-tertiary-bg);
         transition: all 0.3s ease;
-    }
-
-    body.dark-mode .course-image-wrapper {
-        background: #252525;
     }
 
     .course-image {
@@ -78,7 +70,7 @@
         background: linear-gradient(135deg, #20c997 0%, #198754 100%);
     }
 
-    body.dark-mode .course-image-placeholder {
+    [data-bs-theme=dark] .course-image-placeholder {
         background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
     }
 
@@ -94,13 +86,9 @@
     .empty-state {
         text-align: center;
         padding: 3rem 1rem;
-        background: #f8f9fa;
+        background: var(--bs-tertiary-bg);
         border-radius: 0.5rem;
         transition: background-color 0.3s ease;
-    }
-
-    body.dark-mode .empty-state {
-        background: #252525;
     }
 
     .empty-state i {
@@ -110,19 +98,15 @@
         transition: color 0.3s ease;
     }
 
-    body.dark-mode .empty-state i {
+    [data-bs-theme=dark] .empty-state i {
         color: #4cdf7f;
     }
 
     .empty-text {
-        color: #495057;
+        color: var(--bs-secondary-color);
         font-size: 1.05rem;
         margin-bottom: 0;
         transition: color 0.3s ease;
-    }
-
-    body.dark-mode .empty-text {
-        color: #b0b0b0;
     }
 
     /* ===== PAGINATION ===== */
@@ -139,8 +123,8 @@
 
     .page-item .page-link {
         color: #20c997;
-        border-color: #e9ecef;
-        background-color: white;
+        border-color: var(--bs-border-color);
+        background-color: var(--bs-body-bg);
         border-radius: 0.5rem;
         transition: all 0.3s ease;
         padding: 0.5rem 0.75rem;
@@ -150,35 +134,23 @@
         justify-content: center;
     }
 
-    body.dark-mode .page-item .page-link {
-        background-color: #252525;
-        border-color: #333;
-        color: #4cdf7f;
-    }
-
     .page-item .page-link:hover {
         background-color: #20c997;
         color: white;
         border-color: #20c997;
     }
 
-    body.dark-mode .page-item .page-link:hover {
+    [data-bs-theme=dark] .page-item .page-link:hover {
         background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
         border-color: #1a7f54;
         color: white;
     }
 
     .page-item.disabled .page-link {
-        background-color: #f0f0f0;
+        background-color: var(--bs-tertiary-bg);
         color: #20c997;
         cursor: not-allowed;
-        border-color: #e9ecef;
-    }
-
-    body.dark-mode .page-item.disabled .page-link {
-        background-color: #1e1e1e;
-        color: #4cdf7f;
-        border-color: #333;
+        border-color: var(--bs-border-color);
     }
 
     .page-item.active .page-link {
@@ -187,7 +159,7 @@
         border-color: #198754;
     }
 
-    body.dark-mode .page-item.active .page-link {
+    [data-bs-theme=dark] .page-item.active .page-link {
         background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
         border-color: #0f4e2a;
     }

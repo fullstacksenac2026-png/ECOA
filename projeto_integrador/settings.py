@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'authorization',
     'payments',
     'notifications',
+    'reports',
     'django_mongodb_backend',
 ]
 

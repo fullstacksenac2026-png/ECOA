@@ -9,15 +9,14 @@
     .mobile-app-container {
         width: 100%;
         margin: 0;
-        background: #fff;
+        background: var(--bs-body-bg);
         border-radius: 0;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         overflow: hidden;
         transition: background-color 0.3s ease, box-shadow 0.3s ease;
     }
 
-    body.dark-mode .mobile-app-container {
-        background: #1e1e1e;
+    [data-bs-theme=dark] .mobile-app-container {
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     }
 
@@ -30,7 +29,7 @@
         transition: background 0.3s ease;
     }
 
-    body.dark-mode .mobile-app-header {
+    [data-bs-theme=dark] .mobile-app-header {
         background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
     }
 
@@ -54,15 +53,11 @@
 
     .mobile-step-indicator {
         padding: 1.25rem 1rem;
-        background: #f8f9fa;
-        border-bottom: 1px solid #e9ecef;
+        background: var(--bs-tertiary-bg);
+        border-bottom: 1px solid var(--bs-border-color);
         transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
-    body.dark-mode .mobile-step-indicator {
-        background: #252525;
-        border-bottom-color: #333;
-    }
 
     .step-dots {
         display: flex;
@@ -76,15 +71,12 @@
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: #dee2e6;
+        background: var(--bs-secondary-bg);
         transition: all 0.3s ease;
         cursor: pointer;
         flex-shrink: 0;
     }
 
-    body.dark-mode .step-dot {
-        background: #555;
-    }
 
     .step-dot.active {
         background: #20c997;
@@ -101,9 +93,6 @@
         transition: color 0.3s ease;
     }
 
-    body.dark-mode .step-label-mobile {
-        color: #4cdf7f;
-    }
 
     .mobile-form-content {
         padding: 1.5rem 1rem;
@@ -111,10 +100,6 @@
         transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    body.dark-mode .mobile-form-content {
-        background: #1e1e1e;
-        color: #e0e0e0;
-    }
 
     .mobile-form-content h4 {
         margin-bottom: 1rem;
@@ -124,52 +109,39 @@
         transition: color 0.3s ease;
     }
 
-    body.dark-mode .mobile-form-content h4 {
-        color: #4cdf7f;
-    }
 
     .info-box {
-        background-color: #f8f9fa;
+        background-color: var(--bs-tertiary-bg);
         padding: 0.75rem;
         border-radius: 8px;
         transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
-    body.dark-mode .info-box {
-        background-color: #252525;
-        border: 1px solid #333;
-    }
 
     .info-box label {
         font-size: 0.75rem;
-        color: #6c757d;
+        color: var(--bs-secondary-color);
         font-weight: 600;
         margin-bottom: 0.25rem;
         display: block;
         transition: color 0.3s ease;
     }
 
-    body.dark-mode .info-box label {
-        color: #b0b0b0;
-    }
 
     .info-box p {
         font-size: 0.95rem;
-        color: #212529;
+        color: var(--bs-body-color);
         font-weight: 600;
         margin-bottom: 0;
         word-break: break-word;
         transition: color 0.3s ease;
     }
 
-    body.dark-mode .info-box p {
-        color: #e0e0e0;
-    }
 
     .mobile-button-group {
         padding: 1rem;
-        background: #f8f9fa;
-        border-top: 1px solid #e9ecef;
+        background: var(--bs-tertiary-bg);
+        border-top: 1px solid var(--bs-border-color);
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
@@ -177,10 +149,6 @@
         transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
-    body.dark-mode .mobile-button-group {
-        background: #252525;
-        border-top-color: #333;
-    }
 
     .mobile-button-group form {
         width: 100%;
@@ -214,14 +182,14 @@
         text-decoration: none;
     }
 
-    body.dark-mode .btn-mobile-primary {
+    [data-bs-theme=dark] .btn-mobile-primary {
         background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
     }
 
     .btn-mobile-secondary {
-        background: white;
-        color: #495057;
-        border: 2px solid #dee2e6;
+        background: var(--bs-body-bg);
+        color: var(--bs-secondary-color);
+        border: 2px solid var(--bs-border-color);
         transition: all 0.3s ease;
     }
 
@@ -230,16 +198,6 @@
         color: #20c997;
     }
 
-    body.dark-mode .btn-mobile-secondary {
-        background: #1e1e1e;
-        color: #b0b0b0;
-        border-color: #333;
-    }
-
-    body.dark-mode .btn-mobile-secondary:hover {
-        color: #4cdf7f;
-        border-color: #4cdf7f;
-    }
 
     .btn-mobile:disabled {
         opacity: 0.5;
@@ -280,7 +238,7 @@
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
         }
 
-        body.dark-mode .mobile-app-container {
+        [data-bs-theme=dark] .mobile-app-container {
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
         }
 
@@ -360,7 +318,7 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
         }
 
-        body.dark-mode .mobile-app-container {
+        [data-bs-theme=dark] .mobile-app-container {
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
         }
 
@@ -464,10 +422,10 @@
     }
 </style>
 
-<main class="d-flex align-items-center justify-content-center" style="min-height: 100vh; background: #f0f2f5; padding: 0; padding-top: 1rem; padding-bottom: 1rem;">
+<main class="d-flex align-items-center justify-content-center" style="min-height: 100vh; padding: 0; padding-top: 1rem; padding-bottom: 1rem;">
     <div class="mobile-app-container">
         <div class="mobile-app-header">
-            <div class="bg-white text-secondary rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+            <div class="bg-body-secondary text-secondary rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
                 <i class="bi bi-person-check-fill fs-4"></i>
             </div>
             <h2>Olá, {{ user.first_name }}!</h2>
@@ -620,7 +578,7 @@
                                 <i class="bi bi-play-circle-fill fs-3"></i>
                             </div>
                             <div>
-                                <h6 class="mb-0 fw-bold text-dark">{{ enrollment.course.name }}</h6>
+                                <h6 class="mb-0 fw-bold text-body-emphasis">{{ enrollment.course.name }}</h6>
                                 <small class="text-muted">Inscrito em: {{ enrollment.enrolled_at|date:"d/m/Y" }}</small>
                             </div>
                             <i class="bi bi-chevron-right ms-auto text-muted"></i>
@@ -628,7 +586,7 @@
                     </div>
                 </a>
                 {% empty %}
-                <div class="text-center py-4 bg-light rounded-3">
+                <div class="text-center py-4 bg-body-secondary rounded-3">
                     <i class="bi bi-book fs-1 text-muted opacity-50"></i>
                     <p class="mt-2 text-muted mb-0">Nenhum curso inscrito.</p>
                     <a href="{% url 'courses:list-courses-and-categories' %}" class="btn btn-sm btn-link text-primary text-decoration-none">Ver cursos</a>
@@ -655,7 +613,7 @@
                     </div>
                 </div>
                 {% empty %}
-                <div class="text-center py-4 bg-light rounded-3">
+                <div class="text-center py-4 bg-body-secondary rounded-3">
                     <i class="bi bi-credit-card fs-1 text-muted opacity-50"></i>
                     <p class="mt-2 text-muted mb-0">Nenhum pagamento registrado.</p>
                 </div>

@@ -7,5 +7,8 @@ urlpatterns = [
     path('forum/post/<int:post_id>/', views.forum_post_detail, name='forum-post-detail'),
     path('forum/post/<int:post_id>/edit/', views.post_update, name='forum-post-edit'),
     path('forum/post/<int:post_id>/delete/', views.post_delete, name='forum-post-delete'),
+    path('forum/post/<int:post_id>/like/', views.like_post, name='like-post'),
+    path('forum/comment/<int:comment_id>/like/', views.like_comment, name='like-comment'),
+    path('forum/comment/<int:comment_id>/reply/', views.reply_comment, name='comment-reply'),
     path('forum/post-create', views.post_create, name='post-create')
 ]

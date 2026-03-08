@@ -1,178 +1,143 @@
 {% extends "app-base.html" %}
 
-{% block title %}Captura de Foto{% endblock %}
+{% block title %}Captura de Foto | ECOA{% endblock %}
 
 {% block content %}
-<main class="container-fluid">
-    <section class="py-4">
-        <h1 class="text-center mb-4">Captura de Foto</h1>
+<main class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6 text-center">
+            <h1 class="fw-bold mb-4">Captura de Denúncia</h1>
 
-        <form method="POST" enctype="multipart/form-data" class="d-flex flex-column align-items-center">
-            {% csrf_token %}
+            <form id="picture-form" method="POST" enctype="multipart/form-data" class="d-flex flex-column align-items-center">
+                {% csrf_token %}
 
-            <!-- Camera Section -->
-            <div class="camera-container mb-4 position-relative">
-                <video id="camera" autoplay class="img-fluid rounded shadow" style="max-width: 100%; height: auto;"></video>
-                <canvas id="canvas" style="display: none;"></canvas>
+                <div id="location-status" class="alert alert-warning w-100 mb-3">
+                    <i class="bi bi-geo-alt-fill"></i> Aguardando localização...
+                </div>
 
-                <!-- Capture Button -->
-                <button type="button" onclick="takePicture()" class="btn btn-primary position-absolute bottom-0 start-50 translate-middle-x mb-3 rounded-circle" style="width: 60px; height: 60px; z-index: 10;">
-                    <i class="bi bi-camera-fill fs-4"></i>
+                <!-- Camera Section -->
+                <div class="camera-container mb-4 position-relative shadow-lg rounded overflow-hidden bg-dark" style="width: 100%; max-width: 400px; aspect-ratio: 4/3;">
+                    <video id="camera" autoplay playsinline class="w-100 h-100" style="object-fit: cover;"></video>
+                    <canvas id="canvas" style="display: none;"></canvas>
+
+                    <!-- Capture Button Overlay -->
+                    <button type="button" onclick="window.takePicture()" class="btn btn-primary position-absolute bottom-0 start-50 translate-middle-x mb-3 rounded-circle shadow-lg" style="width: 70px; height: 70px; border: 4px solid white; z-index: 10;">
+                        <i class="bi bi-camera-fill fs-2"></i>
+                    </button>
+                </div>
+
+                <!-- Hidden Inputs -->
+                <input type="hidden" name="image" id="image_input">
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
+
+                <!-- Map container -->
+                <div id="map-container" style="display: none;" class="w-100 mb-4">
+                    <div id="map" style="height: 200px; width: 100%;" class="rounded shadow-sm"></div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submit-btn" class="btn btn-success btn-lg w-100 shadow-sm opacity-50" disabled>
+                    <i class="bi bi-send-fill"></i> Enviar para Análise
                 </button>
-            </div>
-
-            <!-- Preview Image (if exists) -->
-            {% if picture.image %}
-            <div class="mb-4">
-                <img src="{{ picture.image.url }}" alt="Imagem capturada" class="img-fluid rounded shadow" style="max-width: 100%; height: auto;">
-            </div>
-            {% endif %}
-
-            <!-- AI Result -->
-            {% if resultado_ia %}
-            <div class="mb-4 w-100">
-                <h3 class="text-center">Resultado da IA</h3>
-                <pre class="bg-light p-3 rounded border">{{ resultado_ia }}</pre>
-            </div>
-            {% endif %}
-
-            <!-- Hidden Inputs -->
-            <input type="hidden" name="image" id="image_input">
-            <input type="hidden" name="latitude" id="latitude">
-            <input type="hidden" name="longitude" id="longitude">
-
-            <!-- Map -->
-            {% if geolocation %}
-            <div id="map" style="height: 300px; width: 100%;" class="rounded shadow">
-
-            </div>
-            {% endif %}
-
-            <!-- Submit Button -->
-            <button type="submit" class="btn btn-success btn-lg w-100" style="max-width: 300px;">Enviar</button>
-        </form>
-    </section>
+            </form>
+        </div>
+    </div>
 </main>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+
 <script>
-    const video = document.getElementById('camera');
-    const canvas = document.getElementById('canvas');
-    const imageInput = document.getElementById('image_input');
-
-    // Request camera access
-    async function startCamera() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: 'environment', // Use back camera on mobile
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                }
-            });
-            video.srcObject = stream;
-        } catch (error) {
-            console.error('Error accessing camera:', error);
-            alert('Erro ao acessar a câmera. Verifique as permissões.');
-        }
-    }
-
-    // Get geolocation
-    function getLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    document.getElementById('latitude').value = position.coords.latitude;
-                    document.getElementById('longitude').value = position.coords.longitude;
-                },
-                function(error) {
-                    console.error('Error getting location:', error);
-                    alert('Não foi possível obter localização. Verifique as permissões.');
-                },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 300000
-                }
-            );
-        } else {
-            alert('Geolocalização não é suportada neste navegador.');
-        }
-    }
-
-    // Take picture function
-    function takePicture() {
-        const context = canvas.getContext('2d');
-
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-
-        context.drawImage(video, 0, 0);
-
-        const imageBase64 = canvas.toDataURL('image/png');
-        imageInput.value = imageBase64;
-
-        // Optional: Show preview
-        const preview = document.createElement('img');
-        preview.src = imageBase64;
-        preview.className = 'img-fluid rounded shadow mt-3';
-        preview.style.maxWidth = '100%';
-        preview.style.height = 'auto';
-
-        // Replace or add preview
-        const existingPreview = document.querySelector('.preview-image');
-        if (existingPreview) {
-            existingPreview.replaceWith(preview);
-        } else {
-            preview.classList.add('preview-image');
-            video.parentNode.insertBefore(preview, video.nextSibling);
-        }
-    }
-
-    // Initialize
     document.addEventListener('DOMContentLoaded', function() {
-        startCamera();
-        getLocation();
+        const video = document.getElementById('camera');
+        const canvas = document.getElementById('canvas');
+        const imageInput = document.getElementById('image_input');
+        const locationStatus = document.getElementById('location-status');
+        const submitBtn = document.getElementById('submit-btn');
+        const latitudeInput = document.getElementById('latitude');
+        const longitudeInput = document.getElementById('longitude');
+        let mapInstance = null;
+        let markerInstance = null;
+
+        // Camera Activation
+        async function initCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+                });
+                video.srcObject = stream;
+            } catch (err) {
+                locationStatus.classList.replace('alert-warning', 'alert-danger');
+                locationStatus.innerHTML = '<i class="bi bi-camera-video-off-fill"></i> Erro ao acessar câmera.';
+            }
+        }
+
+        // Geolocation Logic
+        function initLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(
+                    (pos) => {
+                        const { latitude, longitude } = pos.coords;
+                        latitudeInput.value = latitude;
+                        longitudeInput.value = longitude;
+
+                        locationStatus.classList.remove('alert-warning', 'alert-danger');
+                        locationStatus.classList.add('alert-success');
+                        locationStatus.innerHTML = '<i class="bi bi-check-circle-fill"></i> Localização confirmada!';
+                        
+                        submitBtn.disabled = !imageInput.value;
+                        if (!submitBtn.disabled) submitBtn.classList.remove('opacity-50');
+
+                        updateMiniMap(latitude, longitude);
+                    },
+                    (err) => {
+                        locationStatus.classList.replace('alert-warning', 'alert-danger');
+                        locationStatus.innerHTML = '<i class="bi bi-exclamation-octagon-fill"></i> GPS Obrigatório para denúncia.';
+                    },
+                    { enableHighAccuracy: true }
+                );
+            }
+        }
+
+        function updateMiniMap(lat, lng) {
+            document.getElementById('map-container').style.display = 'block';
+            if (!mapInstance) {
+                mapInstance = L.map('map').setView([lat, lng], 16);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapInstance);
+                markerInstance = L.marker([lat, lng]).addTo(mapInstance);
+            } else {
+                const newPos = [lat, lng];
+                mapInstance.setView(newPos);
+                markerInstance.setLatLng(newPos);
+            }
+        }
+
+        window.takePicture = function() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            imageInput.value = dataUrl;
+
+            // Simple Preview
+            let preview = document.querySelector('.camera-preview-img');
+            if (!preview) {
+                preview = document.createElement('img');
+                preview.className = 'camera-preview-img img-fluid rounded mt-3 border shadow-sm';
+                video.parentElement.after(preview);
+            }
+            preview.src = dataUrl;
+
+            if (latitudeInput.value) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50');
+            }
+        };
+
+        initCamera();
+        initLocation();
     });
 </script>
-
-<script>
-
-const latitude = {{ geolocation.latitude|default:0 }};
-const longitude = {{ geolocation.longitude|default:0 }};
-
-const map = L.map('map').setView([latitude, longitude], 15);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
-}).addTo(map);
-
-L.marker([latitude, longitude])
-    .addTo(map)
-    .bindPopup("Local da captura")
-    .openPopup();
-
-</script>
-
-<style>
-    .camera-container {
-        position: relative;
-        width: 100%;
-        max-width: 400px;
-    }
-
-    @media (max-width: 576px) {
-        .camera-container {
-            max-width: 100%;
-        }
-
-        video {
-            width: 100% !important;
-            height: auto !important;
-        }
-    }
-</style>
 {% endblock %}

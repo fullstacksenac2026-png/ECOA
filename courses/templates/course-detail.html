@@ -13,9 +13,9 @@
                     <p class="lead text-white mb-3">{{ course.description|truncatewords:30 }}</p>
                     
                     <div class="course-stats mb-3">
-                        <span class="badge bg-light text-dark me-2">⭐ {{ course.rating|default:"4.5" }}/5</span>
-                        <span class="badge bg-light text-dark me-2">👥 {{ students_count }} alunos</span>
-                        <span class="badge bg-light text-dark">⏱️ {{ course.time }}</span>
+                        <span class="badge bg-body-secondary text-body-emphasis me-2">⭐ {{ course.rating|default:"4.5" }}/5</span>
+                        <span class="badge bg-body-secondary text-body-emphasis me-2">👥 {{ students_count }} alunos</span>
+                        <span class="badge bg-body-secondary text-body-emphasis">⏱️ {{ course.time }}</span>
                     </div>
 
                     {% if is_enrolled %}
@@ -299,7 +299,7 @@
 
 <style>
     .course-detail-container {
-        background-color: #f8f9fa;
+        background-color: var(--bs-body-bg);
     }
 
     .course-stats .badge {
@@ -308,7 +308,7 @@
     }
 
     .comments-section .card {
-        border: 1px solid #e0e0e0;
+        border: 1px solid var(--bs-border-color);
         transition: all 0.3s ease;
     }
 
@@ -317,14 +317,14 @@
     }
 
     .accordion-button:not(.collapsed) {
-        background-color: #f0f0f0;
-        color: #333;
+        background-color: var(--bs-tertiary-bg);
+        color: var(--bs-body-color);
     }
 
     .list-group-item {
         padding: 1rem;
         border: none;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid var(--bs-border-color);
     }
 
     .list-group-item:last-of-type {

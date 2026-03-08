@@ -81,4 +81,5 @@ dj-database-url
 torch
 transformers
 gunicorn
+tflite-runtime
 

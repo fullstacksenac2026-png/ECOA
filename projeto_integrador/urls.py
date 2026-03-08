@@ -30,6 +30,7 @@ urlpatterns = [
     path('pictures/', include('pictures.urls')),
     path('forum/', include('forum.urls')),
     path('notifications/', include('notifications.urls')),
+    path('reports/', include('reports.urls')),
 ]
 
 if settings.DEBUG:
