@@ -81,5 +81,6 @@ dj-database-url
 torch
 transformers
 gunicorn
-tflite-runtime
-
+ai-edge-litert
+tensorflow
+tensorflow-hub

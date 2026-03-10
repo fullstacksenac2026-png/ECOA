@@ -1,0 +1,13 @@
+# models directory for TFLite models
+# Place your .tflite model files here
+#
+# Recommended models for mobile image classification:
+# - MobileNetV2: https://storage.googleapis.com/tfhub-lite-models/google/tf2-preview/mobilenet_v2/feature_vector/4
+# - EfficientNet-Lite: https://storage.googleapis.com/tfhub-lite-models/google/efficientnet/lite0/feature-vector/1
+#
+# For custom training, convert your model:
+# import tensorflow as tf
+# converter = tf.lite.TFLiteConverter.from_keras_model(model)
+# tflite_model = converter.convert()
+# with open('mobile_classifier.tflite', 'wb') as f:
+#     f.write(tflite_model)
