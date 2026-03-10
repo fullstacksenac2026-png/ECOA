@@ -10,7 +10,7 @@ colorama
 contourpy
 cssbeautifier
 cycler
-Django>=4.2,<5.1
+Django
 django-br-utils
 djlint
 django-mongodb-backend
