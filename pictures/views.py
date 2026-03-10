@@ -11,7 +11,20 @@ from io import BytesIO
 from PIL import Image
 from django.core.files.base import ContentFile
 import os
-import torch
+
+# ML packages - optional, app works without them
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+
+try:
+    import tensorflow as tf
+    import tensorflow_hub as hub
+    TENSORFLOW_AVAILABLE = True
+except ImportError:
+    TENSORFLOW_AVAILABLE = False
 
 
 
@@ -38,6 +51,11 @@ def load_lite_model():
     
     if _lite_interpreter is not None:
         return True
+    
+    # Verificar se TensorFlow está disponível
+    if not TENSORFLOW_AVAILABLE:
+        print("TensorFlow não disponível - recurso de classificação de imagem desabilitado")
+        return False
         
     try:
         # Tentar importar ai_edge_litert
@@ -156,6 +174,11 @@ def get_classifier(lite=False):
     mode = 'lite' if lite else 'full'
     
     if _classifiers[mode] is None:
+        # Verificar se torch está disponível
+        if not TORCH_AVAILABLE:
+            print("Torch não disponível - recurso de classificação de imagem desabilitado")
+            return None
+            
         try:
             from transformers import pipeline
             model_name = "openai/clip-vit-base-patch32"
@@ -347,19 +370,18 @@ def take_picture(request):
                 classifier_fn = ai_classifier['function']
                 
                 if ai_classifier['type'] == 'litert':
-                    # AI Edge LiteRT (otimizado para mobile)
-                    with torch.inference_mode():
-                        valid_labels = ["Poluição ou lixo", "Natureza limpa", "Objeto aleatório", "Pessoa"]
-                        v_res = classifier_fn(ai_img, valid_labels)
-                        is_valid = v_res[0]['label'] == "Poluição ou lixo" and v_res[0]['score'] > 0.4
-                        
-                        place_labels = ["Urbano", "Rural", "Rio ou Mar", "Floresta", "Área Industrial"]
-                        p_res = classifier_fn(ai_img, place_labels)
-                        detected_place = p_res[0]['label']
-                        
-                        ai_message = f"LiteRT detectou: {detected_place}. Identificado como {'Real' if is_valid else 'Irrelevante'} ({v_res[0]['score']*100:.1f}%)"
-                else:
-                    # Transformers (desktop)
+                    # AI Edge LiteRT (otimizado para mobile) - não usa torch
+                    valid_labels = ["Poluição ou lixo", "Natureza limpa", "Objeto aleatório", "Pessoa"]
+                    v_res = classifier_fn(ai_img, valid_labels)
+                    is_valid = v_res[0]['label'] == "Poluição ou lixo" and v_res[0]['score'] > 0.4
+                    
+                    place_labels = ["Urbano", "Rural", "Rio ou Mar", "Floresta", "Área Industrial"]
+                    p_res = classifier_fn(ai_img, place_labels)
+                    detected_place = p_res[0]['label']
+                    
+                    ai_message = f"LiteRT detectou: {detected_place}. Identificado como {'Real' if is_valid else 'Irrelevante'} ({v_res[0]['score']*100:.1f}%)"
+                elif TORCH_AVAILABLE:
+                    # Transformers (desktop) - requer torch
                     with torch.inference_mode():
                         valid_labels = ["Poluição ou lixo", "Natureza limpa", "Objeto aleatório", "Pessoa"]
                         v_res = classifier_fn(ai_img, candidate_labels=valid_labels)
@@ -434,19 +456,18 @@ def create_picture(request):
                 classifier_fn = ai_classifier['function']
                 
                 if ai_classifier['type'] == 'litert':
-                    # AI Edge LiteRT (otimizado para mobile)
-                    with torch.inference_mode():
-                        valid_labels = ["Poluição ou lixo", "Natureza limpa", "Objeto aleatório", "Pessoa"]
-                        v_res = classifier_fn(img, valid_labels)
-                        is_valid = v_res[0]['label'] == "Poluição ou lixo" and v_res[0]['score'] > 0.4
-                        
-                        place_labels = ["Urbano", "Rural", "Rio ou Mar", "Floresta", "Área Industrial"]
-                        p_res = classifier_fn(img, place_labels)
-                        detected_place = p_res[0]['label']
-                        
-                        ai_message = f"LiteRT detectou: {detected_place} ({v_res[0]['score']*100:.1f}%)"
-                else:
-                    # Transformers (desktop)
+                    # AI Edge LiteRT (otimizado para mobile) - não usa torch
+                    valid_labels = ["Poluição ou lixo", "Natureza limpa", "Objeto aleatório", "Pessoa"]
+                    v_res = classifier_fn(img, valid_labels)
+                    is_valid = v_res[0]['label'] == "Poluição ou lixo" and v_res[0]['score'] > 0.4
+                    
+                    place_labels = ["Urbano", "Rural", "Rio ou Mar", "Floresta", "Área Industrial"]
+                    p_res = classifier_fn(img, place_labels)
+                    detected_place = p_res[0]['label']
+                    
+                    ai_message = f"LiteRT detectou: {detected_place} ({v_res[0]['score']*100:.1f}%)"
+                elif TORCH_AVAILABLE:
+                    # Transformers (desktop) - requer torch
                     with torch.inference_mode():
                         valid_labels = ["Poluição ou lixo", "Natureza limpa", "Objeto aleatório", "Pessoa"]
                         v_res = classifier_fn(img, candidate_labels=valid_labels)

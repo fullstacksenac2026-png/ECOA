@@ -79,6 +79,3 @@ wsproto
 whitenoise
 dj-database-url
 gunicorn
-torch
-transformers==4.35.2
-tensorflow-hub
