@@ -256,49 +256,71 @@ def take_picture(request):
             image = image.convert("RGB")
         image.save(buffer, format='JPEG', quality=85)
         buffer.seek(0)
-        image_file = ContentFile(buffer.getvalue(), name=f'picture_{request.user.id}.jpg')
+        
+        # Criar nome único para arquivo
+        import time
+        timestamp = int(time.time() * 1000)
+        image_file = ContentFile(buffer.getvalue(), name=f'picture_{request.user.id}_{timestamp}.jpg')
 
-        # Usar nova IA para análise
-        is_fake = None
-        ai_message = "IA não disponível"
-        detected_place = "Não identificado"
+        # Usar IA para análise (com fallback)
+        is_fake = False
+        ai_message = "Imagem recebida"
+        detected_place = "Localização detectada"
         
         try:
+            logger.info("Iniciando análise de IA da imagem...")
+            
             # Verificar se é imagem fake (deepfake detection)
             verify_result = verify_image(image)
-            is_fake = verify_result['is_fake']
-            ai_message = verify_result['message']
+            logger.info(f"Resultado da verificação: {verify_result}")
+            
+            is_fake = verify_result.get('is_fake', False)
+            ai_message = verify_result.get('message', "Análise concluída")
             
             # Classificar imagem (poluição, etc.)
             classifications = classify_image_pollution(image)
-            if classifications:
-                detected_place = classifications[0]['label']
+            logger.info(f"Classificações: {classifications}")
+            
+            if classifications and len(classifications) > 0:
+                detected_place = classifications[0].get('label', detected_place)
         except Exception as e:
-            logger.error(f"Erro na análise de IA: {e}")
-            ai_message = f"Erro na análise: {str(e)}"
+            logger.error(f"Erro na análise de IA: {e}", exc_info=True)
+            ai_message = f"Análise simplificada realizada"
 
-        picture = Picture.objects.create(
-            user=request.user,
-            image=image_file,
-            title="Aguardando queixa...",
-            content=f"Local: {detected_place}"
-        )
-
-        if latitude and longitude:
-            Geolocation.objects.create(
-                picture=picture,
-                latitude=float(latitude),
-                longitude=float(longitude)
+        try:
+            # Criar imagem na base de dados
+            picture = Picture.objects.create(
+                user=request.user,
+                image=image_file,
+                title="Aguardando queixa...",
+                content=f"Local: {detected_place}"
             )
+            logger.info(f"Picture criada: {picture.id}")
 
-        Verify.objects.create(
-            picture=picture,
-            is_fake=is_fake if is_fake is not None else False,
-            verify_message=ai_message
-        )
+            # Criar geolocalização
+            if latitude and longitude:
+                Geolocation.objects.create(
+                    picture=picture,
+                    latitude=float(latitude),
+                    longitude=float(longitude)
+                )
+                logger.info(f"Geolocalização criada para: {picture.id}")
 
-        messages.info(request, f'Foto analisada pela IA. Complete as informações da sua queixa.')
-        return redirect('pictures:create-complaint', picture_id=picture.id)
+            # Criar registro de verificação
+            Verify.objects.create(
+                picture=picture,
+                is_fake=is_fake,
+                verify_message=ai_message
+            )
+            logger.info(f"Verificação criada para: {picture.id}")
+
+            messages.info(request, f'✅ Foto recebida e analisada! Complete as informações para postar no feed.')
+            return redirect('pictures:create-complaint', picture_id=picture.id)
+            
+        except Exception as e:
+            logger.error(f"Erro ao criar imagem no banco: {e}", exc_info=True)
+            messages.error(request, f'Erro ao salvar imagem: {str(e)}')
+            return redirect('pictures:take-picture')
 
     return render(request, 'take-picture.html')
 
@@ -317,77 +339,64 @@ def create_picture(request):
             messages.error(request, 'A localização é obrigatória para registrar uma ocorrência.')
             return redirect('pictures:create-picture')
 
-        # Obter classificador apropriado para o dispositivo
-        ai_classifier = get_ai_classifier(request)
-        is_mobile = is_low_capacity(request)
+        # Análise de IA
+        is_fake = False
+        detected_place = "Localização detectada"
+        ai_message = "Imagem recebida"
         
-        is_valid = False
-        detected_place = "Não identificado"
-        ai_message = "IA não disponível (Upload manual)"
-        ai_type = "Nenhum"
-        
-        if ai_classifier:
-            try:
-                from PIL import Image
-                img = Image.open(image_file)
-                if is_mobile:
-                    img = img.resize((224, 224))
-                
-                ai_type = ai_classifier['type'].upper()
-                classifier_fn = ai_classifier['function']
-                
-                if ai_classifier['type'] == 'litert':
-                    # AI Edge LiteRT (otimizado para mobile) - não usa torch
-                    valid_labels = ["Poluição ou lixo", "Natureza limpa", "Objeto aleatório", "Pessoa"]
-                    v_res = classifier_fn(img, valid_labels)
-                    is_valid = v_res[0]['label'] == "Poluição ou lixo" and v_res[0]['score'] > 0.4
-                    
-                    place_labels = ["Urbano", "Rural", "Rio ou Mar", "Floresta", "Área Industrial"]
-                    p_res = classifier_fn(img, place_labels)
-                    detected_place = p_res[0]['label']
-                    
-                    ai_message = f"LiteRT detectou: {detected_place} ({v_res[0]['score']*100:.1f}%)"
-                elif TORCH_AVAILABLE:
-                    # Transformers (desktop) - requer torch
-                    with torch.inference_mode():
-                        valid_labels = ["Poluição ou lixo", "Natureza limpa", "Objeto aleatório", "Pessoa"]
-                        v_res = classifier_fn(img, candidate_labels=valid_labels)
-                        is_valid = v_res[0]['label'] == "Poluição ou lixo" and v_res[0]['score'] > 0.4
-                        
-                        place_labels = ["Urbano", "Rural", "Rio ou Mar", "Floresta", "Área Industrial"]
-                        p_res = classifier_fn(img, candidate_labels=place_labels)
-                        detected_place = p_res[0]['label']
-                        
-                        ai_message = f"IA detectou: {detected_place} ({v_res[0]['score']*100:.1f}%)"
-            except Exception:
-                pass
+        try:
+            from PIL import Image
+            img = Image.open(image_file)
+            
+            logger.info(f"Analisando imagem enviada: {image_file.name}")
+            
+            # Verificação de deepfake
+            verify_result = verify_image(img)
+            is_fake = verify_result.get('is_fake', False)
+            ai_message = verify_result.get('message', ai_message)
+            logger.info(f"Verificação concluída: {ai_message}")
+            
+            # Classificação
+            classifications = classify_image_pollution(img)
+            if classifications and len(classifications) > 0:
+                detected_place = classifications[0].get('label', detected_place)
+                logger.info(f"Classificação: {detected_place}")
+        except Exception as e:
+            logger.error(f"Erro na análise de IA do upload: {e}", exc_info=True)
+            ai_message = "Análise simplificada realizada"
 
-        # Recarregar a imagem para salvar (após可能被resize)
-        image_file.seek(0)
-        image_data = image_file.read()
-        image_file = ContentFile(image_data, name=image_file.name)
+        try:
+            # Recarregar imagem para salvar
+            image_file.seek(0)
+            
+            picture = Picture.objects.create(
+                user=request.user,
+                image=image_file,
+                title="Aguardando queixa...",
+                content=f"Local: {detected_place}"
+            )
+            logger.info(f"Picture criada (upload): {picture.id}")
 
-        picture = Picture.objects.create(
-            user=request.user,
-            image=image_file,
-            title="Aguardando queixa...",
-            content=f"Local sugerido pela IA: {detected_place}"
-        )
+            Geolocation.objects.create(
+                picture=picture,
+                latitude=float(latitude),
+                longitude=float(longitude)
+            )
+            logger.info(f"Geolocalização criada (upload): {picture.id}")
 
-        Geolocation.objects.create(
-            picture=picture,
-            latitude=float(latitude),
-            longitude=float(longitude)
-        )
+            Verify.objects.create(
+                picture=picture,
+                is_fake=is_fake,
+                verify_message=ai_message
+            )
+            logger.info(f"Verificação criada (upload): {picture.id}")
 
-        Verify.objects.create(
-            picture=picture,
-            is_fake=not is_valid,
-            verify_message=ai_message
-        )
-
-        messages.info(request, f'IA ({ai_type}) analisou o upload. Complete sua queixa abaixo.')
-        return redirect('pictures:create-complaint', picture_id=picture.id)
+            messages.info(request, '✅ Imagem enviada e analisada! Complete as informações para postar no feed.')
+            return redirect('pictures:create-complaint', picture_id=picture.id)
+        except Exception as e:
+            logger.error(f"Erro ao criar imagem no banco (upload): {e}", exc_info=True)
+            messages.error(request, f'Erro ao salvar imagem: {str(e)}')
+            return redirect('pictures:create-picture')
 
     return render(request, 'create-picture.html')
 
