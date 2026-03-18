@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Chat - Assistente de IA{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">
+                <i class="fas fa-robot"></i> Assistente de IA
+            </h1>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Sidebar com lista de conversas -->
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-comments"></i> Minhas Conversas</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'chatbot:create' %}" class="list-group-item list-group-item-action bg-light border-bottom">
+                            <i class="fas fa-plus"></i> Nova Conversa
+                        </a>
+                        
+                        {% for session in sessions %}
+                            <a href="{% url 'chatbot:detail' session.id %}" class="list-group-item list-group-item-action">
+                                <strong>{{ session.title|truncatewords:5 }}</strong>
+                                <br>
+                                <small class="text-muted">{{ session.updated_at|date:"d/m/Y H:i" }}</small>
+                                <div class="float-end">
+                                    <small>{{ session.messages.count }} msg</small>
+                                </div>
+                            </a>
+                        {% empty %}
+                            <div class="list-group-item text-muted text-center py-4">
+                                Nenhuma conversa.
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conteúdo principal -->
+        <div class="col-md-9">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h4><i class="fas fa-info-circle"></i> Sobre</h4>
+                    <p class="text-muted">
+                        Bem-vindo ao nosso assistente de IA! 
+                        Estou aqui para responder suas perguntas sobre:
+                    </p>
+                    <ul>
+                        <li>Poluição ambiental</li>
+                        <li>Denúncia e legislação</li>
+                        <li>Métodos de descarte correto</li>
+                        <li>Sustentabilidade</li>
+                        <li>E muito mais!</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-lightbulb"></i> Dica</h5>
+                            <p class="card-text mb-0">
+                                <small>
+                                    Comece uma conversa clicando em "Nova Conversa" e faça suas perguntas. 
+                                    O assistente lerá o contexto da conversa para fornecer respostas mais precisas.
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> Últimas Conversas</h5>
+                </div>
+                <div class="card-body">
+                    {% if sessions %}
+                        <div class="list-group">
+                            {% for session in sessions %}
+                                <a href="{% url 'chatbot:detail' session.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ session.title }}</h5>
+                                        <small>{{ session.updated_at|date:"d/m/Y" }}</small>
+                                    </div>
+                                    <p class="mb-1 text-muted">
+                                        <small>{{ session.messages.count }} mensagens</small>
+                                    </p>
+                                </a>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Paginação -->
+                        {% if page_obj.has_other_pages %}
+                            <nav aria-label="Page navigation" class="mt-3">
+                                <ul class="pagination justify-content-center">
+                                    {% if page_obj.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=1">Primeira</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                                        </li>
+                                    {% endif %}
+
+                                    <li class="page-item active">
+                                        <span class="page-link">
+                                            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                        </span>
+                                    </li>
+
+                                    {% if page_obj.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Próxima</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Você não tem nenhuma conversa. 
+                            <a href="{% url 'chatbot:create' %}">Comece uma agora!</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .list-group-item {
+        border-left: 4px solid transparent;
+        transition: all 0.3s ease;
+    }
+    .list-group-item:hover {
+        border-left-color: #0d6efd;
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}

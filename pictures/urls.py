@@ -16,4 +16,8 @@ urlpatterns = [
     path('comment-picture/<int:picture_id>/', views.comment_picture, name='comment-picture'),
     path('reply-comment/<int:comment_id>/', views.reply_comment, name='reply-comment'),
     path('like-comment/<int:comment_id>/', views.like_comment, name='like-comment'),
+    
+    # API endpoints para IA
+    path('api/verify-image/', views.verify_image_ai, name='verify-image-ai'),
+    path('api/classify-image/', views.classify_image_api, name='classify-image-api'),
 ]

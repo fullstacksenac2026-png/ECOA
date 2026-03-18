@@ -31,6 +31,7 @@ urlpatterns = [
     path('forum/', include('forum.urls')),
     path('notifications/', include('notifications.urls')),
     path('reports/', include('reports.urls')),
+    path('chatbot/', include('chatbot.urls')),
 ]
 
 if settings.DEBUG:

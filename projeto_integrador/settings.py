@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'payments',
     'notifications',
     'reports',
+    'chatbot',
     'django_mongodb_backend',
 ]
 
