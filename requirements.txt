@@ -79,13 +79,7 @@ wsproto
 whitenoise
 dj-database-url
 gunicorn
-tensorflow==2.13.0
-tensorflow-hub==0.13.0
-tensorflow-intel
-tensorflow-io-gcs-filesystem
-tensorflow-metadata
+tensorflow==2.15.0
 torch==2.0.1
 transformers==4.35.2
 opencv-python==4.8.1.78
-onnx==1.14.1
-onnxruntime==1.16.3

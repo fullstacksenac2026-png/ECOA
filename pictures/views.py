@@ -212,8 +212,9 @@ def create_complaint(request, picture_id):
             picture.content = complaint.content[:250]
             picture.save()
             
-            messages.success(request, 'Queixa registrada com sucesso.')
-            return redirect('pictures:details-picture', picture_id=picture.id)
+            messages.success(request, '✅ Queixa postada com sucesso! Sua denúncia está visível para todos.')
+            # Redireciona para o histórico público (feed) ao invés de apenas a foto
+            return redirect('pictures:historic-pictures')
         else:
             messages.error(request, 'Por favor, corrija os erros abaixo.')
     else:
