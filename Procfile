@@ -1,2 +1,2 @@
 
-web: hypercorn projeto_integrador.asgi:application --bind 0.0.0.0:$PORT
+web: gunicorn projeto_integrador.wsgi:application --bind 0.0.0.0:$PORT
