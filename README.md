@@ -57,7 +57,7 @@ Este é um projeto Django que implementa uma plataforma educacional completa, de
 - **IA/ML**: 
   - Transformers 4.35+ (Hugging Face) - CLIP e FLAN-T5
   - PyTorch 2.1+ - Redes neurais
-  - TensorFlow 2.13+ - Modelos de deep learning
+  - TensorFlow 2.16+ - Modelos de deep learning
   - OpenCV 4.8+ - Processamento de imagens
   - MediaPipe 0.10+ - Detecção facial e landmarks
   - NumPy 1.21+ - Computação numérica
@@ -67,7 +67,7 @@ Este é um projeto Django que implementa uma plataforma educacional completa, de
 - **Pagamentos**: Stripe, Mercado Pago
 - **Frontend**: HTML/CSS/JavaScript, Bootstrap 5.3+
 - **Deploy**: Render, Heroku
-- **Python**: 3.12+
+- **Python**: 3.13+
 
 ## Estrutura do Projeto
 
@@ -200,11 +200,11 @@ O projeto está configurado para deploy no Render/Heroku:
 
 ### Troubleshooting de Deploy
 
-#### Erro: "No matching distribution found for torch==X.X.X"
-**Solução**: Atualizar requirements.txt para usar versões compatíveis:
+#### Erro: "No matching distribution found for tensorflow>=2.13.0"
+**Solução**: Atualizar requirements.txt para usar versões compatíveis com Python 3.13+:
 ```txt
-torch>=2.1.0
-transformers>=4.35.0
+tensorflow>=2.16.0
+tensorflow-hub>=0.16.0
 ```
 
 #### Erro: "RequestDataTooBig"
