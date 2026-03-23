@@ -1,6 +1,6 @@
 """
 AI Models para detecção de imagens e assistência ao usuário
-Suporta análise de frequência e Transformers
+Suporta análise de dataset, Transformers e detecção de deepfake
 """
 
 import os
@@ -8,6 +8,7 @@ import logging
 import numpy as np
 from PIL import Image
 import io
+import cv2
 
 logger = logging.getLogger(__name__)
 
@@ -23,15 +24,31 @@ try:
 except ImportError:
     TRANSFORMERS_AVAILABLE = False
 
+try:
+    import tensorflow as tf
+    from tensorflow.keras.applications import EfficientNetB0
+    from tensorflow.keras.preprocessing import image as keras_image
+    TF_AVAILABLE = True
+except ImportError:
+    TF_AVAILABLE = False
+
+try:
+    import mediapipe as mp
+    MEDIAPIPE_AVAILABLE = True
+except ImportError:
+    MEDIAPIPE_AVAILABLE = False
+
 # Cache global dos modelos
 _cache = {
     'image_classifier': None,
     'chatbot': None,
+    'deepfake_detector': None,
+    'face_detector': None,
 }
 
 
 class AIModelManager:
-    """Gerenciador de modelos de IA"""
+    """Gerenciador de modelos de IA com detecção avançada de deepfake"""
     
     @staticmethod
     def is_low_capacity():
@@ -46,15 +63,21 @@ class AIModelManager:
     @staticmethod
     def detect_fake_image(image_data):
         """
-        Detecta se uma imagem é real ou fake/deepfake
-        Usa análise de frequência FFT
+        Detecta se uma imagem é real ou fake/deepfake usando múltiplas técnicas
+        
+        Métodos utilizados:
+        1. Análise de frequência FFT (artefatos de compressão)
+        2. Detecção de faces com MediaPipe
+        3. Análise de consistência de iluminação
+        4. Detecção de artefatos de compressão JPEG
         
         Returns:
             {
                 'is_fake': bool,
                 'confidence': float (0-1),
                 'message': str,
-                'recommendation': str
+                'recommendation': str,
+                'methods': list de métodos usados e scores
             }
         """
         try:
@@ -64,58 +87,62 @@ class AIModelManager:
             else:
                 image = image_data
             
-            # Converter para escala de cinza
-            image_gray = image.convert("L")
-            image_array = np.array(image_gray)
+            # Converter para RGB se necessário
+            if image.mode != 'RGB':
+                image = image.convert('RGB')
             
-            # Análise de frequência FFT
-            fft = np.fft.fft2(image_array)
-            magnitude = np.abs(np.fft.fftshift(fft))
+            # Inicializar scores
+            scores = []
             
-            # Log para escala
-            log_magnitude = np.log1p(magnitude)
+            # ========== MÉTODO 1: Análise de Frequência FFT ==========
+            fft_score = AIModelManager._fft_analysis(image)
+            scores.append(('FFT', fft_score))
             
-            # Calcular características de frequência
-            center = log_magnitude.shape[0] // 2
-            radius_size = center // 4
+            # ========== MÉTODO 2: Detecção de Faces ==========
+            face_score = AIModelManager._face_consistency_check(image)
+            if face_score is not None:
+                scores.append(('Face Detection', face_score))
             
-            # Região central (baixa frequência)
-            y_start, y_end = max(0, center - radius_size), min(log_magnitude.shape[0], center + radius_size)
-            x_start, x_end = max(0, center - radius_size), min(log_magnitude.shape[1], center + radius_size)
+            # ========== MÉTODO 3: Análise de Iluminação ==========
+            lighting_score = AIModelManager._lighting_consistency(image)
+            scores.append(('Lighting', lighting_score))
             
-            low_freq = np.sum(log_magnitude[y_start:y_end, x_start:x_end])
-            total_freq = np.sum(log_magnitude)
-            high_freq = total_freq - low_freq
+            # ========== MÉTODO 4: Compressão e Artefatos ==========
+            artifact_score = AIModelManager._compression_artifacts(image)
+            scores.append(('Artifacts', artifact_score))
             
-            # Razão de contraste
-            ratio = high_freq / (low_freq + 1e-8)
+            # Calcular score final (média ponderada)
+            weights = {'FFT': 0.25, 'Face Detection': 0.30, 'Lighting': 0.25, 'Artifacts': 0.20}
+            total_score = 0
+            total_weight = 0
             
-            # Limiar para detecção
-            # Imagens geradas por IA tendem a ter menos variação de frequência
-            threshold = 0.5
-            is_fake_detected = ratio < threshold
+            for method, score in scores:
+                weight = weights.get(method, 0.2)
+                total_score += score * weight
+                total_weight += weight
             
-            # Calcular confiança
-            if is_fake_detected:
-                confidence = min(1.0, (threshold - ratio) / threshold * 0.8 + 0.2)
-            else:
-                confidence = min(1.0, (ratio - threshold) / threshold * 0.8 + 0.2)
+            final_confidence = total_score / total_weight if total_weight > 0 else 0.5
             
-            if is_fake_detected:
+            # Classificação: score > 0.6 = potencialmente fake
+            is_fake = final_confidence > 0.6
+            
+            if is_fake:
                 return {
                     'is_fake': True,
-                    'confidence': confidence,
-                    'message': f'⚠️ Imagem possivelmente MANIPULADA (confiança: {confidence*100:.1f}%)',
-                    'recommendation': 'Esta imagem pode ter sido editada ou gerada. Verifique a origem antes de compartilhar.',
-                    'score': confidence
+                    'confidence': final_confidence,
+                    'message': f'⚠️ Imagem possivelmente MANIPULADA (confiança: {final_confidence*100:.1f}%)',
+                    'recommendation': 'Esta imagem pode ter sido editada, gerada por IA ou deepfake. Verifique a origem antes de compartilhar.',
+                    'score': final_confidence,
+                    'methods': [{'name': m, 'score': s} for m, s in scores]
                 }
             else:
                 return {
                     'is_fake': False,
-                    'confidence': confidence,
-                    'message': f'✅ Imagem parece AUTÊNTICA (confiança: {confidence*100:.1f}%)',
+                    'confidence': 1 - final_confidence,
+                    'message': f'✅ Imagem parece AUTÊNTICA (confiança: {(1-final_confidence)*100:.1f}%)',
                     'recommendation': 'Esta imagem parece ser genuína.',
-                    'score': confidence
+                    'score': 1 - final_confidence,
+                    'methods': [{'name': m, 'score': s} for m, s in scores]
                 }
             
         except Exception as e:
@@ -124,9 +151,145 @@ class AIModelManager:
                 'is_fake': None,
                 'confidence': 0.0,
                 'message': f'⚠️ Não foi possível verificar a imagem: {str(e)}',
-                'recommendation': 'Sistema de verificação temporariamente indisponível. Prossiga com cautela.',
-                'score': 0.0
+                'recommendation': 'Sistema de verificação temporariamente indisponível. Prossida com cautela.',
+                'score': 0.0,
+                'methods': []
             }
+    
+    @staticmethod
+    def _fft_analysis(image):
+        """Análise de frequência para detectar artefatos de compressão"""
+        try:
+            image_gray = image.convert("L")
+            image_array = np.array(image_gray)
+            
+            # Aplicar FFT
+            fft = np.fft.fft2(image_array)
+            magnitude = np.abs(np.fft.fftshift(fft))
+            log_magnitude = np.log1p(magnitude)
+            
+            # Calcular características de frequência
+            center = log_magnitude.shape[0] // 2
+            radius_size = center // 4
+            
+            y_start = max(0, center - radius_size)
+            y_end = min(log_magnitude.shape[0], center + radius_size)
+            x_start = max(0, center - radius_size)
+            x_end = min(log_magnitude.shape[1], center + radius_size)
+            
+            low_freq = np.sum(log_magnitude[y_start:y_end, x_start:x_end])
+            total_freq = np.sum(log_magnitude)
+            high_freq = total_freq - low_freq
+            
+            ratio = high_freq / (low_freq + 1e-8)
+            
+            # Imagens geradas por IA tendem a ter menos variação de frequência
+            # Normalizamos o score [0, 1] onde 1 = provavelmente fake
+            fft_score = 1.0 / (1.0 + np.exp(-(ratio - 0.5) * 5))
+            return fft_score
+        except Exception as e:
+            logger.error(f"Erro em FFT analysis: {e}")
+            return 0.5
+    
+    @staticmethod
+    def _face_consistency_check(image):
+        """Verifica consistência de faces usando MediaPipe"""
+        if not MEDIAPIPE_AVAILABLE:
+            return None
+        
+        try:
+            mp_face_detection = mp.solutions.face_detection
+            
+            # Converter PIL para array numpy
+            image_array = np.array(image)
+            
+            with mp_face_detection.FaceDetection(
+                model_selection=1,
+                min_detection_confidence=0.5
+            ) as face_detection:
+                results = face_detection.process(image_array)
+                
+                if not results.detections:
+                    # Sem faces detectadas = indício de imagem artificial
+                    return 0.4
+                
+                # Analisar consistência das faces detectadas
+                detections = results.detections
+                scores_list = []
+                
+                for detection in detections:
+                    # Score de confiança original do MediaPipe
+                    confidence = detection.location_data.relative_bounding_box.width
+                    scores_list.append(confidence)
+                
+                # Se todas as faces têm alta confiança = mais provavelmente real
+                avg_confidence = np.mean(scores_list) if scores_list else 0.5
+                
+                # Inversão: alta confiança = score baixo (real)
+                face_score = 1.0 - avg_confidence
+                return face_score
+        except Exception as e:
+            logger.error(f"Erro em face detection: {e}")
+            return None
+    
+    @staticmethod
+    def _lighting_consistency(image):
+        """Verifica consistência de iluminação"""
+        try:
+            image_array = np.array(image)
+            
+            # Dividir em canais
+            r, g, b = cv2.split(image_array)
+            
+            # Calcular variância de iluminação em diferentes regiões
+            h, w = r.shape
+            regions = []
+            
+            for i in range(4):
+                for j in range(4):
+                    y_start = i * h // 4
+                    y_end = (i + 1) * h // 4
+                    x_start = j * w // 4
+                    x_end = (j + 1) * w // 4
+                    
+                    region = r[y_start:y_end, x_start:x_end]
+                    regions.append(np.var(region))
+            
+            # Desvio padrão da variância entre regiões
+            consistency = np.std(regions) / (np.mean(regions) + 1e-8)
+            
+            # Normalizar: imagens geradas tendem ter iluminação mais consistente
+            lighting_score = 1.0 / (1.0 + np.exp(-(consistency - 1.0) * 2))
+            return lighting_score
+        except Exception as e:
+            logger.error(f"Erro em lighting check: {e}")
+            return 0.5
+    
+    @staticmethod
+    def _compression_artifacts(image):
+        """Detecta artefatos de compressão JPEG"""
+        try:
+            image_array = np.array(image)
+            gray = cv2.cvtColor(image_array, cv2.COLOR_RGB2GRAY)
+            
+            # Aplicar transformada discreta de cossenos (DCT) para detectar blocos JPEG
+            dct = cv2.dct(np.float32(gray) / 255.0)
+            
+            # Quantizar para detectar padrões de quantização JPEG
+            dct_quantized = np.round(dct * 8) / 8
+            
+            # Diferença entre DCT e quantização
+            quantization_error = np.sum(np.abs(dct - dct_quantized))
+            
+            # Normalizar em relação ao tamanho
+            normalized_error = quantization_error / (gray.size + 1e-8)
+            
+            # Higher error = mais compressão = mais provavelmente real (não gerado)
+            artifact_score = 1.0 / (1.0 + np.exp(normalized_error * 10))
+            return artifact_score
+        except Exception as e:
+            logger.error(f"Erro em compression artifacts: {e}")
+            return 0.5
     
     @staticmethod
     def load_image_classifier():

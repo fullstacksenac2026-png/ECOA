@@ -809,3 +809,63 @@ body {
         font-size: 0.9rem;
     }
 }
+
+/* ========== HEADER IMPROVEMENTS (App Mode) ========== */
+
+/* Top Bar Enhancement */
+#topBar {
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem !important;
+}
+
+/* Logo Container */
+#topBar a img {
+    transition: filter 0.3s ease;
+}
+
+#topBar a div {
+    transition: all 0.3s ease;
+}
+
+/* Icons in header */
+#topBar i {
+    transition: all 0.3s ease;
+}
+
+#themeToggle:hover {
+    transform: rotate(20deg) scale(1.1);
+}
+
+/* Light mode adjustments */
+html[data-bs-theme="light"] #topBar {
+    background: linear-gradient(135deg, #20c997 0%, #198754 100%) !important;
+    color: white;
+}
+
+html[data-bs-theme="light"] #topBar i {
+    filter: brightness(0) invert(1);
+}
+
+/* Dark mode adjustments */
+html[data-bs-theme="dark"] #topBar {
+    background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%) !important;
+    color: white;
+}
+
+html[data-bs-theme="dark"] #topBar i {
+    filter: brightness(0) invert(1);
+}
+
+/* Notification badge */
+#topBar .badge {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
