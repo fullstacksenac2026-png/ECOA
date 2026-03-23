@@ -33,10 +33,18 @@ Este é um projeto Django que implementa uma plataforma educacional completa, de
 - Alertas por email
 - Notificações push
 
-### 6. Análise de Imagens com IA
-- Detecção de imagens manipuladas/fake usando análise de frequência FFT
-- Classificação de imagens usando Transformers (CLIP)
-- Verificação de autenticidade de imagens enviadas
+### 6. Análise de Imagens com IA Avançada
+- **Detecção Multi-Método de Deepfakes**: 
+  - Análise de frequência FFT para artefatos de compressão
+  - Detecção facial usando MediaPipe
+  - Análise de consistência de iluminação
+  - Detecção de artefatos JPEG
+  - Reconhecimento facial com OpenFace/MediaPipe fallback
+  - Validação com datasets simulados (preparado para Kaggle)
+- **Classificação Inteligente**: Transformers (CLIP) para categorização zero-shot
+- **Chatbot**: FLAN-T5 para respostas contextuais
+- **Otimização Mobile**: Detecção de dispositivos de baixa capacidade
+- **Verificação de Autenticidade**: Sistema robusto para validar imagens enviadas
 
 ### 7. Relatórios
 - Geração de relatórios administrativos
@@ -47,13 +55,15 @@ Este é um projeto Django que implementa uma plataforma educacional completa, de
 - **Backend**: Django 4.2+
 - **Banco de Dados**: SQLite (desenvolvimento) / PostgreSQL (produção)
 - **IA/ML**: 
-  - Transformers 4.35+ (Hugging Face)
-  - PyTorch 2.1+
-  - OpenCV 4.8+
-  - MediaPipe 0.10+ (detecção facial)
-  - TensorFlow 2.13+
-  - NumPy 1.21+
-  - PIL (Pillow) 10.0+
+  - Transformers 4.35+ (Hugging Face) - CLIP e FLAN-T5
+  - PyTorch 2.1+ - Redes neurais
+  - TensorFlow 2.13+ - Modelos de deep learning
+  - OpenCV 4.8+ - Processamento de imagens
+  - MediaPipe 0.10+ - Detecção facial e landmarks
+  - NumPy 1.21+ - Computação numérica
+  - PIL (Pillow) 10.0+ - Manipulação de imagens
+  - Scikit-learn 1.3+ - Machine learning
+  - Face Recognition (OpenFace) - Reconhecimento facial avançado
 - **Pagamentos**: Stripe, Mercado Pago
 - **Frontend**: HTML/CSS/JavaScript, Bootstrap 5.3+
 - **Deploy**: Render, Heroku
@@ -151,6 +161,27 @@ O sistema utiliza **múltiplas técnicas avançadas** para detectar possíveis m
 
 ### Classificação de Imagens
 Usa o modelo CLIP (Contrastive Language-Image Pretraining) para classificação zero-shot de imagens em categorias relacionadas à poluição ambiental.
+
+## Compatibilidade Mobile e Dispositivos
+
+### Otimizações Implementadas
+- **Detecção de Capacidade**: Sistema identifica dispositivos de baixa capacidade (< 2GB RAM)
+- **Modelos Adaptativos**: IA usa modelos mais leves em dispositivos móveis
+- **Templates Responsivos**: Interface otimizada para mobile com Bootstrap
+- **Upload Dual-Mode**: Opção de câmera ou galeria para dispositivos móveis
+- **Compressão Inteligente**: Imagens comprimidas automaticamente para mobile
+
+### Funcionalidades Mobile
+- **Captura de Imagem**: Interface nativa da câmera com fallback para upload
+- **Análise em Tempo Real**: Processamento otimizado para dispositivos móveis
+- **Interface Touch-Friendly**: Botões e navegação otimizados para toque
+- **Offline Support**: Cache inteligente de modelos IA
+
+### Navegadores Suportados
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
 
 ## Deploy
 
