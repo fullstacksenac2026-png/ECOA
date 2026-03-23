@@ -44,17 +44,20 @@ Este é um projeto Django que implementa uma plataforma educacional completa, de
 
 ## Tecnologias Utilizadas
 
-- **Backend**: Django 4.x
+- **Backend**: Django 4.2+
 - **Banco de Dados**: SQLite (desenvolvimento) / PostgreSQL (produção)
 - **IA/ML**: 
-  - Transformers 3.12.0 (Hugging Face)
-  - PyTorch 2.0.1
-  - OpenCV
-  - NumPy
-  - PIL (Pillow)
+  - Transformers 4.35+ (Hugging Face)
+  - PyTorch 2.1+
+  - OpenCV 4.8+
+  - MediaPipe 0.10+ (detecção facial)
+  - TensorFlow 2.13+
+  - NumPy 1.21+
+  - PIL (Pillow) 10.0+
 - **Pagamentos**: Stripe, Mercado Pago
-- **Frontend**: HTML/CSS/JavaScript, Bootstrap
+- **Frontend**: HTML/CSS/JavaScript, Bootstrap 5.3+
 - **Deploy**: Render, Heroku
+- **Python**: 3.12+
 
 ## Estrutura do Projeto
 
@@ -118,24 +121,70 @@ projeto_integrador/
 ## Funcionamento da IA
 
 ### Detecção de Imagens Manipuladas
-O sistema utiliza análise de frequência FFT para detectar possíveis manipulações em imagens:
+O sistema utiliza **múltiplas técnicas avançadas** para detectar possíveis manipulações em imagens:
 
-1. **Conversão**: Imagem convertida para escala de cinza
-2. **FFT**: Aplicada Transformada de Fourier
-3. **Análise**: Comparação entre frequências baixas e altas
-4. **Classificação**: Baseada em limiares estatísticos
+#### Técnicas Implementadas:
+1. **Análise de Frequência FFT** (25% peso): Detecta artefatos de compressão JPEG
+2. **Detecção Facial com MediaPipe** (30% peso): Analisa consistência de faces
+3. **Análise de Iluminação** (25% peso): Verifica uniformidade de iluminação
+4. **Artefatos de Compressão** (20% peso): Detecta padrões DCT
+
+#### Processo:
+1. **Pré-processamento**: Conversão para RGB e validação
+2. **Análise Multi-Método**: Cada técnica retorna um score [0-1]
+3. **Ponderação**: Scores combinados com pesos específicos
+4. **Classificação**: Score final > 0.6 = potencialmente fake
+
+#### Resposta Detalhada:
+```json
+{
+    "is_fake": false,
+    "confidence": 0.85,
+    "message": "✅ Imagem parece AUTÊNTICA",
+    "methods": [
+        {"name": "FFT", "score": 0.4},
+        {"name": "Face Detection", "score": 0.3},
+        {"name": "Lighting", "score": 0.45}
+    ]
+}
+```
 
 ### Classificação de Imagens
-Usa o modelo CLIP (Contrastive Language-Image Pretraining) para classificação zero-shot de imagens em categorias pré-definidas.
+Usa o modelo CLIP (Contrastive Language-Image Pretraining) para classificação zero-shot de imagens em categorias relacionadas à poluição ambiental.
 
 ## Deploy
 
 O projeto está configurado para deploy no Render/Heroku:
 
-- **Procfile**: Define o comando de inicialização
-- **render.yaml**: Configuração para Render
-- **runtime.txt**: Versão do Python
-- **build.sh**: Script de build
+- **Procfile**: Define o comando de inicialização com Gunicorn
+- **render.yaml**: Configuração para Render com MongoDB
+- **runtime.txt**: Python 3.12.0
+- **requirements.txt**: Dependências atualizadas para compatibilidade
+
+### Configurações de Produção
+- **DEBUG**: False
+- **SECRET_KEY**: Definida via variável de ambiente
+- **ALLOWED_HOSTS**: Configurado para domínios específicos
+- **DATABASE_URL**: MongoDB Atlas para produção
+
+### Troubleshooting de Deploy
+
+#### Erro: "No matching distribution found for torch==X.X.X"
+**Solução**: Atualizar requirements.txt para usar versões compatíveis:
+```txt
+torch>=2.1.0
+transformers>=4.35.0
+```
+
+#### Erro: "RequestDataTooBig"
+**Solução**: Aumentar limites de upload em `settings.py`:
+```python
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
+```
+
+#### Erro: "ModuleNotFoundError"
+**Solução**: Verificar se todas as dependências estão listadas no requirements.txt com versões compatíveis com Python 3.12+.
 
 ## Contribuição
 
