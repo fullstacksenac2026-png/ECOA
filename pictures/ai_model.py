@@ -139,11 +139,11 @@ class AIModelManager:
             return None
         
         try:
-            # CLIP para classificação zero-shot
+            # CLIP para classificação zero-shot (versão lite)
             device = "cuda" if TORCH_AVAILABLE and torch.cuda.is_available() else "cpu"
             classifier = pipeline(
                 "zero-shot-image-classification",
-                model="openai/clip-vit-base-patch32",
+                model="openai/clip-vit-base-patch16",
                 device=device
             )
             _cache['image_classifier'] = classifier

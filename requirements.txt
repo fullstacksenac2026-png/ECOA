@@ -80,7 +80,7 @@ whitenoise
 dj-database-url
 gunicorn
 torch==2.0.1
-transformers==4.35.2
+transformers==3.12.0
 opencv-python==4.8.1.78
 Pillow>=10.0.0
 numpy>=1.21.0
