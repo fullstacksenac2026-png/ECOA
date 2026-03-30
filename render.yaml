@@ -16,3 +16,5 @@ services:
         value: ".onrender.com"
       - key: DATABASE_URL
         value: "mongodb+srv://Santana:123sdf45@cluster0.ioua4vr.mongodb.net/?appName=Cluster0"
+      - key: PYTHON_VERSION
+        value: "3.11.9"
