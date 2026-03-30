@@ -106,16 +106,22 @@ class FaceRecognitionManager:
     @staticmethod
     def load_kaggle_model():
         """Carrega modelo treinado com dataset Kaggle para detecção de deepfakes"""
-        if not FACE_RECOGNITION_AVAILABLE:
+        if not FACE_RECOGNITION_AVAILABLE and not MP_AVAILABLE:
             return None
             
+        if _cache.get('kaggle_model') is not None:
+            return _cache['kaggle_model']
+            
         try:
-            # Modelo simplificado usando RandomForest
-            # Em produção, seria carregado de um arquivo .pkl treinado
-            model = RandomForestClassifier(n_estimators=100, random_state=42)
-            # Aqui seria carregado o modelo real treinado com dataset Kaggle
-            # model = joblib.load('path/to/kaggle_trained_model.pkl')
-            return model
+            import joblib
+            model_path = os.path.join(os.path.dirname(__file__), 'kaggle_trained_model.pkl')
+            if os.path.exists(model_path):
+                model = joblib.load(model_path)
+                _cache['kaggle_model'] = model
+                return model
+            else:
+                logger.warning("Arquivo kaggle_trained_model.pkl não encontrado.")
+                return None
         except Exception as e:
             logger.error(f"Erro ao carregar modelo Kaggle: {e}")
             return None
@@ -198,14 +204,21 @@ class FaceRecognitionManager:
             if model is None:
                 return 0.5
             
-            # Em produção, o modelo seria treinado com dataset real
-            # Por enquanto, retorna score baseado na qualidade dos features
-            feature_quality = np.std(face_features)  # Variância dos features
+            # Garantir formato (1, 128) para o modelo. 
+            # (OpenFace já provê 128 dimensões, MediaPipe provê menos e será feito o padding).
+            features = np.array(face_features).astype(float).flatten()
+            if len(features) < 128:
+                features = np.pad(features, (0, 128 - len(features)))
+            elif len(features) > 128:
+                features = features[:128]
+                
+            features = features.reshape(1, -1)
             
-            # Score baseado na qualidade: mais variância = mais provável real
-            score = min(1.0, max(0.0, feature_quality / 0.5))
+            # O modelo retorna as probabilidades para [Real, Fake] na ordem
+            proba = model.predict_proba(features)[0]
+            fake_prob = proba[1]  # Probabilidade de ser Fake (classe 1)
             
-            return score
+            return fake_prob
             
         except Exception as e:
             logger.error(f"Erro na validação Kaggle: {e}")
