@@ -6,110 +6,83 @@
 {% endblock %}
 
 {% block content %}
-<main class="container py-4">
+<main class="w-full max-w-3xl mx-auto py-8 px-4">
     <!-- Back Button -->
-    <div class="mb-4">
-        <a href="{% url 'forum:forum-list' %}" class="text-decoration-none text-custom-green fw-semibold">
-            <i class="bi bi-arrow-left me-1"></i> Voltar para o Fórum
+    <div class="mb-6">
+        <a href="{% url 'forum:forum-list' %}" class="inline-flex items-center text-customGreen font-bold hover:text-customGreenHover transition-colors no-underline">
+            <i class="bi bi-arrow-left mr-2 bg-customGreen/10 p-2 rounded-full"></i> Voltar para o Fórum
         </a>
     </div>
 
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                <!-- Header with Brand Gradient -->
-                <div class="bg-gradient-brand p-4 p-md-5 text-white text-center">
-                    <i class="bi bi-pencil-square display-4 mb-3 d-block"></i>
-                    <h2 class="fw-bold mb-0">Nova Discussão</h2>
-                    <p class="opacity-75 mb-0">Compartilhe seu conhecimento ou peça ajuda à comunidade</p>
+    <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden relative">
+        <!-- Header with Brand Gradient -->
+        <div class="bg-gradient-to-r from-customGreen to-emerald-400 p-8 md:p-12 text-white text-center relative overflow-hidden">
+            <!-- Decorative Elements -->
+            <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+            <div class="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full blur-2xl -ml-10 -mb-10"></div>
+            
+            <i class="bi bi-pencil-square text-6xl mb-4 inline-block drop-shadow-md relative z-10"></i>
+            <h2 class="text-3xl font-black mb-2 relative z-10 tracking-tight">Nova Discussão</h2>
+            <p class="text-emerald-50 text-lg m-0 relative z-10 font-medium">Compartilhe seu conhecimento ou peça ajuda à comunidade.</p>
+        </div>
+
+        <div class="p-8 md:p-12">
+            <form method="post" enctype="multipart/form-data" class="flex flex-col gap-8">
+                {% csrf_token %}
+                
+                <!-- Title Input -->
+                <div>
+                    <label for="title" class="block text-slate-800 dark:text-white font-bold mb-3 text-lg">Título da Discussão</label>
+                    <input type="text" name="title" id="title" class="w-full bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-customGreen focus:ring-4 focus:ring-customGreen/10 text-slate-800 dark:text-white text-lg transition-all" placeholder="Ex: Melhores práticas para compostagem..." required>
+                    <div class="mt-2 text-sm text-slate-500 font-medium ml-2"><i class="bi bi-info-circle mr-1"></i> Seja claro e objetivo para atrair mais pessoas.</div>
                 </div>
 
-                <div class="card-body p-4 p-md-5">
-                    <form method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
+                <!-- Content Textarea -->
+                <div>
+                    <label for="content" class="block text-slate-800 dark:text-white font-bold mb-3 text-lg">Conteúdo</label>
+                    <textarea name="content" id="content" rows="8" class="w-full bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-customGreen focus:ring-4 focus:ring-customGreen/10 text-slate-800 dark:text-white text-lg transition-all resize-none" placeholder="Escreva aqui sua dúvida ou compartilhamento de ideias de forma detalhada..." required></textarea>
+                </div>
+
+                <!-- Image Upload -->
+                <div>
+                    <label for="image" class="block text-slate-800 dark:text-white font-bold mb-3 text-lg">Imagem de Capa <span class="text-slate-400 font-normal text-sm ml-2">(Opcional)</span></label>
+                    
+                    <div class="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-3xl p-8 text-center bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-customGreen transition-colors relative cursor-pointer group" id="dropzone">
+                        <input type="file" name="image" id="image" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" accept="image/*" onchange="previewImage(this)">
                         
-                        <!-- Title Input -->
-                        <div class="mb-4">
-                            <label for="title" class="form-label fw-bold text-body-emphasis">Título da Discussão</label>
-                            <input type="text" name="title" id="title" class="form-control form-control-lg border-2 rounded-3 shadow-none focus-custom-green" placeholder="Ex: Melhores práticas para..." required>
-                            <div class="form-text">Seja claro e objetivo para atrair mais pessoas.</div>
-                        </div>
-
-                        <!-- Content Textarea -->
-                        <div class="mb-4">
-                            <label for="content" class="form-label fw-bold text-body-emphasis">Conteúdo</label>
-                            <textarea name="content" id="content" class="form-control border-2 rounded-3 shadow-none focus-custom-green" rows="8" placeholder="Escreva aqui sua dúvida ou compartilhamento..." required></textarea>
-                        </div>
-
-                        <!-- Image Upload -->
-                        <div class="mb-5">
-                            <label for="image" class="form-label fw-bold text-body-emphasis">Imagem de Capa (Opcional)</label>
-                            <div class="image-upload-wrapper border-dashed rounded-4 p-4 text-center position-relative transition-hover" id="dropzone">
-                                <input type="file" name="image" id="image" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" accept="image/*" onchange="previewImage(this)">
-                                <div id="preview-placeholder">
-                                    <i class="bi bi-cloud-arrow-up display-6 text-custom-green mb-2 d-block"></i>
-                                    <p class="mb-0 text-muted">Arraste uma imagem ou clique para selecionar</p>
-                                    <small class="text-muted opacity-75">PNG, JPG até 5MB</small>
-                                </div>
-                                <div id="preview-container" class="d-none">
-                                    <img id="image-preview" src="#" alt="Preview" class="img-fluid rounded-3 mb-2" style="max-height: 200px;">
-                                    <p class="small text-custom-green mb-0 fw-bold">Imagem selecionada!</p>
-                                    <button type="button" class="btn btn-sm btn-link text-danger text-decoration-none" onclick="removeImage()">Remover</button>
-                                </div>
+                        <!-- Initial State -->
+                        <div id="preview-placeholder" class="relative z-10 pointer-events-none transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105">
+                            <div class="w-16 h-16 bg-white dark:bg-slate-800 shadow-sm rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-200 dark:border-slate-700 text-customGreen group-hover:shadow-md transition-shadow">
+                                <i class="bi bi-cloud-arrow-up-fill text-2xl"></i>
                             </div>
+                            <p class="text-slate-700 dark:text-slate-300 font-bold mb-1">Toque ou arraste uma imagem aqui</p>
+                            <span class="text-sm text-slate-400 font-medium">PNG, JPG de até 5MB</span>
                         </div>
 
-                        <!-- Actions -->
-                        <div class="d-grid gap-3 d-md-flex justify-content-md-end pt-4 border-top">
-                            <a href="{% url 'forum:forum-list' %}" class="btn btn-secondary rounded-pill px-5 py-2 fw-semibold">Cancelar</a>
-                            <button type="submit" class="btn btn-custom-green rounded-pill px-5 py-2 fw-bold shadow-sm">
-                                Publicar Discussão <i class="bi bi-send-fill ms-2"></i>
-                            </button>
+                        <!-- Preview State -->
+                        <div id="preview-container" class="hidden relative z-30">
+                            <div class="relative inline-block border-4 border-white dark:border-slate-800 rounded-2xl shadow-lg overflow-hidden mb-4">
+                                <img id="image-preview" src="#" alt="Preview" class="max-h-64 object-cover">
+                            </div>
+                            <p class="text-customGreen font-bold mb-2 flex items-center justify-center gap-2"><i class="bi bi-check-circle-fill"></i> Imagem anexada com sucesso!</p>
+                            <button type="button" class="bg-red-50 hover:bg-red-100 text-red-500 font-bold px-4 py-2 rounded-full text-sm transition-colors shadow-sm" onclick="removeImage()">Remover Arquivo</button>
                         </div>
-                    </form>
+                    </div>
                 </div>
-            </div>
+
+                <!-- Actions -->
+                <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-slate-100 dark:border-slate-700 mt-2">
+                    <a href="{% url 'forum:forum-list' %}" class="flex-1 text-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold rounded-full py-4 transition-colors no-underline">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="flex-[2] bg-customGreen hover:bg-customGreenHover text-white font-bold rounded-full py-4 shadow-lg shadow-customGreen/30 transition-transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                        Publicar Discussão <i class="bi bi-send-fill text-lg"></i>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </main>
-
-<style>
-    .focus-custom-green:focus {
-        border-color: var(--custom-green);
-        box-shadow: 0 0 0 0.25rem rgba(32, 201, 151, 0.15);
-    }
-    .border-dashed {
-        border: 2px dashed #dee2e6;
-        transition: all 0.3s ease;
-    }
-    .image-upload-wrapper:hover {
-        border-color: var(--custom-green);
-        background-color: rgba(32, 201, 151, 0.05);
-    }
-    .cursor-pointer {
-        cursor: pointer;
-    }
-    .bg-gradient-brand {
-        background: linear-gradient(135deg, #20c997 0%, #198754 100%);
-    }
-    .text-custom-green {
-        color: var(--custom-green) !important;
-    }
-    .btn-custom-green {
-        background-color: #20c997; /* Fallback for when var is not loaded */
-        background-color: var(--custom-green);
-        border-color: #20c997;
-        border-color: var(--custom-green);
-        color: white !important;
-    }
-    .btn-custom-green:hover {
-        background-color: #198754;
-        background-color: var(--custom-green-hover);
-        border-color: #198754;
-        border-color: var(--custom-green-hover);
-        color: white !important;
-    }
-</style>
 
 <script>
     function previewImage(input) {
@@ -121,21 +94,29 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 preview.src = e.target.result;
-                placeholder.classList.add('d-none');
-                container.classList.remove('d-none');
+                placeholder.classList.add('hidden');
+                container.classList.remove('hidden');
+                
+                // Keep input above for retapping but push preview container up in z-index internally
+                input.style.zIndex = '40';
             }
             reader.readAsDataURL(input.files[0]);
         }
     }
 
     function removeImage() {
+        // Stop propagation so clicking remove doesn't trigger file dialog
+        event.stopPropagation();
+        event.preventDefault();
+        
         const input = document.getElementById('image');
         const placeholder = document.getElementById('preview-placeholder');
         const container = document.getElementById('preview-container');
         
         input.value = '';
-        placeholder.classList.remove('d-none');
-        container.classList.add('d-none');
+        placeholder.classList.remove('hidden');
+        container.classList.add('hidden');
+        input.style.zIndex = '20';
     }
 </script>
 {% endblock %}

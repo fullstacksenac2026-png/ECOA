@@ -1,401 +1,142 @@
 {% extends 'app-base.html' %}
 
-{% block title %}<title>Cursos</title>{% endblock %}
+{% block title %}<title>Cursos - ECOÁ</title>{% endblock %}
 
 {% block content %}
-<style>
-    /* ===== COURSES CONTAINER ===== */
-    .courses-container {
-        background: var(--bs-body-bg);
-        transition: background-color 0.3s ease;
-    }
+<main class="w-full max-w-7xl mx-auto px-4 py-8">
+    
+    <!-- Hero / Categories Header -->
+    <section class="mb-12">
+        <div class="bg-gradient-to-tr from-customGreen to-emerald-500 rounded-[3rem] p-8 md:p-12 text-white shadow-xl relative overflow-hidden flex flex-col items-center text-center">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+            <div class="absolute bottom-0 left-10 w-40 h-40 bg-black/10 rounded-full blur-2xl -mb-10 pointer-events-none"></div>
+            
+            <i class="bi bi-mortarboard-fill text-6xl mb-4 relative z-10 drop-shadow-lg text-emerald-50"></i>
+            <h1 class="text-4xl md:text-5xl font-black mb-3 relative z-10 tracking-tight">Academia <span class="text-emerald-100">ECOÁ</span></h1>
+            <p class="text-emerald-50 text-xl font-medium m-0 relative z-10 max-w-2xl">Aprenda práticas sustentáveis. Conecte-se com a natureza e transforme a sua comunidade através do conhecimento.</p>
+        </div>
+    </section>
 
-    /* ===== SECTION HEADER ===== */
-    .section-header {
-        background: linear-gradient(135deg, #20c997 0%, #198754 100%);
-        color: white;
-        padding: 1.5rem 1rem;
-        border-radius: 0.5rem;
-        margin-bottom: 2rem;
-        transition: background 0.3s ease;
-    }
-
-    [data-bs-theme=dark] .section-header {
-        background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    .section-title {
-        color: white;
-        margin-bottom: 0.5rem;
-        font-size: 1.5rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .section-title i {
-        font-size: 1.8rem;
-    }
-
-    .section-subtitle {
-        color: rgba(255, 255, 255, 0.92);
-        margin: 0;
-        font-size: 0.95rem;
-    }
-
-    /* ===== COURSE IMAGE ===== */
-    .course-image-wrapper {
-        width: 100%;
-        height: 200px;
-        overflow: hidden;
-        background: var(--bs-tertiary-bg);
-        transition: all 0.3s ease;
-    }
-
-    .course-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s ease;
-    }
-
-    .course-image-placeholder {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #20c997 0%, #198754 100%);
-    }
-
-    [data-bs-theme=dark] .course-image-placeholder {
-        background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
-    }
-
-
-    /* ===== SECTIONS ===== */
-    .categories-section,
-    .courses-section {
-        padding: 1rem;
-        margin-bottom: 3rem;
-    }
-
-    /* ===== EMPTY STATE ===== */
-    .empty-state {
-        text-align: center;
-        padding: 3rem 1rem;
-        background: var(--bs-tertiary-bg);
-        border-radius: 0.5rem;
-        transition: background-color 0.3s ease;
-    }
-
-    .empty-state i {
-        font-size: 3rem;
-        color: #20c997;
-        margin-bottom: 1rem;
-        transition: color 0.3s ease;
-    }
-
-    [data-bs-theme=dark] .empty-state i {
-        color: #4cdf7f;
-    }
-
-    .empty-text {
-        color: var(--bs-secondary-color);
-        font-size: 1.05rem;
-        margin-bottom: 0;
-        transition: color 0.3s ease;
-    }
-
-    /* ===== PAGINATION ===== */
-    .pagination-nav {
-        margin-top: 2.5rem;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .pagination {
-        gap: 0.25rem;
-        flex-wrap: wrap;
-    }
-
-    .page-item .page-link {
-        color: #20c997;
-        border-color: var(--bs-border-color);
-        background-color: var(--bs-body-bg);
-        border-radius: 0.5rem;
-        transition: all 0.3s ease;
-        padding: 0.5rem 0.75rem;
-        min-width: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .page-item .page-link:hover {
-        background-color: #20c997;
-        color: white;
-        border-color: #20c997;
-    }
-
-    [data-bs-theme=dark] .page-item .page-link:hover {
-        background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
-        border-color: #1a7f54;
-        color: white;
-    }
-
-    .page-item.disabled .page-link {
-        background-color: var(--bs-tertiary-bg);
-        color: #20c997;
-        cursor: not-allowed;
-        border-color: var(--bs-border-color);
-    }
-
-    .page-item.active .page-link {
-        background: linear-gradient(135deg, #20c997 0%, #198754 100%);
-        color: white;
-        border-color: #198754;
-    }
-
-    [data-bs-theme=dark] .page-item.active .page-link {
-        background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
-        border-color: #0f4e2a;
-    }
-
-    /* ===== RESPONSIVE ===== */
-    @media (min-width: 480px) {
-        .categories-section,
-        .courses-section {
-            padding: 1.5rem;
-        }
-
-        .section-header {
-            padding: 2rem 1.5rem;
-        }
-
-        .section-title {
-            font-size: 1.65rem;
-        }
-
-        .section-title i {
-            font-size: 2rem;
-        }
-
-        .section-subtitle {
-            font-size: 1rem;
-        }
-    }
-
-    @media (min-width: 768px) {
-        .categories-section,
-        .courses-section {
-            padding: 2rem;
-        }
-
-        .section-header {
-            padding: 2.5rem 2rem;
-        }
-
-        .section-title {
-            font-size: 1.8rem;
-        }
-
-        .empty-state {
-            padding: 4rem 2rem;
-        }
-    }
-
-    @media (min-width: 1024px) {
-        .categories-section,
-        .courses-section {
-            padding: 2.5rem;
-        }
-
-        .section-header {
-            padding: 3rem 2.5rem;
-        }
-
-        .section-title {
-            font-size: 2rem;
-        }
-
-        .pagination {
-            gap: 0.5rem;
-        }
-    }
-</style>
-<main class="courses-container">
-    <!-- Seção de Categorias -->
-    <section class="categories-section mt-4 mb-5">
-        <div class="section-header mb-4">
-            <h1 class="section-title">
-                <i class="bi bi-tag-fill"></i> Categorias
-            </h1>
-            <p class="section-subtitle">Explore nossos cursos por categoria</p>
+    <!-- Categories Section -->
+    <section class="mb-16">
+        <div class="flex items-center gap-4 mb-8">
+            <h2 class="text-3xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-3">
+                <i class="bi bi-tags-fill text-customGreen bg-customGreen/10 p-2.5 rounded-xl text-2xl"></i> Trilhas de Conhecimento
+            </h2>
+            <div class="flex-1 h-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
         </div>
 
         {% if categories %}
-            <div class="categories-grid">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {% for category in categories %}
-                    <article class="category-card">
-                        <div class="category-card-body">
-                            <div class="category-icon">
-                                <i class="bi bi-folder-fill"></i>
-                            </div>
-                            <h3 class="category-name">{{ category.name }}</h3>
-                            <p class="category-description">{{ category.description }}</p>
-                            <a href="{% url 'courses:list-courses-by-category' category.id %}" class="btn btn-custom-green btn-sm w-100">
-                                Ver Cursos
-                                <i class="bi bi-arrow-right ms-2"></i>
-                            </a>
-                        </div>
-                    </article>
+                <a href="{% url 'courses:list-courses-by-category' category.id %}" class="group bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-customGreen shadow-sm hover:shadow-xl rounded-3xl p-6 transition-all hover:-translate-y-1 block no-underline text-center relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-customGreen/0 to-customGreen/0 group-hover:from-customGreen/5 group-hover:to-transparent transition-colors"></div>
+                    <div class="w-16 h-16 mx-auto bg-slate-50 dark:bg-slate-900 group-hover:bg-customGreen group-hover:text-white text-customGreen rounded-2xl flex items-center justify-center mb-4 transition-colors shadow-sm relative z-10">
+                        <i class="bi bi-folder-fill text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2 relative z-10">{{ category.name }}</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm line-clamp-2 m-0 relative z-10">{{ category.description }}</p>
+                </a>
                 {% endfor %}
             </div>
 
-            <!-- Paginação de Categorias -->
+            <!-- Categories Pagination -->
             {% if page_obj.paginator.num_pages > 1 %}
-                <nav aria-label="Paginação de categorias" class="pagination-nav mt-4">
-                    <ul class="pagination justify-content-center">
-                        {% if page_obj.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page=1" aria-label="Primeira página">
-                                    <i class="bi bi-chevron-double-left"></i>
-                                </a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Página anterior">
-                                    <i class="bi bi-chevron-left"></i>
-                                </a>
-                            </li>
-                        {% endif %}
-                        
-                        <li class="page-item disabled">
-                            <span class="page-link">
-                                {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-                            </span>
-                        </li>
-                        
-                        {% if page_obj.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Próxima página">
-                                    <i class="bi bi-chevron-right"></i>
-                                </a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Última página">
-                                    <i class="bi bi-chevron-double-right"></i>
-                                </a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </nav>
+            <nav class="mt-8 flex justify-center">
+                <ul class="flex items-center gap-2 m-0 p-0 list-none bg-white dark:bg-slate-800 p-2 rounded-full shadow-sm border border-slate-100 dark:border-slate-700">
+                    {% if page_obj.has_previous %}
+                    <li><a class="w-10 h-10 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-customGreen no-underline" href="?page={{ page_obj.previous_page_number }}"><i class="bi bi-chevron-left"></i></a></li>
+                    {% endif %}
+                    
+                    <li><span class="w-10 h-10 flex items-center justify-center rounded-full bg-customGreen text-white font-bold">{{ page_obj.number }}</span></li>
+                    
+                    {% if page_obj.has_next %}
+                    <li><a class="w-10 h-10 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-customGreen no-underline" href="?page={{ page_obj.next_page_number }}"><i class="bi bi-chevron-right"></i></a></li>
+                    {% endif %}
+                </ul>
+            </nav>
             {% endif %}
         {% else %}
-            <div class="empty-state">
-                <i class="bi bi-inbox"></i>
-                <p class="empty-text">Nenhuma categoria disponível no momento.</p>
+            <div class="text-center py-12 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-dashed border-slate-200 dark:border-slate-700">
+                <i class="bi bi-inbox text-5xl text-slate-300 dark:text-slate-600 mb-4 inline-block"></i>
+                <h4 class="text-xl font-bold text-slate-700 dark:text-slate-300 mb-2">Sem Trilhas Disponíveis</h4>
+                <p class="text-slate-500 m-0">No momento, nenhuma categoria foi cadastrada.</p>
             </div>
         {% endif %}
     </section>
 
-    <!-- Seção de Cursos -->
-    <section class="courses-section">
-        <div class="section-header mb-4">
-            <h1 class="section-title">
-                <i class="bi bi-book-fill"></i> Cursos
-            </h1>
-            <p class="section-subtitle">Encontre o curso perfeito para você</p>
+    <!-- Courses Section -->
+    <section>
+        <div class="flex items-center gap-4 mb-8">
+            <h2 class="text-3xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-3">
+                <i class="bi bi-book-half text-blue-500 bg-blue-500/10 p-2.5 rounded-xl text-2xl"></i> Cursos em Destaque
+            </h2>
+            <div class="flex-1 h-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
         </div>
 
         {% if courses %}
-            <div class="courses-grid">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for course in courses %}
-                    <article class="course-card">
-                        <div class="course-card-header">
-                            <div class="course-status-badge">
-                                <span class="badge bg-custom-green">Disponível</span>
+                <article class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-sm hover:shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col group transition-all duration-300 hover:-translate-y-1">
+                    
+                    <div class="relative h-48 w-full bg-slate-100 dark:bg-slate-900 overflow-hidden">
+                        <!-- Badge -->
+                        <div class="absolute top-4 left-4 z-20">
+                            <span class="bg-customGreen text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full shadow-sm backdrop-blur-md">Disponível</span>
+                        </div>
+                        
+                        {% if course.image %}
+                            <img src="{{ course.image.url }}" alt="{{ course.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        {% else %}
+                            <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-customGreen/20 flex flex-col items-center justify-center">
+                                <i class="bi bi-image text-slate-300/50 dark:text-slate-600/50 text-6xl group-hover:scale-110 transition-transform duration-500"></i>
                             </div>
-                        </div>
+                        {% endif %}
+                    </div>
 
-                        <div class="course-image-wrapper">
-                            {% if course.image %}
-                                <img src="{{ course.image.url }}" alt="{{ course.name }}" class="course-image">
-                            {% else %}
-                                <div class="course-image-placeholder">
-                                    <i class="bi bi-image" style="font-size: 3rem; color: white; opacity: 0.5;"></i>
-                                </div>
-                            {% endif %}
+                    <div class="p-6 md:p-8 flex flex-col flex-1">
+                        <h3 class="text-2xl font-bold text-slate-800 dark:text-white mb-3 line-clamp-2 leading-tight group-hover:text-customGreen transition-colors">{{ course.name }}</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mb-6 flex-1 line-clamp-3 leading-relaxed">{{ course.description }}</p>
+                        
+                        <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-medium text-sm mb-6 bg-slate-50 dark:bg-slate-900 rounded-xl px-4 py-2 w-fit">
+                            <i class="bi bi-clock-history text-customGreen"></i>
+                            <span>{{ course.time|default:"Duração não especificada" }}</span>
                         </div>
-
-                        <div class="course-card-body">
-                            <h3 class="course-title">{{ course.name }}</h3>
-                            <p class="course-description">{{ course.description }}</p>
-                            
-                            <div class="course-meta">
-                                <div class="meta-item">
-                                    <i class="bi bi-clock"></i>
-                                    <span class="meta-text">{{ course.time }}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="course-card-footer">
-                            <a href="{% url 'courses:course-detail' course.id %}" class="btn btn-custom-green w-100">
-                                Ver Detalhes
-                                <i class="bi bi-arrow-right ms-2"></i>
-                            </a>
-                        </div>
-                    </article>
+                        
+                        <a href="{% url 'courses:course-detail' course.id %}" class="block w-full text-center bg-slate-100 hover:bg-customGreen text-slate-700 hover:text-white font-bold px-6 py-4 rounded-full transition-all no-underline mt-auto">
+                            Acessar Conteúdo <i class="bi bi-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                </article>
                 {% endfor %}
             </div>
 
-            <!-- Paginação de Cursos -->
+            <!-- Courses Pagination -->
             {% if page_obj.paginator.num_pages > 1 %}
-                <nav aria-label="Paginação de cursos" class="pagination-nav mt-5">
-                    <ul class="pagination justify-content-center">
-                        {% if page_obj.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page=1" aria-label="Primeira página">
-                                    <i class="bi bi-chevron-double-left"></i>
-                                </a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Página anterior">
-                                    <i class="bi bi-chevron-left"></i>
-                                </a>
-                            </li>
-                        {% endif %}
-                        
-                        <li class="page-item disabled">
-                            <span class="page-link">
-                                {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-                            </span>
-                        </li>
-                        
-                        {% if page_obj.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Próxima página">
-                                    <i class="bi bi-chevron-right"></i>
-                                </a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Última página">
-                                    <i class="bi bi-chevron-double-right"></i>
-                                </a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </nav>
+            <nav class="mt-12 flex justify-center">
+                <ul class="flex items-center gap-2 m-0 p-0 list-none bg-white dark:bg-slate-800 p-2 rounded-full shadow-sm border border-slate-100 dark:border-slate-700">
+                    {% if page_obj.has_previous %}
+                    <li><a class="w-12 h-12 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-customGreen no-underline" href="?page={{ page_obj.previous_page_number }}"><i class="bi bi-chevron-left text-lg"></i></a></li>
+                    {% endif %}
+                    
+                    <li><span class="w-12 h-12 flex items-center justify-center rounded-full bg-customGreen text-white font-black text-lg">{{ page_obj.number }}</span></li>
+                    
+                    {% if page_obj.has_next %}
+                    <li><a class="w-12 h-12 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-customGreen no-underline" href="?page={{ page_obj.next_page_number }}"><i class="bi bi-chevron-right text-lg"></i></a></li>
+                    {% endif %}
+                </ul>
+            </nav>
             {% endif %}
         {% else %}
-            <div class="empty-state">
-                <i class="bi bi-search"></i>
-                <p class="empty-text">Nenhum curso disponível no momento.</p>
+            <div class="text-center py-20 bg-slate-50 dark:bg-slate-900 rounded-[3rem] border border-dashed border-slate-200 dark:border-slate-700">
+                <div class="w-24 h-24 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+                    <i class="bi bi-search text-5xl text-slate-300 dark:text-slate-600"></i>
+                </div>
+                <h4 class="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-2">Nenhum Curso Encontrado</h4>
+                <p class="text-slate-500 text-lg m-0">Não temos cursos cadastrados nesta área ainda.</p>
             </div>
         {% endif %}
     </section>
+
 </main>
 {% endblock %}

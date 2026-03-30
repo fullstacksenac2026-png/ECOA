@@ -1,108 +1,181 @@
 {% extends 'base.html' %}
 
-{% block title %}FAQ - Perguntas Frequentes{% endblock %}
+{% block title %}ECOÁ - Perguntas Frequentes{% endblock %}
 
 {% block content %}
-    <main class="container py-5 mt-5">
-        <div class="text-center mb-5">
-            <h1 class="display-4 fw-bold mb-3">Perguntas Frequentes</h1>
-            <p class="lead text-muted mx-auto" style="max-width: 700px;">
+<main class="  mt-20 relative py-24 overflow-hidden min-h-screen">
+    <div class="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[600px] h-[600px] bg-customGreen/10 rounded-full blur-3xl pointer-events-none z-0"></div>
+    <div class="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-3xl pointer-events-none z-0"></div>
+
+    <div class="container mx-auto px-4 max-w-4xl relative z-10">
+        <div class="text-center mb-16">
+            <span class="text-customGreen font-bold tracking-widest uppercase mb-2 block text-sm">Central de Ajuda</span>
+            <h1 class="text-5xl md:text-6xl font-black text-slate-800 dark:text-white tracking-tight mb-6">
+                Perguntas <span class="text-transparent bg-clip-text bg-gradient-to-r from-customGreen to-emerald-400">Frequentes</span>
+            </h1>
+            <p class="text-xl text-slate-500 font-light max-w-2xl mx-auto leading-relaxed">
                 Tire suas dúvidas sobre nossos serviços, denúncias e como você pode contribuir para um meio ambiente mais limpo.
             </p>
         </div>
 
-        <div class="row justify-content-center mb-5">
-            <div class="col-lg-8">
-                <div class="accordion custom-accordion" id="faqAccordion">
-                    
-                    <div class="accordion-item border-0 shadow-sm mb-3 rounded overflow-hidden">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button fw-bold py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                <i class="bi bi-question-circle-fill me-2 text-soft-green"></i>
-                                Como faço para registrar uma denúncia?
-                            </button>
-                        </h2>
-                        <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body text-muted py-3">
-                                Para registrar uma denúncia, acesse a página de Serviços, clique na opção "Denúncias Ambientais" e siga o passo a passo. Você precisará tirar uma foto do problema e nossa IA ajudará na classificação antes do envio para o órgão responsável.
-                            </div>
+        <div class="space-y-6 mb-24" id="faqAccordion">
+            
+            <div class="faq-card bg-white dark:bg-slate-800 border-2 border-customGreen dark:border-customGreen rounded-3xl overflow-hidden shadow-lg transition-all duration-300 group">
+                <button type="button" class="flex items-center justify-between w-full p-6 md:p-8 text-left focus:outline-none accordion-btn bg-slate-50/50 dark:bg-slate-800/80" aria-expanded="true">
+                    <span class="flex items-center gap-4 text-lg md:text-xl font-bold text-slate-800 dark:text-white group-hover:text-customGreen transition-colors">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-customGreen/10 text-customGreen flex items-center justify-center">
+                            <i class="bi bi-megaphone-fill text-2xl"></i>
                         </div>
+                        Como faço para registrar uma denúncia?
+                    </span>
+                    <i class="bi bi-chevron-down text-slate-400 text-xl transition-transform duration-300 transform rotate-180 accordion-icon group-hover:text-customGreen"></i>
+                </button>
+                <div class="accordion-content transition-all duration-300 ease-in-out" style="max-height: 1000px;">
+                    <div class="p-6 md:p-8 pt-0 md:pt-0 text-slate-600 dark:text-slate-300 leading-relaxed text-lg font-light">
+                        Para registrar uma denúncia, acesse a página de Serviços, clique na opção "Denúncias Ambientais" e siga o passo a passo. Você precisará tirar uma foto do problema e nossa IA ajudará na classificação antes do envio para o órgão responsável.
                     </div>
-
-                    <div class="accordion-item border-0 shadow-sm mb-3 rounded overflow-hidden">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed fw-bold py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                <i class="bi bi-robot me-2 text-soft-green"></i>
-                                Como funciona a análise por Inteligência Artificial?
-                            </button>
-                        </h2>
-                        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body text-muted py-3">
-                                Nossa IA analisa a imagem enviada para identificar padrões de poluição (como lixo em rios, queimadas, etc.). Ela categoriza a gravidade e o tipo de infração, agilizando a triagem e garantindo que as denúncias mais urgentes sejam priorizadas.
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="accordion-item border-0 shadow-sm mb-3 rounded overflow-hidden">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed fw-bold py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                <i class="bi bi-shield-check me-2 text-soft-green"></i>
-                                Minha identidade será preservada ao fazer uma denúncia?
-                            </button>
-                        </h2>
-                        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body text-muted py-3">
-                                Sim, a segurança e privacidade dos nossos usuários são prioridade. Você pode optar por realizar denúncias anônimas. Seus dados pessoais não serão compartilhados publicamente em nenhuma circunstância.
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="accordion-item border-0 shadow-sm mb-3 rounded overflow-hidden">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed fw-bold py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                                <i class="bi bi-people-fill me-2 text-soft-green"></i>
-                                Quem pode participar do fórum comunitário?
-                            </button>
-                        </h2>
-                        <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body text-muted py-3">
-                                O fórum é aberto a todos os cidadãos interessados em discutir questões ambientais locais. Basta criar uma conta gratuita na plataforma para começar a interagir, propor soluções e organizar ações coletivas.
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
+
+            <div class="faq-card bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 hover:border-blue-100 dark:hover:border-slate-600 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group">
+                <button type="button" class="flex items-center justify-between w-full p-6 md:p-8 text-left focus:outline-none accordion-btn bg-transparent hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors" aria-expanded="false">
+                    <span class="flex items-center gap-4 text-lg md:text-xl font-bold text-slate-800 dark:text-white group-hover:text-blue-500 transition-colors">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
+                            <i class="bi bi-robot text-2xl"></i>
+                        </div>
+                        Como funciona a análise por Inteligência Artificial?
+                    </span>
+                    <i class="bi bi-chevron-down text-slate-400 text-xl transition-transform duration-300 transform accordion-icon group-hover:text-blue-500"></i>
+                </button>
+                <div class="accordion-content overflow-hidden transition-all duration-300 ease-in-out" style="max-height: 0px;">
+                    <div class="p-6 md:p-8 pt-0 md:pt-0 text-slate-600 dark:text-slate-300 leading-relaxed text-lg font-light">
+                        Nossa IA analisa a imagem enviada para identificar padrões de poluição (como lixo em rios, queimadas, etc.). Ela categoriza a gravidade e o tipo de infração, agilizando a triagem e garantindo que as denúncias mais urgentes sejam priorizadas.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-card bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 hover:border-purple-100 dark:hover:border-slate-600 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group">
+                <button type="button" class="flex items-center justify-between w-full p-6 md:p-8 text-left focus:outline-none accordion-btn bg-transparent hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors" aria-expanded="false">
+                    <span class="flex items-center gap-4 text-lg md:text-xl font-bold text-slate-800 dark:text-white group-hover:text-purple-500 transition-colors">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center">
+                            <i class="bi bi-shield-check text-2xl"></i>
+                        </div>
+                        Minha identidade será preservada ao fazer uma denúncia?
+                    </span>
+                    <i class="bi bi-chevron-down text-slate-400 text-xl transition-transform duration-300 transform accordion-icon group-hover:text-purple-500"></i>
+                </button>
+                <div class="accordion-content overflow-hidden transition-all duration-300 ease-in-out" style="max-height: 0px;">
+                    <div class="p-6 md:p-8 pt-0 md:pt-0 text-slate-600 dark:text-slate-300 leading-relaxed text-lg font-light">
+                        Sim, a segurança e privacidade dos nossos usuários são prioridade. Você pode optar por realizar denúncias anônimas. Seus dados pessoais não serão compartilhados publicamente em nenhuma circunstância.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-card bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 hover:border-amber-100 dark:hover:border-slate-600 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group">
+                <button type="button" class="flex items-center justify-between w-full p-6 md:p-8 text-left focus:outline-none accordion-btn bg-transparent hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors" aria-expanded="false">
+                    <span class="flex items-center gap-4 text-lg md:text-xl font-bold text-slate-800 dark:text-white group-hover:text-amber-500 transition-colors">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                            <i class="bi bi-people-fill text-2xl"></i>
+                        </div>
+                        Quem pode participar do fórum comunitário?
+                    </span>
+                    <i class="bi bi-chevron-down text-slate-400 text-xl transition-transform duration-300 transform accordion-icon group-hover:text-amber-500"></i>
+                </button>
+                <div class="accordion-content overflow-hidden transition-all duration-300 ease-in-out" style="max-height: 0px;">
+                    <div class="p-6 md:p-8 pt-0 md:pt-0 text-slate-600 dark:text-slate-300 leading-relaxed text-lg font-light">
+                        O fórum é aberto a todos os cidadãos interessados em discutir questões ambientais locais. Basta criar uma conta gratuita na plataforma para começar a interagir, propor soluções e organizar ações coletivas.
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <div class="text-center py-5">
-            <h3 class="fw-bold mb-3">Ainda tem dúvidas?</h3>
-            <p class="text-muted mb-4">Entre em contato com nossa equipe de suporte.</p>
-            <a href="#" class="btn btn-eco-primary px-5 py-3 rounded-pill fw-bold shadow-sm hover-scale border-0">
-                <i class="bi bi-envelope-fill me-2"></i> Fale Conosco
-            </a>
+        <div class="relative bg-slate-900 rounded-[3rem] p-12 overflow-hidden text-center shadow-2xl">
+            <div class="absolute inset-0 bg-[url('https://picsum.photos/1000/400?random=10')] opacity-10 mix-blend-overlay object-cover"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent"></div>
+            
+            <div class="relative z-10">
+                <div class="w-20 h-20 bg-customGreen/20 backdrop-blur-sm rounded-full flex mx-auto mb-6 items-center justify-center relative border border-customGreen/30 animate-[bounce_4s_infinite]">
+                    <i class="bi bi-headset text-4xl text-customGreen"></i>
+                    <span class="absolute top-0 right-0 w-4 h-4 bg-customGreen border-2 border-slate-900 rounded-full animate-ping"></span>
+                    <span class="absolute top-0 right-0 w-4 h-4 bg-customGreen border-2 border-slate-900 rounded-full"></span>
+                </div>
+                <h3 class="text-3xl md:text-4xl font-black text-white mb-4">Ainda tem dúvidas?</h3>
+                <p class="text-slate-300 mb-8 max-w-md mx-auto text-lg font-light">Nossa equipe de suporte está online para te ajudar a resolver qualquer problema rapidamente.</p>
+                <a href="#" class="inline-flex items-center gap-3 bg-customGreen hover:bg-customGreenHover text-white px-10 py-4 rounded-full font-bold shadow-[0_8px_25px_rgba(32,201,151,0.3)] hover:-translate-y-1 transition-all no-underline text-lg">
+                    <i class="bi bi-chat-dots-fill"></i> Falar com Suporte
+                </a>
+            </div>
         </div>
+    </div>
+</main>
 
-    </main>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const accordionBtns = document.querySelectorAll('.accordion-btn');
 
-    <style>
-        .custom-accordion .accordion-button:not(.collapsed) {
-            background-color: #f8f9fa;
-            color: #000;
-            box-shadow: none;
-        }
-        .custom-accordion .accordion-button:focus {
-            box-shadow: none;
-            border-color: rgba(0,0,0,.125);
-        }
-        .custom-accordion .accordion-button::after {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
-        }
-        .hover-scale {
-            transition: transform 0.2s ease;
-        }
-        .hover-scale:hover {
-            transform: scale(1.05);
-        }
-    </style>
+        // Função para atualizar o visual do card (bordas e cores de fundo)
+        const updateCardStyle = (card, isExpanded) => {
+            if (isExpanded) {
+                card.classList.replace('border-slate-100', 'border-customGreen');
+                card.classList.replace('dark:border-slate-700', 'dark:border-customGreen');
+                card.classList.add('shadow-lg');
+                card.classList.remove('shadow-sm');
+                card.querySelector('.accordion-btn').classList.add('bg-slate-50/50', 'dark:bg-slate-800/80');
+            } else {
+                card.classList.replace('border-customGreen', 'border-slate-100');
+                card.classList.replace('dark:border-customGreen', 'dark:border-slate-700');
+                card.classList.remove('shadow-lg');
+                card.classList.add('shadow-sm');
+                card.querySelector('.accordion-btn').classList.remove('bg-slate-50/50', 'dark:bg-slate-800/80');
+            }
+        };
+
+        // Inicializar alturas corretas no carregamento
+        accordionBtns.forEach(btn => {
+            const content = btn.nextElementSibling;
+            const card = btn.closest('.faq-card');
+            
+            if (btn.getAttribute('aria-expanded') === 'true') {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                updateCardStyle(card, true);
+            }
+        });
+
+        accordionBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const content = btn.nextElementSibling;
+                const icon = btn.querySelector('.accordion-icon');
+                const card = btn.closest('.faq-card');
+                const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+
+                // Fechar todos os outros itens
+                document.querySelectorAll('.accordion-content').forEach(otherContent => {
+                    if (otherContent !== content) {
+                        const otherBtn = otherContent.previousElementSibling;
+                        const otherCard = otherContent.closest('.faq-card');
+                        
+                        otherContent.style.maxHeight = '0px';
+                        otherBtn.setAttribute('aria-expanded', 'false');
+                        otherBtn.querySelector('.accordion-icon').classList.remove('rotate-180');
+                        updateCardStyle(otherCard, false);
+                    }
+                });
+
+                // Alternar o item atual
+                if (!isExpanded) {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                    btn.setAttribute('aria-expanded', 'true');
+                    icon.classList.add('rotate-180');
+                    updateCardStyle(card, true);
+                } else {
+                    content.style.maxHeight = '0px';
+                    btn.setAttribute('aria-expanded', 'false');
+                    icon.classList.remove('rotate-180');
+                    updateCardStyle(card, false);
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

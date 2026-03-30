@@ -156,8 +156,8 @@ USE_TZ = True
 
 # Mercado Pago configuration (public key used in frontend, access token used server-side)
 # these should be provided via environment variables for security
-MERCADO_PAGO_PUBLIC_KEY = os.environ.get('MERCADO_PAGO_PUBLIC_KEY', '')
-MERCADO_PAGO_ACCESS_TOKEN = os.environ.get('MERCADO_PAGO_ACCESS_TOKEN', '')
+MERCADO_PAGO_PUBLIC_KEY = os.environ.get('MERCADO_PAGO_PUBLIC_KEY', 'APP_USR-d5f8b558-6301-4986-be24-853e2c15f09e')
+MERCADO_PAGO_ACCESS_TOKEN = os.environ.get('MERCADO_PAGO_ACCESS_TOKEN', 'APP_USR-5172194930900109-030114-85c2f516ba6236eca794c898c5cb547f-2557709656')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/

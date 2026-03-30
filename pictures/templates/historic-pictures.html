@@ -4,206 +4,198 @@
 {% block title %}Comunidade ECOA - Queixas{% endblock %}
 
 {% block content %}
-<style>
-    .bg-gradient-brand {
-        background: linear-gradient(135deg, #20c997 0%, #198754 100%);
-    }
-    
-    .transition-hover {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .transition-hover:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 24px rgba(0,0,0,0.1) !important;
-    }
-    
-    .bg-blur {
-        background: rgba(0, 0, 0, 0.4);
-        backdrop-filter: blur(4px);
-    }
-    
-    .object-fit-cover {
-        object-fit: cover;
-    }
-    
-    .btn-outline-custom-green {
-        color: #20c997;
-        border-color: #20c997;
-    }
-    
-    .btn-outline-custom-green:hover {
-        background-color: #20c997;
-        color: white;
-    }
-</style>
-
-<main class="container py-4">
+<main class="w-full">
     <!-- Header Section -->
-    <div class="row mb-4">
-        <div class="col-12 text-center">
-            <div class="d-inline-block p-3 rounded-circle bg-gradient-brand shadow-sm mb-3">
-                <i class="bi bi-camera-fill text-white fs-1"></i>
+    <div class="mb-8 text-center">
+        <div class="inline-flex p-4 rounded-full bg-gradient-to-br from-customGreen to-customGreenHover shadow-lg mb-4">
+            <i class="bi bi-camera-fill text-white text-4xl leading-none"></i>
+        </div>
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mt-4">
+            <div class="text-left text-center md:text-left">
+                <h1 class="font-bold text-3xl text-slate-800 dark:text-white mb-2">Portal de Queixas Ambientais</h1>
+                <p class="text-slate-500 dark:text-slate-400 m-0">Acompanhe e interaja com as denúncias postadas pela comunidade</p>
             </div>
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-3">
-                <div class="text-start">
-                    <h1 class="fw-bold text-body-emphasis mb-1">Portal de Queixas Ambientais</h1>
-                    <p class="text-muted mb-0">Acompanhe e interaja com as denúncias postadas pela comunidade</p>
-                </div>
-                <a href="{% url 'pictures:take-picture' %}" class="btn btn-custom-green rounded-pill px-4 fw-bold shadow-sm">
-                    <i class="bi bi-camera-fill me-2"></i> Nova Queixa
-                </a>
-            </div>
+            <a href="{% url 'pictures:take-picture' %}" class="inline-flex items-center no-underline bg-customGreen hover:bg-customGreenHover text-white px-6 py-3 rounded-full font-bold shadow-[0_4px_15px_rgba(32,201,151,0.35)] hover:shadow-[0_8px_25px_rgba(32,201,151,0.45)] transition-all hover:-translate-y-1">
+                <i class="bi bi-camera-fill mr-2"></i> Nova Queixa
+            </a>
         </div>
     </div>
 
-    <!-- Search and Actions -->
-    <div class="row mb-4 justify-content-center">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                <div class="card-body p-2">
-                    <form method="get" action="." class="d-flex gap-2">
-                        <div class="input-group input-group-lg border-0">
-                            <span class="input-group-text bg-transparent border-0 pe-0">
-                                <i class="bi bi-search text-muted"></i>
-                            </span>
-                            <input type="search" name="search_picture" class="form-control border-0 shadow-none fs-6" 
+    <!-- Search and Filter Tabs -->
+    <div class="mb-8 flex justify-center">
+        <div class="w-full lg:w-2/3">
+            <div class="bg-white dark:bg-slate-800 shadow-sm rounded-2xl overflow-hidden mb-6 border border-slate-100 dark:border-slate-700">
+                <div class="p-2">
+                    <form method="get" action="." class="flex gap-2 m-0">
+                        <div class="flex-1 flex items-center bg-transparent px-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                            <i class="bi bi-search text-slate-400 text-xl mr-3"></i>
+                            <input type="search" name="search_picture" class="w-full bg-transparent border-none outline-none text-slate-700 dark:text-slate-200 py-3" 
                                    placeholder="Pesquisar por título ou conteúdo..." value="{{ search_query }}">
                         </div>
-                        <button type="submit" class="btn btn-custom-green px-4 rounded-3 d-none d-md-block">Pesquisar</button>
-                        <button type="submit" class="btn btn-custom-green rounded-3 d-md-none">
+                        <input type="hidden" name="filter_type" value="{{ filter_type }}">
+                        <button type="submit" class="hidden md:block bg-customGreen hover:bg-customGreenHover text-white px-6 py-3 rounded-xl font-semibold transition-colors">Pesquisar</button>
+                        <button type="submit" class="md:hidden bg-customGreen text-white px-4 py-3 rounded-xl">
                             <i class="bi bi-search"></i>
                         </button>
                     </form>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-auto d-none d-lg-flex align-items-center mt-3 mt-lg-0">
-            <a href="{% url 'pictures:take-picture' %}" class="btn btn-custom-green px-4 py-2 rounded-pill shadow-sm fw-bold">
-                <i class="bi bi-plus-lg me-2"></i>Nova Queixa
-            </a>
+            
+            <!-- Navigation Tabs for Filters -->
+            <ul class="flex flex-wrap justify-center gap-3 list-none p-0 m-0">
+                <li>
+                    <a class="block no-underline px-6 py-2 rounded-full font-semibold transition-all hover:-translate-y-1 
+                       {% if filter_type == 'all' or not filter_type %}bg-customGreen text-white shadow-md{% else %}bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-customGreen border border-slate-200 dark:border-slate-700 shadow-sm{% endif %}" 
+                       href="?filter_type=all{% if search_query %}&search_picture={{ search_query }}{% endif %}">
+                        Todas
+                    </a>
+                </li>
+                <li>
+                    <a class="block no-underline px-6 py-2 rounded-full font-semibold transition-all hover:-translate-y-1 
+                       {% if filter_type == 'public' %}bg-customGreen text-white shadow-md{% else %}bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-customGreen border border-slate-200 dark:border-slate-700 shadow-sm{% endif %}" 
+                       href="?filter_type=public{% if search_query %}&search_picture={{ search_query }}{% endif %}">
+                        Em Ambiente Público
+                    </a>
+                </li>
+                <li>
+                    <a class="block no-underline px-6 py-2 rounded-full font-semibold transition-all hover:-translate-y-1 
+                       {% if filter_type == 'private' %}bg-customGreen text-white shadow-md{% else %}bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-customGreen border border-slate-200 dark:border-slate-700 shadow-sm{% endif %}" 
+                       href="?filter_type=private{% if search_query %}&search_picture={{ search_query }}{% endif %}">
+                        Em Ambiente Privado
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 
     <!-- Sticky Create Button (Mobile/Tablet) -->
-    <div class="d-md-none position-fixed bottom-0 end-0 m-4" style="z-index: 999; margin-bottom: 90px !important;">
-        <a href="{% url 'pictures:take-picture' %}" class="btn btn-custom-green rounded-circle shadow-lg d-flex align-items-center justify-content-center" style="width: 56px; height: 56px;">
-            <i class="bi bi-plus-lg fs-3"></i>
+    <div class="md:hidden fixed bottom-[90px] right-4 z-[990]">
+        <a href="{% url 'pictures:take-picture' %}" class="flex items-center justify-center w-14 h-14 bg-customGreen text-white rounded-full shadow-[0_4px_15px_rgba(32,201,151,0.5)] hover:scale-110 transition-transform no-underline">
+            <i class="bi bi-plus-lg text-2xl"></i>
         </a>
     </div>
 
     <!-- Pictures Grid -->
-    <div class="row g-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for picture in pictures %}
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm rounded-4 transition-hover overflow-hidden">
-                    <!-- Image Wrapper -->
-                    <div class="position-relative overflow-hidden" style="height: 220px;">
-                        {% if picture.image %}
-                            <img src="{{ picture.image.url }}" alt="{{ picture.title }}" class="w-100 h-100 object-fit-cover transition-hover">
-                        {% else %}
-                            <div class="w-100 h-100 bg-success-subtle d-flex align-items-center justify-content-center">
-                                <i class="bi bi-image text-success opacity-50" style="font-size: 3rem;"></i>
-                            </div>
-                        {% endif %}
-                        
-                        <!-- Date Badge -->
-                        <div class="position-absolute top-0 start-0 m-3">
-                            <span class="badge bg-blur text-white rounded-pill px-3 py-2 fw-normal">
-                                {{ picture.created_at|date:"d M" }}
-                            </span>
+            <div class="bg-white dark:bg-slate-800 flex flex-col h-full border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1.5 group">
+                <!-- Image Wrapper -->
+                <div class="relative overflow-hidden h-[220px]">
+                    {% if picture.image %}
+                        <img src="{{ picture.image.url }}" alt="{{ picture.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                    {% else %}
+                        <div class="w-full h-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center">
+                            <i class="bi bi-image text-green-500/50 text-5xl"></i>
                         </div>
-
-                        <!-- Status Badge (if fake) -->
-                        {% for verify in picture.verifies.all %}
-                            {% if verify.is_fake %}
-                                <div class="position-absolute top-0 end-0 m-3">
-                                    <span class="badge bg-danger rounded-pill px-3 py-2 fw-bold">
-                                        IA: Fake
-                                    </span>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
+                    {% endif %}
+                    
+                    <!-- Date Badge -->
+                    <div class="absolute top-4 left-4 z-10">
+                        <span class="bg-black/40 backdrop-blur-md text-white text-xs px-3 py-1.5 rounded-full font-medium">
+                            {{ picture.created_at|date:"d M" }}
+                        </span>
                     </div>
 
-                    <div class="card-body p-4 d-flex flex-column">
-                        <!-- User Info -->
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="bg-body-secondary rounded-circle p-1 me-2 shadow-sm" style="width: 32px; height: 32px; overflow: hidden;">
-                                {% if picture.user.profile_picture %}
-                                    <img src="{{ picture.user.profile_picture.url }}" class="w-100 h-100 object-fit-cover rounded-circle">
-                                {% else %}
-                                    <i class="bi bi-person-fill text-muted w-100 h-100 d-flex justify-content-center align-items-center"></i>
-                                {% endif %}
+                    <!-- Fake Badge -->
+                    {% for verify in picture.verifies.all %}
+                        {% if verify.is_fake %}
+                            <div class="absolute top-4 right-4 z-10">
+                                <span class="bg-red-500 text-white font-bold text-xs px-3 py-1.5 rounded-full shadow-md">
+                                    IA: Fake
+                                </span>
                             </div>
-                            <div class="user-info">
-                                <span class="small fw-semibold text-body-emphasis d-block">{{ picture.user.first_name }} {{ picture.user.last_name|default:"" }}</span>
-                            </div>
-                        </div>
+                        {% endif %}
+                    {% endfor %}
 
-                        <h5 class="card-title fw-bold text-body-emphasis mb-2">{{ picture.title }}</h5>
-                        <p class="card-text text-muted small mb-4 flex-grow-1">
-                            {{ picture.content|truncatewords:15 }}
-                        </p>
+                    <!-- Public/Private Badge -->
+                    <div class="absolute bottom-4 left-4 z-10">
+                        {% if "público" in picture.title|lower %}
+                            <span class="bg-emerald-500/90 backdrop-blur-sm text-white text-[10px] uppercase tracking-tighter px-2 py-1 rounded-md font-black shadow-sm flex items-center gap-1">
+                                <i class="bi bi-globe"></i> Público
+                            </span>
+                        {% elif "privado" in picture.title|lower %}
+                            <span class="bg-amber-500/90 backdrop-blur-sm text-white text-[10px] uppercase tracking-tighter px-2 py-1 rounded-md font-black shadow-sm flex items-center gap-1">
+                                <i class="bi bi-shield-lock-fill"></i> Privado
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
 
-                        <!-- Footer Actions -->
-                        <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
-                            <div class="d-flex gap-3 text-muted small">
-                                <span title="Comentários"><i class="bi bi-chat-dots me-1"></i> {{ picture.total_comments|default:0 }}</span>
-                                <span title="Likes"><i class="bi bi-hand-thumbs-up me-1"></i> {{ picture.total_likes|default:0 }}</span>
-                            </div>
-                            <a href="{% url 'pictures:details-picture' picture.id %}" class="btn btn-sm btn-outline-custom-green rounded-pill px-3">
-                                Ver detalhes <i class="bi bi-arrow-right list-inline-item"></i>
-                            </a>
+                <div class="p-5 flex flex-col flex-1">
+                    <!-- User Info -->
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-700 shadow-sm mr-3 shrink-0 flex items-center justify-center">
+                            {% if picture.user.profile_picture %}
+                                <img src="{{ picture.user.profile_picture.url }}" class="w-full h-full object-cover">
+                            {% else %}
+                                <i class="bi bi-person-fill text-slate-400"></i>
+                            {% endif %}
                         </div>
+                        <div class="flex-1">
+                            <span class="text-sm font-semibold text-slate-800 dark:text-slate-200 block truncate">{{ picture.user.first_name }} {{ picture.user.last_name|default:"" }}</span>
+                        </div>
+                    </div>
+
+                    <h5 class="font-bold text-lg text-slate-800 dark:text-white mb-2">{{ picture.title }}</h5>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm mb-6 flex-1 line-clamp-3">
+                        {{ picture.content }}
+                    </p>
+
+                    <!-- Footer Actions -->
+                    <div class="flex justify-between items-center pt-4 border-t border-slate-100 dark:border-slate-700 mt-auto">
+                        <div class="flex gap-4 text-slate-500 dark:text-slate-400 text-sm">
+                            <span title="Comentários" class="flex items-center gap-1.5 hover:text-customGreen cursor-pointer transition-colors"><i class="bi bi-chat-dots-fill"></i> {{ picture.total_comments|default:0 }}</span>
+                            <span title="Likes" class="flex items-center gap-1.5 hover:text-customGreen cursor-pointer transition-colors"><i class="bi bi-hand-thumbs-up-fill"></i> {{ picture.total_likes|default:0 }}</span>
+                        </div>
+                        <a href="{% url 'pictures:details-picture' picture.id %}" class="no-underline text-customGreen border border-customGreen hover:bg-customGreen hover:text-white px-4 py-1.5 rounded-full text-sm font-semibold transition-colors flex items-center gap-1">
+                            Detalhes <i class="bi bi-arrow-right"></i>
+                        </a>
                     </div>
                 </div>
             </div>
         {% empty %}
-            <div class="col-12 text-center py-5">
-                <div class="empty-state">
-                    <i class="bi bi-camera-off fs-1 mb-3 d-block opacity-25"></i>
-                    <h3 class="text-muted">Nenhuma queixa encontrada</h3>
-                    <p class="text-muted mb-4">Seja o primeiro a reportar um problema ambiental em sua região!</p>
-                    <a href="{% url 'pictures:take-picture' %}" class="btn btn-custom-green px-4 py-2 rounded-pill fw-bold">
-                        Começar Agora
-                    </a>
-                </div>
+            <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-16 bg-white dark:bg-slate-800 rounded-3xl border border-dashed border-slate-200 dark:border-slate-700">
+                <i class="bi bi-camera-off text-6xl text-slate-200 dark:text-slate-700 block mb-4"></i>
+                <h3 class="text-xl font-bold text-slate-600 dark:text-slate-300 mb-2">Nenhuma queixa encontrada</h3>
+                <p class="text-slate-500 dark:text-slate-400 mb-6">Seja o primeiro a reportar um problema ambiental em sua região!</p>
+                <a href="{% url 'pictures:take-picture' %}" class="inline-block bg-customGreen text-white px-6 py-3 rounded-full font-bold shadow-[0_4px_15px_rgba(32,201,151,0.35)] hover:shadow-[0_8px_25px_rgba(32,201,151,0.45)] hover:-translate-y-1 transition-all no-underline">
+                    Começar Agora
+                </a>
             </div>
         {% endfor %}
     </div>
 
     <!-- Pagination -->
     {% if page_obj.paginator.num_pages > 1 %}
-        <nav class="mt-5">
-            <ul class="pagination justify-content-center gap-2">
+        <nav class="mt-12 flex justify-center mb-8">
+            <ul class="flex items-center gap-2 list-none p-0 m-0">
                 {% if page_obj.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link border-0 rounded-3 shadow-sm text-custom-green" href="?page=1{% if search_query %}&search_picture={{ search_query }}{% endif %}">
+                    <li>
+                        <a class="flex items-center justify-center w-10 h-10 rounded-xl bg-white dark:bg-slate-800 text-customGreen border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors no-underline" href="?page=1{% if search_query %}&search_picture={{ search_query }}{% endif %}{% if filter_type %}&filter_type={{ filter_type }}{% endif %}">
                             <i class="bi bi-chevron-double-left"></i>
                         </a>
                     </li>
-                    <li class="page-item">
-                        <a class="page-link border-0 rounded-3 shadow-sm text-custom-green" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search_picture={{ search_query }}{% endif %}">
+                    <li>
+                        <a class="flex items-center justify-center w-10 h-10 rounded-xl bg-white dark:bg-slate-800 text-customGreen border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors no-underline" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search_picture={{ search_query }}{% endif %}{% if filter_type %}&filter_type={{ filter_type }}{% endif %}">
                             <i class="bi bi-chevron-left"></i>
                         </a>
                     </li>
                 {% endif %}
 
-                <li class="page-item disabled">
-                    <span class="page-link border-0 rounded-3 shadow-sm bg-body-tertiary">
+                <li>
+                    <span class="flex items-center justify-center px-4 h-10 rounded-xl bg-customGreen text-white font-semibold shadow-sm">
                         Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
                     </span>
                 </li>
 
                 {% if page_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link border-0 rounded-3 shadow-sm text-custom-green" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search_picture={{ search_query }}{% endif %}">
+                    <li>
+                        <a class="flex items-center justify-center w-10 h-10 rounded-xl bg-white dark:bg-slate-800 text-customGreen border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors no-underline" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search_picture={{ search_query }}{% endif %}{% if filter_type %}&filter_type={{ filter_type }}{% endif %}">
                             <i class="bi bi-chevron-right"></i>
                         </a>
                     </li>
-                    <li class="page-item">
-                        <a class="page-link border-0 rounded-3 shadow-sm text-custom-green" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search_picture={{ search_query }}{% endif %}">
+                    <li>
+                        <a class="flex items-center justify-center w-10 h-10 rounded-xl bg-white dark:bg-slate-800 text-customGreen border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors no-underline" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search_picture={{ search_query }}{% endif %}{% if filter_type %}&filter_type={{ filter_type }}{% endif %}">
                             <i class="bi bi-chevron-double-right"></i>
                         </a>
                     </li>

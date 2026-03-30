@@ -1,26 +1,163 @@
 {% extends 'app-base.html' %}
 
-{% block title %}<title>Checkout - {{ course.name }}</title>{% endblock %}
+{% block title %}Checkout - {{ course.name }} - ECOÁ{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <h2 class="mb-4">Pagamento do curso: {{ course.name }}</h2>
-    <p>Valor: <strong>R$ {{ course.price }}</strong></p>
-    <div id="wallet_container"></div>
-    <p class="mt-4">
-        <a href="{% url 'courses:course-detail' course.id %}" class="btn btn-secondary">Voltar para o curso</a>
-    </p>
-</div>
+<main class="w-full max-w-4xl mx-auto px-4 py-8 relative">
+    <!-- Header -->
+    <div class="mb-10 text-center">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-blue-600 mb-4 shadow-sm">
+            <i class="bi bi-shield-lock-fill text-3xl"></i>
+        </div>
+        <h1 class="text-3xl font-black text-slate-800 dark:text-white tracking-tight mb-2">Finalizar Inscrição</h1>
+        <p class="text-slate-500 dark:text-slate-400 font-medium">Ambiente seguro e criptografado</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Order Summary -->
+        <div class="lg:col-span-4 order-2 lg:order-1">
+            <div class="bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-sm p-6 sticky top-24">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                    <i class="bi bi-receipt text-customGreen"></i> Resumo da Compra
+                </h3>
+
+                <!-- Course Thumbnail -->
+                <div class="relative w-full h-32 rounded-xl bg-slate-100 dark:bg-slate-900 mb-4 overflow-hidden shadow-inner">
+                    {% if course.image %}
+                        <img src="{{ course.image.url }}" alt="{{ course.name }}" class="w-full h-full object-cover">
+                    {% else %}
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-customGreen/20 flex items-center justify-center">
+                            <i class="bi bi-play-circle-fill text-slate-300 text-4xl"></i>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Details -->
+                <h4 class="font-bold text-slate-800 dark:text-slate-200 leading-tight mb-2">{{ course.name }}</h4>
+                <p class="text-sm text-slate-500 line-clamp-2 mb-4">{{ course.description }}</p>
+
+                <div class="h-px w-full bg-slate-100 dark:bg-slate-700 my-4"></div>
+
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-slate-500 dark:text-slate-400">Subtotal</span>
+                    <span class="font-medium text-slate-800 dark:text-slate-200">R$ {{ course.price }}</span>
+                </div>
+                
+                <div class="flex items-center justify-between font-black text-xl text-slate-800 dark:text-white mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+                    <span>Total</span>
+                    <span class="text-customGreen">R$ {{ course.price }}</span>
+                </div>
+
+                <a href="{% url 'courses:course-detail' course.id %}" class="block text-center text-sm font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 mt-6 transition-colors no-underline">
+                    <i class="bi bi-arrow-left mr-1"></i> Cancelar e voltar ao curso
+                </a>
+            </div>
+        </div>
+
+        <!-- Payment Setup -->
+        <div class="lg:col-span-8 order-1 lg:order-2">
+            <div class="bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-sm p-6 md:p-8">
+                <!-- Payment Providers Logos -->
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-xl font-bold text-slate-800 dark:text-white m-0">Método de Pagamento</h2>
+                    <div class="flex gap-2 text-slate-300 dark:text-slate-600">
+                        <i class="bi bi-credit-card-fill text-2xl"></i>
+                        <span class="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded">PIX</span>
+                    </div>
+                </div>
+
+                <div id="loading_checkout" class="flex flex-col items-center justify-center py-12">
+                    <div class="w-12 h-12 border-4 border-slate-100 border-t-customGreen rounded-full animate-spin mb-4"></div>
+                    <p class="text-slate-500 font-medium">Carregando ambiente seguro Mercado Pago...</p>
+                </div>
+
+                <!-- MercadoPago Container -->
+                <div id="wallet_container" class="min-h-[200px]"></div>
+
+            </div>
+
+            <!-- Trust Badges -->
+            <div class="flex flex-wrap items-center justify-center gap-6 mt-8 text-slate-400 dark:text-slate-500">
+                <div class="flex items-center gap-2"><i class="bi bi-lock-fill text-xl"></i><span class="text-xs font-bold uppercase tracking-wider">Pagamento Seguro</span></div>
+                <div class="flex items-center gap-2"><i class="bi bi-shield-check text-xl"></i><span class="text-xs font-bold uppercase tracking-wider">Dados Criptografados</span></div>
+                <div class="flex items-center gap-2"><i class="bi bi-arrow-return-left text-xl"></i><span class="text-xs font-bold uppercase tracking-wider">Garantia 7 dias</span></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<style>
+/* Adjusts Mercado Pago Wallet UI spacing inside our container */
+#wallet_container iframe {
+    border-radius: 1rem !important;
+}
+</style>
 
 <script src="https://sdk.mercadopago.com/js/v2"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const mp = new MercadoPago("{{ public_key }}", { locale: 'pt-BR' });
-        mp.bricks().create('wallet', 'wallet_container', {
-            initialization: {
-                preferenceId: '{{ preference_id }}'
-            }
-        });
+        try {
+            const mp = new MercadoPago("{{ public_key }}", { locale: 'pt-BR' });
+            
+            // Initialization configuration
+            const initialization = {
+                preferenceId: '{{ preference_id }}',
+            };
+            
+            // Customization configuration to fit the new design
+            const customization = {
+                visual: {
+                    buttonBackground: 'black',
+                    borderRadius: '16px',
+                },
+                texts: {
+                    action: 'pay',
+                    valueProp: 'security_details',
+                }
+            };
+            
+            const renderWalletBrick = async (bricksBuilder) => {
+                const settings = {
+                    initialization: initialization,
+                    customization: customization,
+                    callbacks: {
+                        onReady: () => {
+                            // Hide loading spinner when ready
+                            document.getElementById('loading_checkout').style.display = 'none';
+                        },
+                        onSubmit: () => {
+                            // Can add additional logic here before submission if needed
+                        },
+                        onError: (error) => {
+                            // Error handling
+                            console.error(error);
+                            document.getElementById('loading_checkout').innerHTML = `
+                                <div class="text-red-500 text-center">
+                                    <i class="bi bi-exclamation-octagon text-4xl mb-2 block"></i>
+                                    <p class="font-bold border-red-500 border rounded-xl p-4 bg-red-50">Não foi possível carregar o módulo de pagamento. Tente novamente mais tarde.</p>
+                                </div>
+                            `;
+                        },
+                    },
+                };
+                window.walletBrickController = await bricksBuilder.create(
+                    'wallet', 
+                    'wallet_container', 
+                    settings
+                );
+            };
+
+            renderWalletBrick(mp.bricks());
+
+        } catch (error) {
+            console.error("MercadoPago initialization error:", error);
+            document.getElementById('loading_checkout').innerHTML = `
+                <div class="text-red-500 text-center">
+                    <i class="bi bi-exclamation-octagon text-4xl mb-2 block"></i>
+                    <p class="font-bold border-red-500 border rounded-xl p-4 bg-red-50">Erro ao iniciar pagamento. Verifique a configuração do Mercado Pago.</p>
+                </div>
+            `;
+        }
     });
 </script>
 {% endblock %}

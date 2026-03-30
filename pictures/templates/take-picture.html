@@ -3,74 +3,104 @@
 {% block title %}Captura de Foto | ECOA{% endblock %}
 
 {% block content %}
-<main class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6 text-center">
-            <h1 class="fw-bold mb-4">Captura de Denúncia</h1>
+<main class="w-full max-w-2xl mx-auto py-6 px-4">
+    <div class="text-center mb-8">
+        <div class="inline-flex w-20 h-20 bg-customGreen/10 rounded-full items-center justify-center mb-4">
+            <i class="bi bi-camera-fill text-4xl text-customGreen"></i>
+        </div>
+        <h1 class="text-3xl font-black text-slate-800 dark:text-white mb-2 tracking-tight">Postar Nova Queixa</h1>
+        <p class="text-slate-500 dark:text-slate-400 font-medium">Capture ou selecione a foto do incidente em sua região.</p>
+    </div>
 
-            <!-- Mode Selection -->
-            <div class="btn-group w-100 mb-4" role="group" aria-label="Escolher modo">
-                <input type="radio" class="btn-check" name="mode" id="camera-mode" autocomplete="off" checked>
-                <label class="btn btn-outline-primary" for="camera-mode">
-                    <i class="bi bi-camera-fill"></i> Tirar Foto
-                </label>
+    <!-- Mode Selection -->
+    <div class="flex w-full bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl mb-8 shadow-inner overflow-hidden relative border border-slate-200 dark:border-slate-700">
+        <input type="radio" name="mode" id="camera-mode" class="peer/camera hidden" checked>
+        <label for="camera-mode" class="flex-1 py-3 text-center rounded-xl cursor-pointer text-slate-500 dark:text-slate-400 font-semibold peer-checked/camera:bg-white dark:peer-checked/camera:bg-slate-700 peer-checked/camera:text-customGreen peer-checked/camera:shadow-sm transition-all relative z-10 flex items-center justify-center gap-2 m-0">
+            <i class="bi bi-camera-fill text-lg"></i> Câmera
+        </label>
 
-                <input type="radio" class="btn-check" name="mode" id="upload-mode" autocomplete="off">
-                <label class="btn btn-outline-primary" for="upload-mode">
-                    <i class="bi bi-image"></i> Escolher do Dispositivo
-                </label>
-            </div>
+        <input type="radio" name="mode" id="upload-mode" class="peer/upload hidden">
+        <label for="upload-mode" class="flex-1 py-3 text-center rounded-xl cursor-pointer text-slate-500 dark:text-slate-400 font-semibold peer-checked/upload:bg-white dark:peer-checked/upload:bg-slate-700 peer-checked/upload:text-blue-500 peer-checked/upload:shadow-sm transition-all relative z-10 flex items-center justify-center gap-2 m-0">
+            <i class="bi bi-image text-lg"></i> Galeria
+        </label>
+    </div>
 
-            <form id="picture-form" method="POST" enctype="multipart/form-data" class="d-flex flex-column align-items-center">
-                {% csrf_token %}
+    <form id="picture-form" method="POST" enctype="multipart/form-data" class="flex flex-col items-center w-full">
+        {% csrf_token %}
 
-                <div id="location-status" class="alert alert-warning w-100 mb-3">
-                    <i class="bi bi-geo-alt-fill"></i> Aguardando localização...
+        <div id="location-status" class="w-full mb-6 p-4 rounded-xl flex items-center justify-center gap-3 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-500 font-semibold border border-amber-200 dark:border-amber-700/50 shadow-sm transition-colors duration-300">
+            <i class="bi bi-geo-alt-fill animate-pulse text-xl"></i> Aguardando localização GPS...
+        </div>
+
+        <!-- Camera Section -->
+        <div id="camera-section" class="w-full mb-8 relative group">
+            <div id="camera-view" class="w-full relative rounded-3xl overflow-hidden bg-black shadow-xl aspect-[4/3] border-4 border-slate-800 dark:border-slate-700">
+                <video id="camera" autoplay playsinline class="w-full h-full object-cover"></video>
+                <canvas id="canvas" class="hidden"></canvas>
+
+                <!-- Grid Overlay -->
+                <div class="absolute inset-0 pointer-events-none opacity-20">
+                    <div class="w-full h-[33.33%] border-b border-white"></div>
+                    <div class="w-full h-[33.33%] border-b border-white"></div>
+                    <div class="absolute top-0 left-[33.33%] w-[33.33%] h-full border-x border-white"></div>
                 </div>
 
-                <!-- Camera Section -->
-                <div id="camera-section" class="camera-container mb-4 position-relative shadow-lg rounded overflow-hidden bg-dark" style="width: 100%; max-width: 400px; aspect-ratio: 4/3;">
-                    <video id="camera" autoplay playsinline class="w-100 h-100" style="object-fit: cover;"></video>
-                    <canvas id="canvas" style="display: none;"></canvas>
-
-                    <!-- Capture Button Overlay -->
-                    <button type="button" onclick="window.takePicture()" class="btn btn-primary position-absolute bottom-0 start-50 translate-middle-x mb-3 rounded-circle shadow-lg" style="width: 70px; height: 70px; border: 4px solid white; z-index: 10;">
-                        <i class="bi bi-camera-fill fs-2"></i>
+                <!-- Capture Button -->
+                <button type="button" onclick="window.takePicture()" class="absolute bottom-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-customGreen hover:bg-customGreenHover rounded-full border-[6px] border-white/90 shadow-[0_0_20px_rgba(0,0,0,0.6)] flex items-center justify-center transition-transform active:scale-95 group/btn focus:outline-none focus:ring-4 focus:ring-customGreen/50">
+                    <i class="bi bi-camera-fill text-3xl text-white group-hover/btn:scale-110 transition-transform"></i>
+                </button>
+            </div>
+            
+            <div id="camera-preview-container" class="hidden w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-customGreen relative aspect-[4/3] bg-black">
+                <img id="camera-preview" class="w-full h-full object-contain">
+                <div class="absolute bottom-6 w-full flex justify-center gap-4">
+                    <button type="button" id="retake-btn" class="bg-slate-800/80 hover:bg-slate-900 text-white px-6 py-3 rounded-full backdrop-blur-md transition-colors shadow-lg font-bold flex items-center gap-2 border border-white/20">
+                        <i class="bi bi-arrow-counterclockwise text-xl"></i> Tentar Novamente
                     </button>
                 </div>
-
-                <!-- Upload Section -->
-                <div id="upload-section" class="mb-4" style="display: none; width: 100%; max-width: 400px;">
-                    <div class="border border-2 border-dashed border-primary rounded p-4 text-center bg-light">
-                        <i class="bi bi-cloud-upload fs-1 text-primary mb-3"></i>
-                        <p class="mb-3">Clique para escolher uma imagem do seu dispositivo</p>
-                        <input type="file" id="file-input" accept="image/*" class="form-control" style="display: none;">
-                        <button type="button" onclick="document.getElementById('file-input').click()" class="btn btn-primary">
-                            <i class="bi bi-folder-open"></i> Selecionar Imagem
-                        </button>
-                        <div id="image-preview" class="mt-3" style="display: none;">
-                            <img id="preview-img" class="img-fluid rounded shadow" style="max-height: 300px;">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Hidden Inputs -->
-                <input type="hidden" name="image" id="image_input">
-                <input type="hidden" name="latitude" id="latitude">
-                <input type="hidden" name="longitude" id="longitude">
-
-                <!-- Map container -->
-                <div id="map-container" style="display: none;" class="w-100 mb-4">
-                    <div id="map" style="height: 200px; width: 100%;" class="rounded shadow-sm"></div>
-                </div>
-
-                <!-- Submit Button -->
-                <button type="submit" id="submit-btn" class="btn btn-success btn-lg w-100 shadow-sm opacity-50" disabled>
-                    <i class="bi bi-send-fill"></i> Enviar para Análise
-                </button>
-            </form>
+            </div>
         </div>
-    </div>
+
+        <!-- Upload Section -->
+        <div id="upload-section" class="w-full hidden mb-8">
+            <div id="upload-box" class="border-2 border-dashed border-blue-400 dark:border-blue-600 rounded-3xl p-10 text-center bg-blue-50 dark:bg-blue-900/10 hover:bg-blue-100 dark:hover:bg-blue-900/20 transition-colors cursor-pointer group shadow-inner" onclick="document.getElementById('file-input').click()">
+                <div class="w-20 h-20 bg-blue-100 dark:bg-blue-800/50 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform border border-blue-200 dark:border-blue-700">
+                    <i class="bi bi-cloud-upload-fill text-4xl text-blue-500"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">Selecione da Galeria</h3>
+                <p class="text-slate-500 dark:text-slate-400 mb-0 font-medium">Toque para escolher a foto do incidente.</p>
+                <input type="file" id="file-input" accept="image/*" class="hidden">
+            </div>
+            
+            <div id="image-preview" class="hidden rounded-3xl overflow-hidden shadow-xl border-4 border-blue-500 relative aspect-[4/3] bg-slate-900">
+                <img id="preview-img" class="w-full h-full object-contain">
+                <button type="button" class="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white px-5 py-2.5 rounded-full backdrop-blur-md transition-colors shadow-lg font-bold text-sm flex items-center gap-2 border border-white/20" onclick="document.getElementById('file-input').click()">
+                    <i class="bi bi-arrow-repeat text-lg"></i> Trocar
+                </button>
+            </div>
+        </div>
+
+        <div class="w-full">
+            <label class="block text-slate-700 dark:text-slate-300 font-bold mb-2">Descreva o Problema (Opcional)</label>
+            <textarea name="content" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 placeholder-slate-400 focus:outline-none focus:border-customGreen focus:ring-2 focus:ring-customGreen/20 text-slate-700 dark:text-slate-200 min-h-[120px] resize-none mb-6 shadow-sm transition-all" placeholder="Adicione detalhes sobre o local, severidade, ou outras informações relevantes..."></textarea>
+        </div>
+
+        <!-- Hidden Inputs -->
+        <input type="hidden" name="image" id="image_input">
+        <input type="hidden" name="latitude" id="latitude">
+        <input type="hidden" name="longitude" id="longitude">
+
+        <!-- Map container -->
+        <div id="map-container" class="hidden w-full mb-8">
+            <h5 class="font-bold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2 text-sm uppercase tracking-widest"><i class="bi bi-geo-alt-fill text-red-500 text-lg"></i> Local Detectado</h5>
+            <div id="map" class="h-48 w-full rounded-2xl shadow-inner border border-slate-200 dark:border-slate-700 z-10"></div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="submit-btn" class="w-full flex items-center justify-center gap-3 bg-customGreen hover:bg-customGreenHover text-white text-xl font-bold py-5 rounded-2xl shadow-[0_8px_20px_rgba(32,201,151,0.3)] hover:shadow-[0_12px_25px_rgba(32,201,151,0.4)] transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:-translate-y-0 disabled:hover:shadow-none" disabled>
+            <i class="bi bi-send-fill text-2xl"></i> Enviar Queixa
+        </button>
+    </form>
 </main>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -88,8 +118,16 @@
         const cameraSection = document.getElementById('camera-section');
         const uploadSection = document.getElementById('upload-section');
         const fileInput = document.getElementById('file-input');
+        
+        const cameraView = document.getElementById('camera-view');
+        const cameraPreviewContainer = document.getElementById('camera-preview-container');
+        const cameraPreviewImg = document.getElementById('camera-preview');
+        const retakeBtn = document.getElementById('retake-btn');
+
+        const uploadBox = document.getElementById('upload-box');
         const previewImg = document.getElementById('preview-img');
         const imagePreview = document.getElementById('image-preview');
+        
         let mapInstance = null;
         let markerInstance = null;
 
@@ -97,25 +135,21 @@
         document.querySelectorAll('input[name="mode"]').forEach(radio => {
             radio.addEventListener('change', function() {
                 if (this.id === 'camera-mode') {
-                    cameraSection.style.display = 'block';
-                    uploadSection.style.display = 'none';
+                    cameraSection.classList.remove('hidden');
+                    uploadSection.classList.add('hidden');
                     initCamera();
+                    if(!imageInput.value.startsWith('data:image')) resetCameraPreview();
                 } else {
-                    cameraSection.style.display = 'none';
-                    uploadSection.style.display = 'block';
+                    cameraSection.classList.add('hidden');
+                    uploadSection.classList.remove('hidden');
                     // Stop camera if running
                     if (video.srcObject) {
                         video.srcObject.getTracks().forEach(track => track.stop());
                     }
                 }
-                // Reset image input
-                imageInput.value = '';
-                submitBtn.disabled = true;
-                submitBtn.classList.add('opacity-50');
-                // Hide any preview
-                const existingPreview = document.querySelector('.camera-preview-img');
-                if (existingPreview) existingPreview.remove();
-                imagePreview.style.display = 'none';
+                
+                // Keep image if it exists in the active mode
+                checkSubmitStatus();
             });
         });
 
@@ -127,11 +161,9 @@
                 reader.onload = function(e) {
                     imageInput.value = e.target.result;
                     previewImg.src = e.target.result;
-                    imagePreview.style.display = 'block';
-                    if (latitudeInput.value) {
-                        submitBtn.disabled = false;
-                        submitBtn.classList.remove('opacity-50');
-                    }
+                    uploadBox.classList.add('hidden');
+                    imagePreview.classList.remove('hidden');
+                    checkSubmitStatus();
                 };
                 reader.readAsDataURL(file);
             }
@@ -141,15 +173,15 @@
         function initCamera() {
             if (document.getElementById('camera-mode').checked) {
                 try {
-                    const stream = navigator.mediaDevices.getUserMedia({
+                    navigator.mediaDevices.getUserMedia({
                         video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
                     }).then(stream => {
                         video.srcObject = stream;
+                    }).catch(err => {
+                        locationStatus.className = 'w-full mb-6 p-4 rounded-xl flex items-center justify-center gap-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-500 font-semibold border border-red-200 dark:border-red-700/50 shadow-sm';
+                        locationStatus.innerHTML = '<i class="bi bi-camera-video-off-fill text-xl"></i> Erro ao acessar câmera. Verifique as permissões.';
                     });
-                } catch (err) {
-                    locationStatus.classList.replace('alert-warning', 'alert-danger');
-                    locationStatus.innerHTML = '<i class="bi bi-camera-video-off-fill"></i> Erro ao acessar câmera.';
-                }
+                } catch (err) {}
             }
         }
 
@@ -162,18 +194,15 @@
                         latitudeInput.value = latitude;
                         longitudeInput.value = longitude;
 
-                        locationStatus.classList.remove('alert-warning', 'alert-danger');
-                        locationStatus.classList.add('alert-success');
-                        locationStatus.innerHTML = '<i class="bi bi-check-circle-fill"></i> Localização confirmada!';
+                        locationStatus.className = 'w-full mb-6 p-4 rounded-xl flex items-center justify-center gap-3 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-500 font-semibold border border-green-200 dark:border-green-700/50 shadow-sm';
+                        locationStatus.innerHTML = '<i class="bi bi-check-circle-fill text-xl"></i> Localização confirmada via GPS';
                         
-                        submitBtn.disabled = !imageInput.value;
-                        if (!submitBtn.disabled) submitBtn.classList.remove('opacity-50');
-
+                        checkSubmitStatus();
                         updateMiniMap(latitude, longitude);
                     },
                     (err) => {
-                        locationStatus.classList.replace('alert-warning', 'alert-danger');
-                        locationStatus.innerHTML = '<i class="bi bi-exclamation-octagon-fill"></i> GPS Obrigatório para denúncia.';
+                        locationStatus.className = 'w-full mb-6 p-4 rounded-xl flex items-center justify-center gap-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-500 font-semibold border border-red-200 dark:border-red-700/50 shadow-sm';
+                        locationStatus.innerHTML = '<i class="bi bi-exclamation-octagon-fill text-xl"></i> GPS Obrigatório para postar a queixa.';
                     },
                     { enableHighAccuracy: true }
                 );
@@ -181,16 +210,21 @@
         }
 
         function updateMiniMap(lat, lng) {
-            document.getElementById('map-container').style.display = 'block';
-            if (!mapInstance) {
-                mapInstance = L.map('map').setView([lat, lng], 16);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapInstance);
-                markerInstance = L.marker([lat, lng]).addTo(mapInstance);
-            } else {
-                const newPos = [lat, lng];
-                mapInstance.setView(newPos);
-                markerInstance.setLatLng(newPos);
-            }
+            document.getElementById('map-container').classList.remove('hidden');
+            // Give time for display:block to calc layout
+            setTimeout(() => {
+                if (!mapInstance) {
+                    mapInstance = L.map('map').setView([lat, lng], 16);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapInstance);
+                    markerInstance = L.marker([lat, lng]).addTo(mapInstance);
+                    // Invalidatesize fixes grey maps when loading in hidden containers
+                    mapInstance.invalidateSize(); 
+                } else {
+                    const newPos = [lat, lng];
+                    mapInstance.setView(newPos);
+                    markerInstance.setLatLng(newPos);
+                }
+            }, 100);
         }
 
         window.takePicture = function() {
@@ -201,20 +235,30 @@
             const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
             imageInput.value = dataUrl;
 
-            // Simple Preview
-            let preview = document.querySelector('.camera-preview-img');
-            if (!preview) {
-                preview = document.createElement('img');
-                preview.className = 'camera-preview-img img-fluid rounded mt-3 border shadow-sm';
-                video.parentElement.after(preview);
-            }
-            preview.src = dataUrl;
+            // Show Preview
+            cameraPreviewImg.src = dataUrl;
+            cameraView.classList.add('hidden');
+            cameraPreviewContainer.classList.remove('hidden');
 
-            if (latitudeInput.value) {
-                submitBtn.disabled = false;
-                submitBtn.classList.remove('opacity-50');
-            }
+            checkSubmitStatus();
         };
+
+        function resetCameraPreview() {
+            imageInput.value = '';
+            cameraPreviewContainer.classList.add('hidden');
+            cameraView.classList.remove('hidden');
+            checkSubmitStatus();
+        }
+
+        retakeBtn.addEventListener('click', resetCameraPreview);
+
+        function checkSubmitStatus() {
+            if (latitudeInput.value && imageInput.value) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
 
         initCamera();
         initLocation();

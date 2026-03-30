@@ -1,211 +1,491 @@
 {% extends 'app-base.html' %}
 
-{% block title %}<title>{{ course.name }} - Aulas</title>{% endblock %}
+{% block title %}<title>{{ course.name }} - Aulas - ECOÁ</title>{% endblock %}
 
 {% block content %}
-<div class="course-lessons-container">
-    <!-- Header -->
-    <div class="course-header-gradient border-bottom sticky-top" style="z-index: 10; top: 0; background: linear-gradient(135deg, #20c997 0%, #198754 100%);">
-        <div class="container py-3">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="h3 mb-0 text-white fw-bold">{{ course.name }}</h1>
-                    <p class="text-white-50 small mb-0">Sua jornada de aprendizado</p>
-                </div>
-                <div class="col-md-4 text-end">
-                    <div class="progress" style="height: 25px;">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                             role="progressbar" 
-                             style="width: {{ progress_percentage }}%"
-                             aria-valuenow="{{ progress_percentage }}" 
-                             aria-valuemin="0" 
-                             aria-valuemax="100">
-                            {{ progress_percentage }}%
-                        </div>
-                    </div>
-                    <small class="text-muted">{{ completed_lessons }}/{{ total_lessons }} aulas</small>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="container-fluid py-4">
-        <div class="row">
-            <!-- Sidebar com Seções e Lições -->
-            <div class="col-lg-3 mb-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="bi bi-list-check"></i> Conteúdo do Curso</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="accordion accordion-flush" id="lessonsAccordion">
-                            {% for section in sections %}
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" 
-                                            type="button" 
-                                            data-bs-toggle="collapse" 
-                                            data-bs-target="#section{{ section.id }}">
-                                        <strong>{{ section.title }}</strong>
-                                        <span class="badge bg-secondary ms-auto">
-                                            {{ section.lessons.count }}
-                                        </span>
-                                    </button>
-                                </h2>
-                                <div id="section{{ section.id }}" 
-                                     class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" 
-                                     data-bs-parent="#lessonsAccordion">
-                                    <div class="accordion-body p-0">
-                                        <div class="list-group list-group-flush">
-                                            {% for lesson in section.lessons.all %}
-                                            <a href="{% url 'courses:course-video' lesson.id %}" 
-                                               class="list-group-item list-group-item-action py-2 px-3">
-                                                <div class="d-flex align-items-center">
-                                                    {% if lesson.lesson_type == 'video' %}
-                                                        <i class="bi bi-play-circle-fill text-primary me-2"></i>
-                                                    {% elif lesson.lesson_type == 'text' %}
-                                                        <i class="bi bi-file-text-fill text-info me-2"></i>
-                                                    {% else %}
-                                                        <i class="bi bi-pencil-square text-warning me-2"></i>
-                                                    {% endif %}
-                                                    <div class="flex-grow-1">
-                                                        <small class="d-block">{{ lesson.title }}</small>
-                                                        <small class="text-muted">{{ lesson.duration_minutes }} min</small>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Statistics Card -->
-                <div class="card shadow-sm mt-3">
-                    <div class="card-body">
-                        <h6 class="card-title mb-3"><i class="bi bi-graph-up"></i> Seu Progresso</h6>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <small>Concluído</small>
-                                <small><strong>{{ completed_lessons }}/{{ total_lessons }}</strong></small>
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar bg-success" role="progressbar" 
-                                     style="width: {{ progress_percentage }}%" 
-                                     aria-valuenow="{{ progress_percentage }}" 
-                                     aria-valuemin="0" 
-                                     aria-valuemax="100"></div>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="text-center">
-                            {% if progress_percentage == 100 %}
-                                <span class="badge bg-success"><i class="bi bi-check-circle"></i> Parabéns! Curso Completo</span>
-                            {% elif progress_percentage >= 50 %}
-                                <span class="badge bg-info">Você está perto do final! 🚀</span>
-                            {% elif progress_percentage > 0 %}
-                                <span class="badge bg-warning">Continue estudando! 📚</span>
-                            {% else %}
-                                <span class="badge bg-secondary">Comece agora! 🎓</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Content Area -->
-            <div class="col-lg-9">
-                <div class="card shadow-sm">
-                    <div class="card-body p-5 text-center">
-                        <i class="bi bi-play-circle display-1 text-primary mb-4"></i>
-                        <h2 class="mb-3">Bem-vindo ao Curso!</h2>
-                        <p class="text-muted mb-4">
-                            Selecione uma aula no menu lateral para começar sua jornada de aprendizado.
-                        </p>
-                        <p>
-                            <strong>Dicas:</strong>
-                        </p>
-                        <ul class="list-unstyled text-muted small">
-                            <li><i class="bi bi-check-circle-fill text-success"></i> Assista todas as aulas até o final</li>
-                            <li><i class="bi bi-check-circle-fill text-success"></i> Faça os quizzes para avaliar seu aprendizado</li>
-                            <li><i class="bi bi-check-circle-fill text-success"></i> Deixe dúvidas nos comentários</li>
-                            <li><i class="bi bi-check-circle-fill text-success"></i> Participe e aprenda com outros alunos</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Info Cards -->
-                <div class="row mt-4">
-                    <div class="col-md-4 mb-3">
-                        <div class="card shadow-sm text-center">
-                            <div class="card-body">
-                                <i class="bi bi-clock text-primary h3 mb-2"></i>
-                                <h6 class="card-title">Tempo Total</h6>
-                                <p class="mb-0 text-muted">{{ course.time }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <div class="card shadow-sm text-center">
-                            <div class="card-body">
-                                <i class="bi bi-book text-success h3 mb-2"></i>
-                                <h6 class="card-title">Aulas Disponíveis</h6>
-                                <p class="mb-0 text-muted">{{ total_lessons }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <div class="card shadow-sm text-center">
-                            <div class="card-body">
-                                <i class="bi bi-award text-warning h3 mb-2"></i>
-                                <h6 class="card-title">Certificado</h6>
-                                <p class="mb-0 text-muted">Obtenha ao concluir</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <style>
-    .course-lessons-container {
-        background-color: #f8f9fa;
+    /* PREMIUM VANILLA CSS (No Tailwind) */
+    
+    :root {
+        --primary-green: #10b981;
+        --primary-dark: #047857;
+        --bg-color: #f8fafc;
+        --card-bg: #ffffff;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --radius-lg: 1.5rem;
+        --radius-xl: 2rem;
+    }
+
+    [data-bs-theme=dark] {
+        --bg-color: #0f172a;
+        --card-bg: #1e293b;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --border-color: #334155;
+    }
+
+    .l-wrapper {
+        background-color: var(--bg-color);
         min-height: 100vh;
+        font-family: 'Inter', system-ui, sans-serif;
+        color: var(--text-main);
     }
 
-    .accordion-button:not(.collapsed) {
-        background-color: #e7f1ff;
-        color: #0d6efd;
+    /* Hero Header */
+    .l-header {
+        background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+        padding: 2.5rem 1.5rem;
+        position: relative;
+        overflow: hidden;
+        color: white;
+    }
+    
+    .l-header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        position: relative;
+        z-index: 2;
     }
 
-    .list-group-item {
-        border: none;
-        border-bottom: 1px solid #e0e0e0;
-        padding: 0.75rem 1rem;
+    .l-header h1 {
+        font-size: 2rem;
+        font-weight: 900;
+        margin: 0 0 0.5rem 0;
+        letter-spacing: -0.025em;
     }
 
-    .list-group-item:last-child {
+    .l-header p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    /* Progress Bar */
+    .l-progress-wrapper {
+        min-width: 250px;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 1rem;
+        border-radius: 1rem;
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .l-progress-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    .l-progress-track {
+        width: 100%;
+        height: 8px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .l-progress-fill {
+        height: 100%;
+        background: #fff;
+        border-radius: 4px;
+        transition: width 1s ease-in-out;
+    }
+
+    /* Main Grid */
+    .l-main {
+        max-width: 1200px;
+        margin: -2rem auto 3rem auto;
+        padding: 0 1.5rem;
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 2rem;
+        position: relative;
+        z-index: 10;
+    }
+
+    @media (max-width: 992px) {
+        .l-main {
+            grid-template-columns: 1fr;
+            margin-top: 2rem;
+        }
+    }
+
+    /* Cards */
+    .l-card {
+        background: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .l-card-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .l-card-header h2 {
+        font-size: 1.25rem;
+        font-weight: 800;
+        margin: 0;
+        color: var(--text-main);
+    }
+
+    .l-card-icon {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--primary-green);
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    /* Sidebar Accordion */
+    .l-module {
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .l-module:last-child {
         border-bottom: none;
     }
 
-    .list-group-item:hover {
-        background-color: #f5f5f5;
+    .l-module-btn {
+        width: 100%;
+        padding: 1.25rem 1.5rem;
+        background: transparent;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         cursor: pointer;
+        color: var(--text-main);
+        font-weight: 700;
+        font-size: 1rem;
+        transition: background 0.2s;
     }
 
-    .list-group-item.active {
-        background-color: #e7f1ff;
-        border-color: #0d6efd;
+    .l-module-btn:hover {
+        background: rgba(0, 0, 0, 0.02);
     }
 
-    .progress {
-        background-color: #e0e0e0;
+    [data-bs-theme=dark] .l-module-btn:hover {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .l-module-content {
+        display: none;
+        padding: 0 1rem 1rem 1rem;
+    }
+
+    .l-module.is-open .l-module-content {
+        display: block;
+        animation: slideDown 0.3s ease-out;
+    }
+
+    .l-module.is-open .l-chevron {
+        transform: rotate(180deg);
+    }
+
+    .l-chevron {
+        transition: transform 0.3s;
+        color: var(--text-muted);
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Lesson Items */
+    .l-lesson {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        border-radius: 1rem;
+        color: var(--text-main);
+        text-decoration: none;
+        margin-bottom: 0.5rem;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+    }
+
+    .l-lesson:last-child {
+        margin-bottom: 0;
+    }
+
+    .l-lesson:hover {
+        background: var(--bg-color);
+        border-color: var(--border-color);
+        transform: translateX(4px);
+    }
+
+    .l-lesson-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+
+    .l-lesson-info {
+        flex-grow: 1;
+    }
+
+    .l-lesson-title {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.2rem;
+        display: block;
+    }
+
+    .l-lesson-meta {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: block;
+    }
+
+    /* Welcome Area */
+    .l-welcome {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .l-welcome-icon {
+        font-size: 5rem;
+        color: var(--primary-green);
+        margin-bottom: 1.5rem;
+        opacity: 0.8;
+    }
+
+    .l-welcome h2 {
+        font-size: 2rem;
+        font-weight: 900;
+        margin-bottom: 1rem;
+    }
+
+    .l-welcome p {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        max-width: 500px;
+        margin: 0 auto 2rem auto;
+        line-height: 1.6;
+    }
+
+    .l-tips {
+        background: var(--bg-color);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        max-width: 600px;
+        margin: 0 auto;
+        text-align: left;
+        border: 1px solid var(--border-color);
+    }
+
+    .l-tips h4 {
+        margin: 0 0 1rem 0;
+        font-size: 1.1rem;
+        font-weight: 800;
+    }
+
+    .l-tips ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .l-tips li {
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+    }
+
+    .l-tips li i {
+        color: var(--primary-green);
+        font-size: 1.1rem;
+    }
+
+    /* Stats Grid */
+    .l-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .l-stat-card {
+        background: var(--card-bg);
+        border-radius: 1.25rem;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+        transition: transform 0.3s;
+    }
+
+    .l-stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .l-stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem auto;
+        font-size: 1.5rem;
+    }
+
+    .l-stat-card h5 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .l-stat-card p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.9rem;
     }
 </style>
+
+<div class="l-wrapper">
+    <!-- Header -->
+    <header class="l-header">
+        <div class="l-header-content">
+            <div>
+                <h1>{{ course.name }}</h1>
+                <p>Sua jornada de aprendizado contínua</p>
+            </div>
+            
+            <div class="l-progress-wrapper">
+                <div class="l-progress-header">
+                    <span>Progresso do Curso</span>
+                    <span>{{ completed_lessons }}/{{ total_lessons }}</span>
+                </div>
+                <div class="l-progress-track">
+                    <div class="l-progress-fill" style="width: {{ progress_percentage }}%;"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <main class="l-main">
+        
+        <!-- Sidebar -->
+        <aside>
+            <div class="l-card">
+                <div class="l-card-header">
+                    <div class="l-card-icon">
+                        <i class="bi bi-collection-play-fill"></i>
+                    </div>
+                    <h2>Módulos</h2>
+                </div>
+                
+                <div class="l-modules-list">
+                    {% for section in sections %}
+                    <div class="l-module {% if forloop.first %}is-open{% endif %}">
+                        <button class="l-module-btn" onclick="this.parentElement.classList.toggle('is-open')">
+                            <span>{{ section.title }}</span>
+                            <i class="bi bi-chevron-down l-chevron"></i>
+                        </button>
+                        
+                        <div class="l-module-content">
+                            {% for lesson in section.lessons.all %}
+                            <a href="{% url 'courses:course-video' lesson.id %}" class="l-lesson">
+                                <div class="l-lesson-icon">
+                                    <i class="bi bi-play-fill"></i>
+                                </div>
+                                <div class="l-lesson-info">
+                                    <span class="l-lesson-title">{{ lesson.title }}</span>
+                                    <span class="l-lesson-meta">{{ lesson.duration_minutes }} min res.</span>
+                                </div>
+                                <i class="bi bi-arrow-right-short opacity-50"></i>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <section>
+            <div class="l-card l-welcome">
+                <i class="bi bi-mortarboard-fill l-welcome-icon"></i>
+                <h2>Bem-vindo à Sala de Aula!</h2>
+                <p>Selecione uma aula no menu lateral para começar sua jornada rumo ao conhecimento e sustentabilidade.</p>
+                
+                <div class="l-tips">
+                    <h4>Dicas para o sucesso:</h4>
+                    <ul>
+                        <li><i class="bi bi-check-circle-fill"></i> Siga as aulas na ordem recomendada para melhor absorção.</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Utilize a seção de comentários para sanar dúvidas.</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Pratique o que você aprende paralelamente.</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Conclua os módulos para garantir seu certificado final.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="l-stats-grid">
+                <div class="l-stat-card">
+                    <div class="l-stat-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <h5>Tempo de Curso</h5>
+                    <p>{{ course.time }}</p>
+                </div>
+                
+                <div class="l-stat-card">
+                    <div class="l-stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="bi bi-journal-check"></i>
+                    </div>
+                    <h5>Total de Aulas</h5>
+                    <p>{{ total_lessons }} Conteúdos</p>
+                </div>
+                
+                <div class="l-stat-card">
+                    <div class="l-stat-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                        <i class="bi bi-award-fill"></i>
+                    </div>
+                    <h5>Certificado</h5>
+                    <p>Liberado ao concluir</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
 {% endblock %}

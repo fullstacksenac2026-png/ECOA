@@ -1,731 +1,213 @@
 {% extends 'app-base.html' %}
+{% load static %}
 
-{% block title %}Perfil{% endblock %}
+{% block title %}Meu Perfil - ECOÁ{% endblock %}
 
 {% block content %}
-<style>
-    /* ===== MOBILE-FIRST BASE STYLES ===== */
+<main class="w-full max-w-7xl mx-auto px-4 py-8">
     
-    .mobile-app-container {
-        width: 100%;
-        margin: 0;
-        background: var(--bs-body-bg);
-        border-radius: 0;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    [data-bs-theme=dark] .mobile-app-container {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-    }
-
-    .mobile-app-header {
-        background: linear-gradient(135deg, #20c997 0%, #198754 100%);
-        color: white;
-        padding: 1.5rem 1rem;
-        border-radius: 0;
-        text-align: center;
-        transition: background 0.3s ease;
-    }
-
-    [data-bs-theme=dark] .mobile-app-header {
-        background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
-    }
-
-    .mobile-app-header h2 {
-        margin-bottom: 0.25rem;
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-
-    .mobile-app-header p {
-        opacity: 0.95;
-        margin-bottom: 0;
-        font-size: 0.85rem;
-    }
-
-    .mobile-app-header .rounded-circle {
-        width: 50px !important;
-        height: 50px !important;
-        font-size: 1.5rem !important;
-    }
-
-    .mobile-step-indicator {
-        padding: 1.25rem 1rem;
-        background: var(--bs-tertiary-bg);
-        border-bottom: 1px solid var(--bs-border-color);
-        transition: background-color 0.3s ease, border-color 0.3s ease;
-    }
-
-
-    .step-dots {
-        display: flex;
-        justify-content: center;
-        gap: 0.4rem;
-        margin-bottom: 0.75rem;
-        flex-wrap: wrap;
-    }
-
-    .step-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--bs-secondary-bg);
-        transition: all 0.3s ease;
-        cursor: pointer;
-        flex-shrink: 0;
-    }
-
-
-    .step-dot.active {
-        background: #20c997;
-        width: 20px;
-        border-radius: 4px;
-    }
-
-    .step-label-mobile {
-        text-align: center;
-        font-weight: 600;
-        color: #20c997;
-        font-size: 0.8rem;
-        letter-spacing: 0.5px;
-        transition: color 0.3s ease;
-    }
-
-
-    .mobile-form-content {
-        padding: 1.5rem 1rem;
-        min-height: 280px;
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
-
-
-    .mobile-form-content h4 {
-        margin-bottom: 1rem;
-        font-size: 1.1rem;
-        color: #20c997;
-        font-weight: 700;
-        transition: color 0.3s ease;
-    }
-
-
-    .info-box {
-        background-color: var(--bs-tertiary-bg);
-        padding: 0.75rem;
-        border-radius: 8px;
-        transition: background-color 0.3s ease, border-color 0.3s ease;
-    }
-
-
-    .info-box label {
-        font-size: 0.75rem;
-        color: var(--bs-secondary-color);
-        font-weight: 600;
-        margin-bottom: 0.25rem;
-        display: block;
-        transition: color 0.3s ease;
-    }
-
-
-    .info-box p {
-        font-size: 0.95rem;
-        color: var(--bs-body-color);
-        font-weight: 600;
-        margin-bottom: 0;
-        word-break: break-word;
-        transition: color 0.3s ease;
-    }
-
-
-    .mobile-button-group {
-        padding: 1rem;
-        background: var(--bs-tertiary-bg);
-        border-top: 1px solid var(--bs-border-color);
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        border-radius: 0;
-        transition: background-color 0.3s ease, border-color 0.3s ease;
-    }
-
-
-    .mobile-button-group form {
-        width: 100%;
-    }
-
-    .btn-mobile {
-        width: 100%;
-        padding: 0.65rem 1rem;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        border: none;
-        cursor: pointer;
-        font-size: 0.85rem;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.4rem;
-    }
-
-    .btn-mobile-primary {
-        background: linear-gradient(135deg, #20c997 0%, #198754 100%);
-        color: white;
-    }
-
-    .btn-mobile-primary:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 3px 10px rgba(32, 201, 151, 0.25);
-        color: white;
-        text-decoration: none;
-    }
-
-    [data-bs-theme=dark] .btn-mobile-primary {
-        background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
-    }
-
-    .btn-mobile-secondary {
-        background: var(--bs-body-bg);
-        color: var(--bs-secondary-color);
-        border: 2px solid var(--bs-border-color);
-        transition: all 0.3s ease;
-    }
-
-    .btn-mobile-secondary:hover {
-        border-color: #20c997;
-        color: #20c997;
-    }
-
-
-    .btn-mobile:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    .profile-section {
-        display: none;
-    }
-
-    .profile-section.active {
-        display: block;
-        animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-
-    .profile-row {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 0.75rem;
-    }
-
-    /* ===== TABLET STYLES (480px+) ===== */
-    @media (min-width: 480px) {
-        .mobile-app-container {
-            max-width: 420px;
-            margin: 0 auto;
-            border-radius: 16px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-        }
-
-        [data-bs-theme=dark] .mobile-app-container {
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-        }
-
-        .mobile-app-header {
-            padding: 1.75rem 1.5rem;
-            border-radius: 16px 16px 0 0;
-        }
-
-        .mobile-app-header h2 {
-            font-size: 1.65rem;
-        }
-
-        .mobile-app-header p {
-            font-size: 0.9rem;
-        }
-
-        .mobile-app-header .rounded-circle {
-            width: 55px !important;
-            height: 55px !important;
-            font-size: 1.65rem !important;
-        }
-
-        .mobile-step-indicator {
-            padding: 1.5rem;
-        }
-
-        .step-label-mobile {
-            font-size: 0.85rem;
-        }
-
-        .mobile-form-content {
-            padding: 1.75rem 1.5rem;
-            min-height: 320px;
-        }
-
-        .mobile-form-content h4 {
-            font-size: 1.2rem;
-            margin-bottom: 1.25rem;
-        }
-
-        .info-box {
-            padding: 0.9rem;
-        }
-
-        .info-box label {
-            font-size: 0.8rem;
-        }
-
-        .info-box p {
-            font-size: 1rem;
-        }
-
-        .mobile-button-group {
-            padding: 1.25rem 1.5rem;
-            flex-direction: row;
-            gap: 0.75rem;
-            border-radius: 0 0 16px 16px;
-        }
-
-        .btn-mobile {
-            width: auto;
-            flex: 1;
-            font-size: 0.9rem;
-            padding: 0.7rem 1.2rem;
-        }
-
-        .profile-row {
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-    }
-
-    /* ===== MEDIUM TABLET/SMALL DESKTOP (768px+) ===== */
-    @media (min-width: 768px) {
-        .mobile-app-container {
-            max-width: 450px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-        }
-
-        [data-bs-theme=dark] .mobile-app-container {
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-        }
-
-        .mobile-app-header {
-            padding: 2rem 1.75rem;
-        }
-
-        .mobile-app-header h2 {
-            font-size: 1.8rem;
-        }
-
-        .mobile-app-header p {
-            font-size: 0.95rem;
-        }
-
-        .mobile-form-content {
-            padding: 2rem 1.75rem;
-            min-height: 350px;
-        }
-
-        .mobile-form-content h4 {
-            font-size: 1.3rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .info-box {
-            padding: 1rem;
-        }
-
-        .info-box label {
-            font-size: 0.85rem;
-        }
-
-        .info-box p {
-            font-size: 1.05rem;
-        }
-
-        .mobile-button-group {
-            padding: 1.5rem 1.75rem;
-            gap: 1rem;
-        }
-
-        .btn-mobile {
-            font-size: 0.95rem;
-            padding: 0.8rem 1.5rem;
-        }
-    }
-
-    /* ===== LARGE DESKTOP (1024px+) ===== */
-    @media (min-width: 1024px) {
-        .mobile-app-container {
-            max-width: 480px;
-        }
-
-        .mobile-app-header {
-            padding: 2.25rem 2rem;
-        }
-
-        .mobile-app-header h2 {
-            font-size: 1.9rem;
-        }
-
-        .mobile-form-content {
-            padding: 2.25rem 2rem;
-        }
-
-        .mobile-form-content h4 {
-            font-size: 1.4rem;
-        }
-
-        .mobile-button-group {
-            padding: 1.75rem 2rem;
-        }
-    }
-
-    /* ===== LARGE DESKTOP (1024px+) ===== */
-    @media (min-width: 1024px) {
-        .mobile-app-container {
-            max-width: 480px;
-        }
-
-        .mobile-app-header {
-            padding: 2.25rem 2rem;
-        }
-
-        .mobile-app-header h2 {
-            font-size: 1.9rem;
-        }
-
-        .mobile-form-content {
-            padding: 2.25rem 2rem;
-        }
-
-        .mobile-form-content h4 {
-            font-size: 1.4rem;
-        }
-
-        .mobile-button-group {
-            padding: 1.75rem 2rem;
-        }
-    }
-</style>
-
-<main class="d-flex align-items-center justify-content-center" style="min-height: 100vh; padding: 0; padding-top: 1rem; padding-bottom: 1rem;">
-    <div class="mobile-app-container">
-        <div class="mobile-app-header">
-            <div class="bg-body-secondary text-secondary rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
-                <i class="bi bi-person-check-fill fs-4"></i>
+    <!-- Profile Header -->
+    <div class="bg-gradient-to-r from-customGreen to-emerald-500 rounded-[3rem] p-8 md:p-12 text-white shadow-lg relative overflow-hidden mb-8">
+        <!-- Decorative blobs -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+        <div class="absolute bottom-0 left-10 w-40 h-40 bg-black/10 rounded-full blur-2xl -mb-10 pointer-events-none"></div>
+        
+        <div class="flex flex-col md:flex-row items-center gap-8 relative z-10">
+            <!-- Avatar -->
+            <div class="w-32 h-32 md:w-40 md:h-40 bg-white/20 p-2 rounded-full backdrop-blur-sm shadow-xl shrink-0">
+                <div class="w-full h-full bg-white dark:bg-slate-800 rounded-full overflow-hidden flex items-center justify-center border-4 border-white">
+                    <i class="bi bi-person-fill text-6xl text-slate-300 dark:text-slate-600"></i>
+                </div>
             </div>
-            <h2>Olá, {{ user.first_name }}!</h2>
-            <p>Seus dados e atividades</p>
-        </div>
-
-        <div class="mobile-step-indicator">
-            <div class="step-dots" id="stepDots"></div>
-            <div class="step-label-mobile" id="stepLabel">Pessoal</div>
-        </div>
-
-        {% if message %}
-            <div class="alert alert-{{ message_type }} alert-dismissible fade show m-3" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endif %}
-
-        <!-- SEÇÃO 1: INFORMAÇÕES PESSOAIS -->
-        <div class="mobile-form-content profile-section active" data-step="0">
-            <h4>Informações Pessoais</h4>
-            <div class="profile-row">
-                <div class="info-box">
-                    <label>Nome</label>
-                    <p>{{ user.first_name }}</p>
-                </div>
-                <div class="info-box">
-                    <label>Sobrenome</label>
-                    <p>{{ user.last_name }}</p>
-                </div>
-                <div class="info-box">
-                    <label>CPF</label>
-                    <p>
-                        {% if user.cpf %}
-                            {{ user.cpf|slice:":3" }}.{{ user.cpf|slice:"3:6" }}.{{ user.cpf|slice:"6:9" }}-{{ user.cpf|slice:"9:11" }}
-                        {% else %}
-                            <span class="text-muted">Não informado</span>
-                        {% endif %}
-                    </p>
-                </div>
-                <div class="info-box">
-                    <label>Data de Nascimento</label>
-                    <p>
-                        {% if user.birth_date %}
-                            {{ user.birth_date|date:"d/m/Y" }}
-                        {% else %}
-                            <span class="text-muted">Não informado</span>
-                        {% endif %}
-                    </p>
-                </div>
-                <div class="info-box">
-                    <label>Gênero</label>
-                    <p>
-                        {% if user.gender %}
-                            {{ user.get_gender_display }}
-                        {% else %}
-                            <span class="text-muted">Não informado</span>
-                        {% endif %}
-                    </p>
-                </div>
-                <div class="info-box">
-                    <label>Sexualidade</label>
-                    <p>
-                        {% if user.sexuality %}
-                            {{ user.get_sexuality_display }}
-                        {% else %}
-                            <span class="text-muted">Não informado</span>
-                        {% endif %}
-                    </p>
+            
+            <!-- Info -->
+            <div class="text-center md:text-left flex-1">
+                <h1 class="text-4xl md:text-5xl font-black mb-2 tracking-tight">{{ user.first_name }} {{ user.last_name }}</h1>
+                <p class="text-emerald-50 text-lg md:text-xl font-medium mb-6 opacity-90">Membro da Comunidade ECOÁ</p>
+                
+                <div class="flex flex-wrap justify-center md:justify-start gap-4">
+                    <a href="{% url 'authorization:update-profile' %}" class="bg-white text-customGreen hover:bg-slate-50 font-bold px-6 py-3 rounded-full shadow-md transition-transform hover:-translate-y-1 flex items-center gap-2 no-underline">
+                        <i class="bi bi-pencil-square"></i> Editar Perfil
+                    </a>
+                    <form method="post" action="{% url 'authorization:logout' %}" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-red-500/20 hover:bg-red-500 text-white border border-red-500/30 font-bold px-6 py-3 rounded-full backdrop-blur-sm transition-colors flex items-center gap-2">
+                            <i class="bi bi-box-arrow-right"></i> Sair
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- SEÇÃO 2: ENDEREÇO -->
-        <div class="mobile-form-content profile-section" data-step="1">
-            <h4>Endereço</h4>
-            {% if user.addresses.all.0 %}
-                <div class="profile-row">
-                    <div class="info-box">
-                        <label>CEP</label>
-                        <p>{{ user.addresses.all.0.cep|default:"Não informado" }}</p>
-                    </div>
-                    <div class="info-box">
-                        <label>Logradouro</label>
-                        <p>{{ user.addresses.all.0.street|default:"Não informado" }}</p>
-                    </div>
-                    <div class="info-box">
-                        <label>Número</label>
-                        <p>{{ user.addresses.all.0.residence_number|default:"Não informado" }}</p>
-                    </div>
-                    <div class="info-box">
-                        <label>Complemento</label>
-                        <p>{{ user.addresses.all.0.complement|default:"Não informado" }}</p>
-                    </div>
-                    <div class="info-box">
-                        <label>Bairro</label>
-                        <p>{{ user.addresses.all.0.neighborhood|default:"Não informado" }}</p>
-                    </div>
-                    <div class="info-box">
-                        <label>Cidade</label>
-                        <p>{{ user.addresses.all.0.city|default:"Não informado" }}</p>
-                    </div>
-                    <div class="info-box">
-                        <label>Estado</label>
-                        <p>{{ user.addresses.all.0.state|default:"Não informado" }}</p>
-                    </div>
-                    <div class="info-box">
-                        <label>País</label>
-                        <p>{{ user.addresses.all.0.country|default:"Não informado" }}</p>
-                    </div>
-                </div>
-            {% else %}
-                <div class="alert alert-info mb-0">
-                    <i class="bi bi-info-circle me-2"></i>
-                    Nenhum endereço cadastrado
-                </div>
-            {% endif %}
+    <!-- Feedback Message -->
+    {% if message %}
+        <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 text-blue-700 dark:text-blue-400 p-4 rounded-2xl mb-8 flex justify-between items-center shadow-sm">
+            <div class="flex items-center gap-3">
+                <i class="bi bi-info-circle-fill text-xl"></i>
+                <span class="font-medium">{{ message }}</span>
+            </div>
+            <button onclick="this.parentElement.remove()" class="text-blue-500 hover:text-blue-700 focus:outline-none"><i class="bi bi-x-lg"></i></button>
         </div>
+    {% endif %}
 
-        <!-- SEÇÃO 3: CONTATO -->
-        <div class="mobile-form-content profile-section" data-step="2">
-            <h4>Contato</h4>
-            <div class="profile-row">
-                <div class="info-box">
-                    <label>Email</label>
-                    <p>{{ user.email|default:"Não informado" }}</p>
+    <!-- Dashboard Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Left Column: Personal Data -->
+        <div class="lg:col-span-1 space-y-8">
+            <!-- Personal Info Card -->
+            <div class="bg-white dark:bg-slate-800 rounded-[2rem] p-6 md:p-8 shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden relative">
+                <div class="absolute top-0 left-0 w-1 h-full bg-customGreen"></div>
+                <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-6 flex items-center gap-3">
+                    <i class="bi bi-person-vcard text-customGreen bg-customGreen/10 p-2 rounded-xl text-xl"></i> Pessoal
+                </h3>
+                
+                <div class="space-y-5">
+                    <div>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Nome Completo</span>
+                        <p class="text-slate-800 dark:text-slate-200 font-medium m-0">{{ user.first_name }} {{ user.last_name }}</p>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">CPF</span>
+                        <p class="text-slate-800 dark:text-slate-200 font-medium m-0">
+                            {% if user.cpf %}{{ user.cpf|slice:":3" }}.{{ user.cpf|slice:"3:6" }}.{{ user.cpf|slice:"6:9" }}-{{ user.cpf|slice:"9:11" }}{% else %}<span class="text-slate-400 italic">Não informado</span>{% endif %}
+                        </p>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Data de Nascimento</span>
+                        <p class="text-slate-800 dark:text-slate-200 font-medium m-0">
+                            {% if user.birth_date %}{{ user.birth_date|date:"d/m/Y" }}{% else %}<span class="text-slate-400 italic">Não informado</span>{% endif %}
+                        </p>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Email</span>
+                        <p class="text-slate-800 dark:text-slate-200 font-medium m-0">{{ user.email|default:"Não informado" }}</p>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Telefone</span>
+                        <p class="text-slate-800 dark:text-slate-200 font-medium m-0">
+                            {% if user.phones.all.0 %}({{ user.phones.all.0.ddi }}) {{ user.phones.all.0.ddd }} {{ user.phones.all.0.phone_number }}{% else %}<span class="text-slate-400 italic">Não informado</span>{% endif %}
+                        </p>
+                    </div>
                 </div>
-                <div class="info-box">
-                    <label>Telefone</label>
-                    <p>
-                        {% if user.phones.all.0 %}
-                            ({{ user.phones.all.0.ddi }}) {{ user.phones.all.0.ddd }} {{ user.phones.all.0.phone_number }}
-                        {% else %}
-                            <span class="text-muted">Não informado</span>
-                        {% endif %}
-                    </p>
+            </div>
+
+            <!-- Address Card -->
+            <div class="bg-white dark:bg-slate-800 rounded-[2rem] p-6 md:p-8 shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden relative">
+                <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+                <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-6 flex items-center gap-3">
+                    <i class="bi bi-geo-alt-fill text-blue-500 bg-blue-500/10 p-2 rounded-xl text-xl"></i> Endereço
+                </h3>
+                
+                {% if user.addresses.all.0 %}
+                <div class="space-y-5">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="col-span-2">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Logradouro</span>
+                            <p class="text-slate-800 dark:text-slate-200 font-medium m-0">{{ user.addresses.all.0.street|default:"-" }}, {{ user.addresses.all.0.residence_number|default:"S/N" }}</p>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Complemento</span>
+                            <p class="text-slate-800 dark:text-slate-200 font-medium m-0">{{ user.addresses.all.0.complement|default:"-" }}</p>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">CEP</span>
+                            <p class="text-slate-800 dark:text-slate-200 font-medium m-0">{{ user.addresses.all.0.cep|default:"-" }}</p>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Bairro</span>
+                            <p class="text-slate-800 dark:text-slate-200 font-medium m-0">{{ user.addresses.all.0.neighborhood|default:"-" }}</p>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Local</span>
+                            <p class="text-slate-800 dark:text-slate-200 font-medium m-0">{{ user.addresses.all.0.city|default:"-" }} - {{ user.addresses.all.0.state|default:"-" }}</p>
+                        </div>
+                    </div>
                 </div>
+                {% else %}
+                <div class="text-center py-6">
+                    <i class="bi bi-map text-4xl text-slate-300 dark:text-slate-600 mb-2 inline-block"></i>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium">Nenhum endereço cadastrado.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
 
-        <!-- SEÇÃO 4: CURSOS -->
-        <div class="mobile-form-content profile-section" data-step="3">
-            <h4>Meus Cursos</h4>
-            <div class="d-flex flex-column gap-3">
-                {% for enrollment in enrolled_courses %}
-                <a href="{% url 'courses:course-lessons' enrollment.course.id %}" class="text-decoration-none">
-                    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
-                        <div class="card-body p-3 d-flex align-items-center">
-                            <div class="bg-primary-subtle text-primary rounded-3 d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                                <i class="bi bi-play-circle-fill fs-3"></i>
+        <!-- Right Column: Courses & Payments -->
+        <div class="lg:col-span-2 flex flex-col gap-8">
+            
+            <!-- My Courses -->
+            <div class="bg-white dark:bg-slate-800 rounded-[2rem] p-6 md:p-8 shadow-sm border border-slate-100 dark:border-slate-700 flex-1">
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3 m-0">
+                        <i class="bi bi-book-half text-amber-500 bg-amber-500/10 p-2 rounded-xl text-xl"></i> Meus Cursos
+                    </h3>
+                    <a href="{% url 'courses:list-courses-and-categories' %}" class="text-customGreen hover:text-customGreenHover font-bold text-sm tracking-wide bg-customGreen/10 hover:bg-customGreen/20 px-4 py-2 rounded-full transition-colors no-underline">
+                        Explorar Cursos
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for enrollment in enrolled_courses %}
+                    <a href="{% url 'courses:course-lessons' enrollment.course.id %}" class="group bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-2xl p-4 flex items-center gap-4 hover:border-customGreen hover:shadow-md transition-all no-underline">
+                        <div class="w-14 h-14 rounded-xl bg-customGreen/10 text-customGreen flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:bg-customGreen group-hover:text-white transition-all shadow-sm">
+                            <i class="bi bi-play-fill text-3xl ml-1"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-slate-800 dark:text-slate-200 font-bold text-base m-0 line-clamp-2 leading-tight group-hover:text-customGreen transition-colors">{{ enrollment.course.name }}</h4>
+                            <span class="text-slate-400 text-xs mt-1 block">Inscrito em {{ enrollment.enrolled_at|date:"d/m/Y" }}</span>
+                        </div>
+                        <i class="bi bi-chevron-right text-slate-300 group-hover:text-customGreen transition-colors text-xl"></i>
+                    </a>
+                    {% empty %}
+                    <div class="col-span-1 md:col-span-2 text-center py-12 bg-slate-50 dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-700">
+                        <div class="w-20 h-20 bg-white dark:bg-slate-800 rounded-full mx-auto flex items-center justify-center mb-4 shadow-sm border border-slate-100 dark:border-slate-700">
+                            <i class="bi bi-journal-x text-3xl text-slate-400"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">Você não iniciou nenhum curso ainda</h4>
+                        <p class="text-slate-500 m-0">Descubra novos conteúdos e aprimore seus conhecimentos.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Payment History -->
+            <div class="bg-white dark:bg-slate-800 rounded-[2rem] p-6 md:p-8 shadow-sm border border-slate-100 dark:border-slate-700">
+                <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-6 flex items-center gap-3">
+                    <i class="bi bi-receipt text-purple-500 bg-purple-500/10 p-2 rounded-xl text-xl"></i> Histórico de Pagamentos
+                </h3>
+                
+                <div class="flex flex-col gap-3">
+                    {% for payment in payments %}
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-700">
+                        <div class="flex items-start gap-4 mb-3 sm:mb-0">
+                            <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0 border border-green-200">
+                                <i class="bi bi-check-lg text-2xl"></i>
                             </div>
                             <div>
-                                <h6 class="mb-0 fw-bold text-body-emphasis">{{ enrollment.course.name }}</h6>
-                                <small class="text-muted">Inscrito em: {{ enrollment.enrolled_at|date:"d/m/Y" }}</small>
+                                <h5 class="text-slate-800 dark:text-slate-200 font-bold m-0 line-clamp-1">{{ payment.course.name }}</h5>
+                                <div class="flex items-center gap-3 text-xs text-slate-500 mt-1 font-medium">
+                                    <span><i class="bi bi-calendar3 mr-1"></i> {{ payment.payment_date|date:"d/m/Y" }}</span>
+                                    <span><i class="bi bi-credit-card mr-1"></i> {{ payment.payment_method }}</span>
+                                </div>
                             </div>
-                            <i class="bi bi-chevron-right ms-auto text-muted"></i>
+                        </div>
+                        <div class="text-left sm:text-right pl-16 sm:pl-0">
+                            <span class="block text-xl font-black text-slate-800 dark:text-white">R$ {{ payment.amount }}</span>
+                            <span class="bg-green-100 text-green-700 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full inline-block mt-1">Concluído</span>
                         </div>
                     </div>
-                </a>
-                {% empty %}
-                <div class="text-center py-4 bg-body-secondary rounded-3">
-                    <i class="bi bi-book fs-1 text-muted opacity-50"></i>
-                    <p class="mt-2 text-muted mb-0">Nenhum curso inscrito.</p>
-                    <a href="{% url 'courses:list-courses-and-categories' %}" class="btn btn-sm btn-link text-primary text-decoration-none">Ver cursos</a>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- SEÇÃO 5: PAGAMENTOS -->
-        <div class="mobile-form-content profile-section" data-step="4">
-            <h4>Histórico de Pagamentos</h4>
-            <div class="d-flex flex-column gap-2">
-                {% for payment in payments %}
-                <div class="info-box border-start border-4 border-success">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <label class="mb-0">{{ payment.course.name }}</label>
-                            <p class="mb-0">R$ {{ payment.amount }}</p>
-                        </div>
-                        <span class="badge bg-success-subtle text-success rounded-pill" style="font-size: 0.65rem;">Concluído</span>
+                    {% empty %}
+                    <div class="text-center py-10 bg-slate-50 dark:bg-slate-900 rounded-2xl">
+                        <i class="bi bi-wallet2 text-3xl text-slate-300 dark:text-slate-600 mb-3 block"></i>
+                        <p class="text-slate-500 font-medium m-0">Nenhum pagamento registrado no momento.</p>
                     </div>
-                    <div class="mt-1">
-                        <small class="text-muted" style="font-size: 0.7rem;">{{ payment.payment_date|date:"d/m/Y H:i" }} • {{ payment.payment_method }}</small>
-                    </div>
+                    {% endfor %}
                 </div>
-                {% empty %}
-                <div class="text-center py-4 bg-body-secondary rounded-3">
-                    <i class="bi bi-credit-card fs-1 text-muted opacity-50"></i>
-                    <p class="mt-2 text-muted mb-0">Nenhum pagamento registrado.</p>
-                </div>
-                {% endfor %}
             </div>
-        </div>
 
-        <div class="mobile-button-group">
-            <button type="button" class="btn btn-mobile btn-mobile-secondary" id="prevBtn" disabled onclick="previousStep()">
-                <i class="bi bi-arrow-left me-2"></i>Anterior
-            </button>
-            <button type="button" class="btn btn-mobile btn-mobile-primary" id="nextBtn" onclick="nextStep()">
-                Próximo<i class="bi bi-arrow-right ms-2"></i>
-            </button>
-            <a href="{% url 'authorization:update-profile' %}" class="btn btn-mobile btn-mobile-primary d-none" id="updateBtn">
-                <i class="bi bi-pencil-square me-2"></i>Atualizar
-            </a>
         </div>
-
-        <form method="post" action="{% url 'authorization:logout' %}" id="logoutForm" class="mobile-button-group d-none" style="border-top: none; padding-top: 0;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-mobile" style="background: #dc3545; color: white;">
-                <i class="bi bi-box-arrow-right me-2"></i>Sair
-            </button>
-        </form>
     </div>
 </main>
-
-<script>
-    let currentStep = 0;
-    const totalSteps = 5;
-
-    function updateProgress() {
-        const stepDots = document.querySelectorAll('.step-dot');
-        const stepLabel = document.getElementById('stepLabel');
-        const stepNames = ['Pessoal', 'Endereço', 'Contato', 'Cursos', 'Pagamentos'];
-        
-        // Atualizar dots
-        stepDots.forEach(function(dot, index) {
-            if (index === currentStep) {
-                dot.classList.add('active');
-            } else {
-                dot.classList.remove('active');
-            }
-        });
-        
-        // Atualizar label
-        if (stepLabel) {
-            stepLabel.textContent = stepNames[currentStep] || 'Etapa';
-        }
-        
-        // Mostrar/esconder seções
-        document.querySelectorAll('.profile-section').forEach(section => {
-            section.classList.remove('active');
-        });
-        document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
-        
-        // Atualizar botões
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const updateBtn = document.getElementById('updateBtn');
-        const logoutForm = document.getElementById('logoutForm');
-        
-        prevBtn.disabled = currentStep === 0;
-        
-        if (currentStep === totalSteps - 1) {
-            nextBtn.classList.add('d-none');
-            updateBtn.classList.remove('d-none');
-            logoutForm.classList.remove('d-none');
-        } else {
-            nextBtn.classList.remove('d-none');
-            updateBtn.classList.add('d-none');
-            logoutForm.classList.add('d-none');
-        }
-    }
-
-    function nextStep() {
-        if (currentStep < totalSteps - 1) {
-            currentStep++;
-            updateProgress();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    }
-
-    function previousStep() {
-        if (currentStep > 0) {
-            currentStep--;
-            updateProgress();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // Criar step dots
-        const stepDotsContainer = document.getElementById('stepDots');
-        if (stepDotsContainer) {
-            stepDotsContainer.innerHTML = '';
-            for (let i = 0; i < totalSteps; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'step-dot' + (i === 0 ? ' active' : '');
-                dot.style.cursor = 'pointer';
-                dot.onclick = function() {
-                    currentStep = i;
-                    updateProgress();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                };
-                stepDotsContainer.appendChild(dot);
-            }
-        }
-        
-        updateProgress();
-    });
-</script>
-
 {% endblock %}

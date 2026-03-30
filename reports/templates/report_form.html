@@ -3,47 +3,107 @@
 {% block title %}Denunciar {% if type == 'picture' %}Imagem{% elif type == 'forum_post' %}Post do Fórum{% else %}Comentário{% endif %} | ECOA{% endblock %}
 
 {% block content %}
-<main class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5 text-center">
-            <div class="card border-0 shadow-lg p-4">
-                <div class="text-warning mb-4">
-                    <i class="bi bi-flag-fill display-1"></i>
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .dark .glass-card {
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Standard CSS overrides for form fields since @apply doesn't work with CDN */
+    .report-form select, .report-form textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        background-color: rgba(255, 255, 255, 0.5);
+        outline: none;
+        transition: all 0.3s ease;
+    }
+    
+    .dark .report-form select, .dark .report-form textarea {
+        border-color: #334155;
+        background-color: rgba(30, 41, 59, 0.5);
+        color: #f1f5f9;
+    }
+
+    .report-form select:focus, .report-form textarea:focus {
+        border-color: #20c997;
+        box-shadow: 0 0 0 4px rgba(32, 201, 151, 0.15);
+    }
+</style>
+
+<main class="max-w-lg mx-auto py-12 px-4">
+    <div class="glass-card rounded-[2.5rem] p-8 md:p-10 text-center relative overflow-hidden">
+        <!-- Decorative background element -->
+        <div class="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 bg-yellow-400/10 rounded-full blur-3xl"></div>
+        
+        <div class="relative z-10">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-yellow-100 dark:bg-yellow-900/30 text-yellow-500 mb-6 transform -rotate-6 transition-transform hover:rotate-0 duration-500">
+                <i class="bi bi-exclamation-triangle-fill text-4xl"></i>
+            </div>
+            
+            <h2 class="text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight mb-3">Reportar Conteúdo</h2>
+            <p class="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
+                Ajude-nos a manter a comunidade segura. Sua denúncia será analisada anonimamente por nossa equipe.
+            </p>
+
+            <!-- Target Context Box -->
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 mb-8 text-left border border-slate-100 dark:border-slate-700">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="px-2 py-1 rounded-md bg-slate-200 dark:bg-slate-700 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">Alvo</span>
+                    <span class="text-xs font-semibold text-slate-500">
+                        {% if type == 'picture' %}Imagem{% elif type == 'forum_post' %}Post{% else %}Comentário{% endif %}
+                    </span>
                 </div>
-                <h2 class="fw-bold mb-3">Reportar Problema</h2>
-                <p class="text-muted mb-4">
-                    Ajude-nos a manter a plataforma segura denunciando conteúdo inadequado ou abusivo.
+                <p class="text-sm font-medium text-slate-800 dark:text-slate-200 truncate italic">
+                    "{% if type == 'picture' or type == 'forum_post' %}{{ target.title }}{% else %}{{ target.content|truncatechars:100 }}{% endif %}"
                 </p>
-                <div class="alert alert-secondary border small text-start">
-                    <strong>Alvo:</strong> {% if type == 'picture' or type == 'forum_post' %}{{ target.title }}{% else %}{{ target.content|truncatechars:30 }}{% endif %}
+            </div>
+            
+            <form method="POST" class="report-form space-y-6 text-left">
+                {% csrf_token %}
+                
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Motivo da denúncia</label>
+                    {{ form.reason }}
+                    {% if form.reason.errors %}
+                        <div class="flex items-center gap-1 text-red-500 text-xs font-semibold mt-1">
+                            <i class="bi bi-exclamation-circle"></i>
+                            {{ form.reason.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Detalhes adicionais (opcional)</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="flex items-center gap-1 text-red-500 text-xs font-semibold mt-1">
+                            <i class="bi bi-exclamation-circle"></i>
+                            {{ form.description.errors.0 }}
+                        </div>
+                    {% endif %}
                 </div>
                 
-                <form method="POST" class="d-grid gap-3 text-start">
-                    {% csrf_token %}
-                    <div>
-                        <label class="form-label fw-bold">{{ form.reason.label }}</label>
-                        {{ form.reason }}
-                        {% if form.reason.errors %}
-                            <div class="text-danger small">{{ form.reason.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div>
-                        <label class="form-label fw-bold">{{ form.description.label }}</label>
-                        {{ form.description }}
-                        {% if form.description.errors %}
-                            <div class="text-danger small">{{ form.description.errors }}</div>
-                        {% endif %}
-                    </div>
-                    
-                    <button type="submit" class="btn btn-warning btn-lg shadow-sm mt-2 fw-bold">
+                <div class="pt-4 space-y-3">
+                    <button type="submit" class="w-full py-4 rounded-2xl bg-yellow-500 text-white font-extrabold shadow-lg shadow-yellow-500/20 transition-all hover:scale-[1.02] hover:shadow-yellow-500/40 active:scale-95 flex items-center justify-center gap-2">
                         <i class="bi bi-send-fill"></i> Enviar Denúncia
                     </button>
-                    <a href="{% if type == 'picture' %}{% url 'pictures:details-picture' target.id %}{% elif type == 'comment' %}{% url 'pictures:details-picture' target.picture.id %}{% elif type == 'forum_post' %}{% url 'forum:forum-post-detail' target.id %}{% elif type == 'forum_comment' %}{% url 'forum:forum-post-detail' target.post.id %}{% endif %}" class="btn btn-outline-secondary">
+                    
+                    <a href="{% if type == 'picture' %}{% url 'pictures:details-picture' target.id %}{% elif type == 'comment' %}{% url 'pictures:details-picture' target.picture.id %}{% elif type == 'forum_post' %}{% url 'forum:forum-post-detail' target.id %}{% elif type == 'forum_comment' %}{% url 'forum:forum-post-detail' target.post.id %}{% endif %}" 
+                       class="block w-full py-3 rounded-2xl text-center font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
                         Cancelar
                     </a>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 </main>

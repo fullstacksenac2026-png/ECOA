@@ -4,65 +4,97 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<main class="container py-5 mt-5 pt-5 d-flex flex-column align-items-center justify-content-center min-vh-75">
-    <div class="col-lg-5 col-md-8 col-sm-10">
-        <div class="card shadow-lg border-0 rounded-4 card-custom-green">
-            <div class="card-body p-5">
-                <div class="text-center mb-4">
-                    <div class="bg-custom-green text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                        <i class="bi bi-person-fill fs-2"></i>
+<main class="mt-20 container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-[75vh]">
+    <div class="w-full max-w-md md:max-w-lg lg:max-w-xl">
+        <div class="bg-white shadow-2xl rounded-2xl border-t-4 border-customGreen overflow-hidden">
+            <div class="p-8 sm:p-10">
+                <div class="text-center mb-8">
+                    <div class="bg-customGreen text-white rounded-full inline-flex items-center justify-center mb-4 w-16 h-16 shadow-lg shadow-customGreen/30">
+                        <i class="bi bi-person-fill text-3xl"></i>
                     </div>
-                    <h2 class="fw-bold text-secondary">Bem-vindo de volta!</h2>
-                    <p class="text-muted">Por favor, faça login na sua conta.</p>
+                    <h2 class="text-2xl font-bold text-slate-800">Bem-vindo de volta!</h2>
+                    <p class="text-slate-500 mt-1">Por favor, faça login na sua conta.</p>
                 </div>
 
-                <form method="post">
+                <form method="post" class="space-y-6">
                     {% csrf_token %}
                     
                     {% if message %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ message }}
+                        <div class="bg-red-50 text-red-600 p-4 rounded-xl border border-red-200 shadow-sm" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill mr-2"></i>{{ message }}
                         </div>
                     {% endif %}
 
-                    <div class="form-floating mb-3">
-                        {{ login_form.cpf }}
-                        {{ login_form.cpf.label_tag }}
+                    <div class="relative">
+                        <div class="mb-1 text-sm font-semibold text-slate-700">{{ login_form.cpf.label_tag }}</div>
+                        <div class="mt-1">
+                            {{ login_form.cpf }}
+                        </div>
                         {% if login_form.cpf.errors %}
-                            <div class="text-danger small mt-1">
+                            <div class="text-red-500 text-xs mt-1">
                                 {{ login_form.cpf.errors }}
                             </div>
                         {% endif %}
                     </div>
 
-                    <div class="form-floating mb-4">
-                        {{ login_form.password }}
-                        {{ login_form.password.label_tag }}
+                    <div class="relative">
+                        <div class="mb-1 text-sm font-semibold text-slate-700">{{ login_form.password.label_tag }}</div>
+                        <div class="mt-1">
+                            {{ login_form.password }}
+                        </div>
                         {% if login_form.password.errors %}
-                            <div class="text-danger small mt-1">
+                            <div class="text-red-500 text-xs mt-1">
                                 {{ login_form.password.errors }}
                             </div>
                         {% endif %}
                     </div>
 
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        {{ login_form.remember_me.label_tag }}
-                        {{ login_form.remember_me }}
-                        <a href="{% url 'authorization:password-reset' %}" class="text-decoration-none text-custom-green small fw-semibold">Esqueceu a senha?</a>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            {{ login_form.remember_me }}
+                            <span class="text-sm font-medium text-slate-600">{{ login_form.remember_me.label_tag }}</span>
+                        </div>
+                        <a href="{% url 'authorization:password-reset' %}" class="text-sm font-semibold text-customGreen hover:text-customGreenHover transition-colors">Esqueceu a senha?</a>
                     </div>
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-login-enhanced w-100 justify-content-center">
+                    <div>
+                        <button type="submit" class="btn-login-enhanced w-full justify-center">
                             <span>Entrar</span>
                             <i class="bi bi-box-arrow-in-right"></i>
                         </button>
                     </div>
                 </form>
             </div>
-            <div class="card-footer bg-light border-0 py-3 text-center rounded-bottom-4">
-                <p class="mb-0 text-muted small">Não tem uma conta? <a href="{% url 'authorization:register' %}" class="text-decoration-none text-custom-green fw-bold">Cadastre-se</a></p>
+            
+            <div class="bg-slate-50 border-t border-slate-100 py-4 text-center">
+                <p class="mb-0 text-slate-500 text-sm">Não tem uma conta? <a href="{% url 'authorization:register' %}" class="text-customGreen font-bold hover:underline transition-all">Cadastre-se</a></p>
             </div>
         </div>
     </div>
 </main>
+
+<style>
+    /* Styling injected Django form inputs */
+    input[type="text"], input[type="password"], input[type="email"] {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        outline: none;
+        background-color: #f8fafc;
+        transition: all 0.3s;
+        font-size: 1rem;
+    }
+    input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
+        border-color: #20c997;
+        box-shadow: 0 0 0 3px rgba(32, 201, 151, 0.2);
+        background-color: #ffffff;
+    }
+    input[type="checkbox"] {
+        accent-color: #20c997;
+        width: 1.125rem;
+        height: 1.125rem;
+        cursor: pointer;
+    }
+</style>
 {% endblock %}

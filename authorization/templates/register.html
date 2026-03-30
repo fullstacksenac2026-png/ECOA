@@ -5,195 +5,238 @@
 
 {% block content %}
 <script>document.documentElement.classList.add('js-enabled');</script>
-<main class="container py-5 mt-5 pt-5">
-    <div class="row justify-content-center">
-        <div class="col-xl-8 col-lg-9 col-md-11">
-            <div class="card shadow-lg border-0 rounded-4">
-                <div class="card-body p-4 p-lg-5">
-                    <div class="text-center mb-4">
-                        <div class="register-icon bg-light text-secondary rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
-                            <i class="bi bi-person-plus-fill fs-3"></i>
-                        </div>
-                        <h2 class="fw-bold text-secondary">Criar conta</h2>
-                        <p class="text-muted mb-0">Complete as etapas para finalizar o cadastro.</p>
+<main class="mt-28 container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-[75vh]">
+    <div class="w-full max-w-4xl">
+        <div class="bg-white shadow-2xl rounded-2xl border-t-4 border-customGreen overflow-hidden">
+            <div class="p-8 sm:p-12">
+                <div class="text-center mb-8">
+                    <div class="bg-slate-100 text-slate-500 rounded-full inline-flex items-center justify-center mb-4 w-16 h-16 shadow-inner">
+                        <i class="bi bi-person-plus-fill text-3xl"></i>
                     </div>
-
-                    <div class="mb-4">
-                        <div class="progress register-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                            <div class="progress-bar register-progress-bar" id="progressBar"></div>
-                        </div>
-                        <div class="d-flex justify-content-between small text-muted mt-3" id="stepLabels">
-                            <span data-step-label="0">Pessoal</span>
-                            <span data-step-label="1">Endereço</span>
-                            <span data-step-label="2">Contato</span>
-                            <span data-step-label="3">Login</span>
-                        </div>
-                    </div>
-
-                    <form id="registerForm" action="{% url 'authorization:register' %}" method="post" novalidate>
-                        {% csrf_token %}
-
-                        <div id="formFeedback" class="alert d-none register-feedback" role="alert" aria-live="polite"></div>
-
-                        <div class="register-step is-active is-animating" data-step="0" aria-hidden="false">
-                            <h4 class="text-custom-green fw-bold mb-4">Informações Pessoais</h4>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label" for="id_first_name">Nome</label>
-                                    {{ user_form.first_name }}
-                                    <div class="invalid-feedback" id="error-first_name"></div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label" for="id_last_name">Sobrenome</label>
-                                    {{ user_form.last_name }}
-                                    <div class="invalid-feedback" id="error-last_name"></div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label" for="id_cpf">CPF</label>
-                                    {{ user_form.cpf }}
-                                    <div class="invalid-feedback" id="error-cpf"></div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label" for="id_birth_date">Data de nascimento</label>
-                                    {{ user_form.birth_date }}
-                                    <div class="invalid-feedback" id="error-birth_date"></div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label" for="id_gender">Gênero</label>
-                                    {{ user_form.gender }}
-                                    <div class="invalid-feedback" id="error-gender"></div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label" for="id_sexuality">Sexualidade</label>
-                                    {{ user_form.sexuality }}
-                                    <div class="invalid-feedback" id="error-sexuality"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="register-step" data-step="1" aria-hidden="true">
-                            <h4 class="text-custom-green fw-bold mb-4">Endereço</h4>
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <label class="form-label" for="id_cep">CEP</label>
-                                    {{ address_form.cep }}
-                                    <div class="invalid-feedback" id="error-cep"></div>
-                                </div>
-                                <div class="col-md-5">
-                                    <label class="form-label" for="id_street">Logradouro</label>
-                                    {{ address_form.street }}
-                                    <div class="invalid-feedback" id="error-street"></div>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label" for="id_residence_number">Número</label>
-                                    {{ address_form.residence_number }}
-                                    <div class="invalid-feedback" id="error-residence_number"></div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label" for="id_complement">Complemento</label>
-                                    {{ address_form.complement }}
-                                    <div class="invalid-feedback" id="error-complement"></div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label" for="id_neighborhood">Bairro</label>
-                                    {{ address_form.neighborhood }}
-                                    <div class="invalid-feedback" id="error-neighborhood"></div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label" for="address-city-select">Cidade</label>
-                                    {{ address_form.city }}
-                                    <div class="invalid-feedback" id="error-city"></div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label" for="address-state-select">Estado</label>
-                                    {{ address_form.state }}
-                                    <div class="invalid-feedback" id="error-state"></div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label" for="address-country-select">País</label>
-                                    {{ address_form.country }}
-                                    <div class="invalid-feedback" id="error-country"></div>
-                                </div>
-                                <div class="col-12">
-                                    <div id="address-api-status" class="small text-muted mt-1" aria-live="polite"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="register-step" data-step="2" aria-hidden="true">
-                            <h4 class="text-custom-green fw-bold mb-4">Contato</h4>
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <label class="form-label" for="ddi-select">DDI</label>
-                                    {{ phone_form.ddi }}
-                                    <div class="invalid-feedback" id="error-ddi"></div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label" for="ddd-select">DDD</label>
-                                    {{ phone_form.ddd }}
-                                    <div class="invalid-feedback" id="error-ddd"></div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label" for="phone-input">Telefone celular</label>
-                                    {{ phone_form.phone_number }}
-                                    <div class="invalid-feedback" id="error-phone_number"></div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label" for="optional-phone">Telefone opcional</label>
-                                    <input type="tel" class="form-control" id="optional-phone" name="optional_phone" placeholder="00000-0000">
-                                </div>
-                                <div class="col-12">
-                                    <div id="phone-api-status" class="small text-muted mt-1" aria-live="polite"></div>
-                                </div>
-                                <div class="visually-hidden">
-                                    {{ phone_form.is_mobile }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="register-step" data-step="3" aria-hidden="true">
-                            <h4 class="text-custom-green fw-bold mb-4">Informações de Login</h4>
-                            <div class="row g-3">
-                                <div class="col-md-12">
-                                    <label class="form-label" for="id_email">Email</label>
-                                    {{ user_form.email }}
-                                    <div class="invalid-feedback" id="error-email"></div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label" for="id_password">Senha</label>
-                                    {{ user_form.password }}
-                                    <div class="invalid-feedback" id="error-password"></div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label" for="id_confirm_password">Confirme a senha</label>
-                                    {{ user_form.confirm_password }}
-                                    <div class="invalid-feedback" id="error-confirm_password"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mt-5">
-                            <button type="button" class="btn btn-step" id="prevBtn" disabled>
-                                <i class="bi bi-arrow-left me-2"></i>Anterior
-                            </button>
-                            <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto justify-content-md-end align-items-stretch align-items-sm-center">
-                                <a href="{% url 'authorization:login' %}" class="btn btn-link text-decoration-none text-muted fw-semibold">Já tenho conta</a>
-                                <button type="button" class="btn btn-step" id="nextBtn">
-                                    Próximo<i class="bi bi-arrow-right ms-2"></i>
-                                </button>
-                                <button type="submit" class="btn btn-login-enhanced d-none justify-content-center" id="submitBtn">
-                                    <span id="submitText">Cadastrar</span>
-                                    <span class="spinner-border spinner-border-sm d-none" id="submitSpinner" role="status" aria-hidden="true"></span>
-                                    <i class="bi bi-check-lg" id="submitIcon"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                    <h2 class="text-2xl font-bold text-slate-800">Criar conta</h2>
+                    <p class="text-slate-500 mt-1">Complete as etapas para finalizar o cadastro.</p>
                 </div>
+
+                <div class="mb-8">
+                    <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                        <div class="h-full bg-customGreen transition-all duration-300 ease-out" id="progressBar"></div>
+                    </div>
+                    <div class="flex justify-between text-xs sm:text-sm text-slate-400 mt-3 font-medium" id="stepLabels">
+                        <span class="transition-colors" data-step-label="0">Pessoal</span>
+                        <span class="transition-colors" data-step-label="1">Endereço</span>
+                        <span class="transition-colors" data-step-label="2">Contato</span>
+                        <span class="transition-colors" data-step-label="3">Login</span>
+                    </div>
+                </div>
+
+                <form id="registerForm" action="{% url 'authorization:register' %}" method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div id="formFeedback" class="hidden p-4 mb-6 rounded-xl border text-sm shadow-sm" role="alert" aria-live="polite"></div>
+
+                    <!-- Step 0 -->
+                    <div class="register-step is-active is-animating" data-step="0" aria-hidden="false">
+                        <h4 class="text-customGreen font-bold text-xl mb-6">Informações Pessoais</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="id_first_name">Nome</label>
+                                {{ user_form.first_name }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-first_name"></div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="id_last_name">Sobrenome</label>
+                                {{ user_form.last_name }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-last_name"></div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="id_cpf">CPF</label>
+                                {{ user_form.cpf }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-cpf"></div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="id_birth_date">Data de nascimento</label>
+                                {{ user_form.birth_date }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-birth_date"></div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="id_gender">Gênero</label>
+                                {{ user_form.gender }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-gender"></div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="id_sexuality">Sexualidade</label>
+                                {{ user_form.sexuality }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-sexuality"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 1 -->
+                    <div class="register-step hidden" data-step="1" aria-hidden="true">
+                        <h4 class="text-customGreen font-bold text-xl mb-6">Endereço</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                            <div class="md:col-span-4">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="id_cep">CEP</label>
+                                {{ address_form.cep }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-cep"></div>
+                            </div>
+                            <div class="md:col-span-8">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="id_street">Logradouro</label>
+                                {{ address_form.street }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-street"></div>
+                            </div>
+                            <div class="md:col-span-3">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="id_residence_number">Número</label>
+                                {{ address_form.residence_number }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-residence_number"></div>
+                            </div>
+                            <div class="md:col-span-4">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="id_complement">Complemento</label>
+                                {{ address_form.complement }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-complement"></div>
+                            </div>
+                            <div class="md:col-span-5">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="id_neighborhood">Bairro</label>
+                                {{ address_form.neighborhood }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-neighborhood"></div>
+                            </div>
+                            <div class="md:col-span-4">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="address-city-select">Cidade</label>
+                                {{ address_form.city }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-city"></div>
+                            </div>
+                            <div class="md:col-span-4">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="address-state-select">Estado</label>
+                                {{ address_form.state }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-state"></div>
+                            </div>
+                            <div class="md:col-span-4">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="address-country-select">País</label>
+                                {{ address_form.country }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-country"></div>
+                            </div>
+                            <div class="md:col-span-12">
+                                <div id="address-api-status" class="text-xs mt-1 empty:hidden" aria-live="polite"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="register-step hidden" data-step="2" aria-hidden="true">
+                        <h4 class="text-customGreen font-bold text-xl mb-6">Contato</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                            <div class="md:col-span-4">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="ddi-select">DDI</label>
+                                {{ phone_form.ddi }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-ddi"></div>
+                            </div>
+                            <div class="md:col-span-4">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="ddd-select">DDD</label>
+                                {{ phone_form.ddd }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-ddd"></div>
+                            </div>
+                            <div class="md:col-span-4">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="phone-input">Telefone celular</label>
+                                {{ phone_form.phone_number }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-phone_number"></div>
+                            </div>
+                            <div class="md:col-span-6">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="optional-phone">Telefone opcional</label>
+                                <input type="tel" id="optional-phone" name="optional_phone" placeholder="00000-0000">
+                            </div>
+                            <div class="md:col-span-12">
+                                <div id="phone-api-status" class="text-xs mt-1 empty:hidden" aria-live="polite"></div>
+                            </div>
+                            <div class="hidden">
+                                {{ phone_form.is_mobile }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="register-step hidden" data-step="3" aria-hidden="true">
+                        <h4 class="text-customGreen font-bold text-xl mb-6">Informações de Login</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="id_email">Email</label>
+                                {{ user_form.email }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-email"></div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="id_password">Senha</label>
+                                {{ user_form.password }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-password"></div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1" for="id_confirm_password">Confirme a senha</label>
+                                {{ user_form.confirm_password }}
+                                <div class="text-red-500 text-xs mt-1 empty:hidden" id="error-confirm_password"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-10 pt-8 border-t border-slate-100">
+                        <button type="button" class="disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 px-6 py-2.5 rounded-full border border-slate-300 text-slate-600 font-semibold hover:bg-slate-50 transition-colors w-full sm:w-auto" id="prevBtn" disabled>
+                            <i class="bi bi-arrow-left"></i>Anterior
+                        </button>
+                        
+                        <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                            <a href="{% url 'authorization:login' %}" class="text-sm font-semibold text-slate-500 hover:text-customGreen transition-colors order-2 sm:order-1">Já tenho conta</a>
+                            
+                            <button type="button" class="flex items-center justify-center gap-2 px-8 py-2.5 rounded-full bg-slate-800 text-white font-semibold hover:bg-slate-700 transition-colors w-full sm:w-auto order-1 sm:order-2" id="nextBtn">
+                                Próximo<i class="bi bi-arrow-right"></i>
+                            </button>
+
+                            <button type="submit" class="hidden btn-login-enhanced justify-center w-full sm:w-auto order-1 sm:order-2" id="submitBtn">
+                                <span id="submitText">Cadastrar</span>
+                                <i class="bi bi-arrow-repeat animate-spin hidden ml-2" id="submitSpinner"></i>
+                                <i class="bi bi-check-lg ml-2" id="submitIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </main>
+<style>
+    /* Javascript animation logic ties into these */
+    .register-step.is-animating {
+        animation: stepFadeIn 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+    }
+    @keyframes stepFadeIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    input[type="text"], input[type="password"], input[type="email"], input[type="tel"], input[type="date"], select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        outline: none;
+        background-color: #f8fafc;
+        transition: all 0.3s;
+        font-size: 1rem;
+        color: #334155;
+    }
+    input:focus, select:focus {
+        border-color: #20c997;
+        box-shadow: 0 0 0 3px rgba(32, 201, 151, 0.2);
+        background-color: #ffffff;
+    }
+    
+    input.is-invalid, select.is-invalid {
+        border-color: #ef4444 !important;
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+    }
+    
+    /* custom step labels */
+    #stepLabels span[aria-current="step"] {
+        color: #20c997;
+        font-weight: 700;
+    }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -281,10 +324,10 @@
             formFeedback.textContent = message || '';
             formFeedback.classList.remove('alert-danger', 'alert-success');
             if (!message) {
-                formFeedback.classList.add('d-none');
+                formFeedback.classList.add('hidden');
                 return;
             }
-            formFeedback.classList.remove('d-none');
+            formFeedback.classList.remove('hidden');
             formFeedback.classList.add(type === 'success' ? 'alert-success' : 'alert-danger');
         }
 
@@ -317,11 +360,11 @@
             updateProgress();
             prevBtn.disabled = currentStep === 0;
             if (currentStep === totalSteps - 1) {
-                nextBtn.classList.add('d-none');
-                submitBtn.classList.remove('d-none');
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
             } else {
-                nextBtn.classList.remove('d-none');
-                submitBtn.classList.add('d-none');
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
             }
         }
 
@@ -345,8 +388,8 @@
             submitBtn.disabled = isLoading;
             nextBtn.disabled = isLoading;
             prevBtn.disabled = isLoading || currentStep === 0;
-            submitSpinner.classList.toggle('d-none', !isLoading);
-            submitIcon.classList.toggle('d-none', isLoading);
+            submitSpinner.classList.toggle('hidden', !isLoading);
+            submitIcon.classList.toggle('hidden', isLoading);
             submitText.textContent = isLoading ? 'Enviando' : 'Cadastrar';
             submitBtn.setAttribute('aria-busy', isLoading ? 'true' : 'false');
         }

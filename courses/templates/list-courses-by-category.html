@@ -1,47 +1,80 @@
 {% extends 'app-base.html' %}
 
-{% block title %}<title>Cursos por Categoria</title>{% endblock %}
+{% block title %}Cursos por Categoria - ECOÁ{% endblock %}
 
 {% block content %}
-<style>
-    .category-header {
-        background: linear-gradient(135deg, #20c997 0%, #198754 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 0.5rem;
-        margin-bottom: 2rem;
-    }
+<main class="w-full max-w-7xl mx-auto px-4 py-8">
     
-    body.dark-mode .category-header {
-        background: linear-gradient(135deg, #1a7f54 0%, #0f4e2a 100%);
-    }
-    
-    .courses-by-category-title {
-        color: white;
-        margin-bottom: 0.5rem;
-    }
-</style>
-<main class="courses-by-category-container">
-    <div class="category-header">
-        <h1 class="courses-by-category-title">Cursos por Categoria</h1>
+    <!-- Hero / Category Header -->
+    <div class="bg-gradient-to-r from-customGreen to-emerald-400 rounded-3xl p-8 md:p-12 text-white shadow-xl relative overflow-hidden mb-12 flex flex-col items-center justify-center text-center">
+        <!-- Decorative Elements -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div class="absolute bottom-0 left-10 w-40 h-40 bg-black/10 rounded-full blur-2xl -mb-10"></div>
+        
+        <i class="bi bi-collection-fill text-6xl mb-4 relative z-10 drop-shadow-md text-emerald-50"></i>
+        <h1 class="text-4xl md:text-5xl font-black mb-3 relative z-10 tracking-tight">Cursos por Categoria</h1>
+        <p class="text-emerald-50 text-xl font-medium m-0 relative z-10 max-w-2xl">Descubra trilhas de aprendizado focadas nos tópicos que você mais se interessa.</p>
     </div>
-    <div class="courses-grid">
-        {% for course in courses %}
-            <div class="course-card">
-                {% if course.image %}
-                    <img src="{{ course.image.url }}" alt="{{ course.name }}" class="course-thumbnail">
-                {% else %}
-                    <div class="course-thumbnail-placeholder">
-                        <i class="bi bi-image" style="font-size: 3rem; color: white; opacity: 0.5;"></i>
+
+    <!-- Divider/Title -->
+    <div class="flex items-center gap-4 mb-8">
+        <h2 class="text-3xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-3">
+            <i class="bi bi-funnel-fill text-blue-500 bg-blue-500/10 p-2.5 rounded-xl text-2xl"></i> Resultados Encontrados
+        </h2>
+        <div class="flex-1 h-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
+    </div>
+
+    <!-- Courses Grid -->
+    {% if courses %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for course in courses %}
+            <article class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-sm hover:shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col group transition-all duration-300 hover:-translate-y-1">
+                
+                <!-- Course Image -->
+                <div class="relative h-48 w-full bg-slate-100 dark:bg-slate-900 overflow-hidden flex items-center justify-center">
+                    <!-- Badge -->
+                    <div class="absolute top-4 left-4 z-20">
+                        <span class="bg-blue-500 text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full shadow-sm">
+                            {{ course.category.name|default:"Geral" }}
+                        </span>
                     </div>
-                {% endif %}
-                <div class="course-card-content">
-                    <h2 class="course-card-title">{{ course.name }}</h2>
-                    <p class="course-card-category">{{ course.category.name }}</p>
-                    <a href="{% url 'courses:course-detail' course.id %}" class="btn btn-primary">Ver Detalhes</a>
+
+                    {% if course.image %}
+                        <img src="{{ course.image.url }}" alt="{{ course.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    {% else %}
+                        <div class="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center">
+                            <i class="bi bi-image text-slate-400 dark:text-slate-500 text-6xl group-hover:scale-110 transition-transform duration-500"></i>
+                        </div>
+                    {% endif %}
                 </div>
+
+                <!-- Course Content -->
+                <div class="p-6 md:p-8 flex flex-col flex-1">
+                    <h3 class="text-2xl font-bold text-slate-800 dark:text-white mb-4 line-clamp-2 leading-tight group-hover:text-customGreen transition-colors">{{ course.name }}</h3>
+                    
+                    <a href="{% url 'courses:course-detail' course.id %}" class="block w-full text-center bg-slate-100 dark:bg-slate-700 hover:bg-customGreen text-slate-700 dark:text-slate-200 hover:text-white font-bold px-6 py-4 rounded-full transition-all no-underline mt-auto">
+                        Ver Detalhes <i class="bi bi-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-24 bg-slate-50 dark:bg-slate-900 rounded-[3rem] border border-dashed border-slate-200 dark:border-slate-700">
+            <div class="w-24 h-24 bg-white dark:bg-slate-800 rounded-full flex mx-auto items-center justify-center mb-6 shadow-sm border border-slate-100 dark:border-slate-700">
+                <i class="bi bi-slash-circle text-5xl text-slate-300 dark:text-slate-600"></i>
             </div>
-        {% endfor %}
-    </div>
+            <h4 class="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-3 tracking-tight">Nenhum curso por aqui.</h4>
+            <p class="text-slate-500 text-lg m-0 max-w-sm mx-auto">Não encontramos cursos disponíveis nesta categoria no momento. Explore outras opções ou volte à lista principal.</p>
+            
+            <div class="mt-8">
+                <a href="{% url 'courses:list-courses-and-categories' %}" class="inline-flex bg-customGreen hover:bg-customGreenHover text-white font-bold py-4 px-8 rounded-full transition-all shadow-lg hover:-translate-y-1 no-underline gap-2">
+                    <i class="bi bi-arrow-left"></i> Voltar para Acadêmia
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
 </main>
 {% endblock %}

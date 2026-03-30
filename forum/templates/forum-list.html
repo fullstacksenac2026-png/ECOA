@@ -6,181 +6,155 @@
 {% endblock %}
 
 {% block content %}
-  <main class="container py-4">
-    <!-- Header Section -->
-    <div class="row mb-4">
-      <div class="col-12 text-center">
-        <div class="d-inline-block p-3 rounded-circle bg-gradient-brand shadow-sm mb-3">
-          <i class="bi bi-chat-left-quote-fill text-white fs-1"></i>
-        </div>
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-          <div>
-            <h1 class="fw-bold text-body-emphasis mb-1">Fórum da Comunidade</h1>
-            <p class="text-muted mb-0">Conecte-se, compartilhe e aprenda com outros entusiastas</p>
+<main class="w-full max-w-7xl mx-auto px-4 py-8">
+  <!-- Header Section -->
+  <div class="text-center mb-12">
+    <div class="inline-flex p-4 rounded-3xl bg-customGreen/10 shadow-inner mb-6">
+      <i class="bi bi-chat-left-quote-fill text-customGreen text-4xl"></i>
+    </div>
+    <div class="flex flex-col md:flex-row justify-between items-center gap-6 max-w-5xl mx-auto bg-white dark:bg-slate-800 p-8 rounded-[3rem] shadow-sm border border-slate-100 dark:border-slate-700">
+      <div class="text-left">
+        <h1 class="text-3xl md:text-4xl font-black text-slate-800 dark:text-white mb-2 tracking-tight">Fórum da Comunidade</h1>
+        <p class="text-slate-500 dark:text-slate-400 font-medium m-0">Conecte-se, debata e aprenda com outros entusiastas locais.</p>
+      </div>
+      <a href="{% url 'forum:post-create' %}" class="shrink-0 bg-customGreen hover:bg-customGreenHover text-white px-8 py-4 rounded-full font-bold shadow-lg shadow-customGreen/30 transition-transform hover:-translate-y-1 flex items-center gap-3 no-underline">
+        <i class="bi bi-pencil-square text-xl"></i> Nova Discussão
+      </a>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="max-w-3xl mx-auto mb-16">
+    <form method="get" action="." class="flex relative group">
+      <div class="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+        <i class="bi bi-search text-slate-400 group-focus-within:text-customGreen transition-colors text-xl"></i>
+      </div>
+      <input type="search" name="search_post" class="w-full bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 focus:border-customGreen dark:focus:border-customGreen focus:ring-4 focus:ring-customGreen/10 rounded-full py-5 pl-16 pr-36 text-slate-800 dark:text-white text-lg placeholder-slate-400 transition-all outline-none shadow-sm" placeholder="O que você está procurando?" value="{{ request.GET.search_post }}">
+      <button type="submit" class="absolute right-3 top-3 bottom-3 bg-customGreen hover:bg-customGreenHover text-white px-8 rounded-full font-bold shadow-sm transition-colors hidden md:block">
+        Pesquisar
+      </button>
+      <button type="submit" class="absolute right-3 top-3 bottom-3 bg-customGreen hover:bg-customGreenHover text-white w-14 rounded-full font-bold shadow-sm transition-colors md:hidden flex items-center justify-center">
+        <i class="bi bi-search"></i>
+      </button>
+    </form>
+  </div>
+
+  <!-- Sticky Create Button (Mobile/Tablet) -->
+  <div class="md:hidden fixed bottom-24 right-6 z-50">
+    <a href="{% url 'forum:post-create' %}" class="bg-customGreen text-white w-16 h-16 rounded-full shadow-[0_8px_20px_rgba(32,201,151,0.5)] flex items-center justify-center hover:scale-110 transition-transform focus:outline-none">
+      <i class="bi bi-plus-lg text-3xl"></i>
+    </a>
+  </div>
+
+  <!-- Posts Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    {% for post in page_obj_post %}
+      <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm hover:shadow-2xl hover:-translate-y-2 border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col group transition-all duration-300">
+        
+        <!-- Post Image Header -->
+        {% if post.image %}
+          <div class="relative h-56 overflow-hidden bg-slate-100 dark:bg-slate-900">
+            <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            <div class="absolute top-4 left-4">
+              <span class="bg-black/40 backdrop-blur-md text-white border border-white/20 rounded-full px-4 py-1.5 text-xs font-bold tracking-wide shadow-sm">
+                {{ post.created_at|date:"d M" }}
+              </span>
+            </div>
           </div>
-          <a href="{% url 'forum:post-create' %}" class="btn btn-custom-green rounded-pill px-4 fw-bold shadow-sm">
-            <i class="bi bi-pencil-square me-2"></i> Nova Discussão
+        {% else %}
+          <div class="h-40 bg-gradient-to-br from-customGreen/20 to-emerald-500/10 dark:from-customGreen/10 dark:to-emerald-900/20 flex flex-col items-center justify-center relative overflow-hidden">
+            <i class="bi bi-chat-square-text text-customGreen/30 text-6xl group-hover:scale-110 transition-transform duration-500"></i>
+            <div class="absolute top-4 left-4">
+              <span class="bg-white/60 dark:bg-black/40 backdrop-blur-md text-slate-800 dark:text-white border border-white/20 rounded-full px-4 py-1.5 text-xs font-bold tracking-wide shadow-sm">
+                {{ post.created_at|date:"d M" }}
+              </span>
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Card Body -->
+        <div class="p-6 md:p-8 flex flex-col flex-1">
+          
+          <!-- Author -->
+          <div class="flex items-center mb-6">
+            <div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 overflow-hidden shrink-0 flex items-center justify-center mr-3">
+              {% if post.user.profile_picture %}
+                 <img src="{{ post.user.profile_picture.url }}" class="w-full h-full object-cover">
+              {% else %}
+                 <i class="bi bi-person-fill text-slate-400"></i>
+              {% endif %}
+            </div>
+            <span class="text-sm font-bold text-slate-700 dark:text-slate-300 line-clamp-1">{{ post.user.first_name }} {{ post.user.last_name|default:"" }}</span>
+          </div>
+
+          <!-- Title & Content -->
+          <h5 class="text-xl font-bold text-slate-800 dark:text-white mb-3 line-clamp-2 leading-tight group-hover:text-customGreen transition-colors">{{ post.title }}</h5>
+          <p class="text-slate-500 dark:text-slate-400 text-base mb-6 flex-1 line-clamp-3 leading-relaxed">
+            {{ post.content|striptags }}
+          </p>
+
+          <!-- Footer Stats & Link -->
+          <div class="flex justify-between items-center pt-5 border-t border-slate-100 dark:border-slate-700/50 mt-auto">
+            <div class="flex gap-4 text-slate-400 dark:text-slate-500 font-medium text-sm">
+              <span class="flex items-center gap-1.5 hover:text-customGreen transition-colors cursor-default"><i class="bi bi-chat-dots-fill text-lg"></i> {{ post.total_comments|default:0 }}</span>
+              <span class="flex items-center gap-1.5 hover:text-blue-500 transition-colors cursor-default"><i class="bi bi-eye-fill text-lg"></i> {{ post.total_views|default:0 }}</span>
+            </div>
+            <a href="{% url 'forum:forum-post-detail' post.id %}" class="bg-slate-50 hover:bg-customGreen hover:text-white dark:bg-slate-700/50 dark:hover:bg-customGreen text-customGreen font-bold px-5 py-2.5 rounded-full transition-colors text-sm flex items-center gap-2 no-underline">
+              Ler tudo <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+    {% empty %}
+      <div class="col-span-1 md:col-span-2 lg:col-span-3">
+        <div class="bg-white dark:bg-slate-800 rounded-[3rem] p-16 text-center shadow-sm border border-slate-100 dark:border-slate-700">
+          <div class="w-32 h-32 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="bi bi-inbox text-slate-300 dark:text-slate-600 text-6xl"></i>
+          </div>
+          <h3 class="text-3xl font-black text-slate-800 dark:text-white mb-3">Ainda não há discussões</h3>
+          <p class="text-slate-500 dark:text-slate-400 text-lg mb-8 max-w-sm mx-auto">Seja o primeiro a compartilhar algo com a comunidade ambiental do ECOÁ!</p>
+          <a href="{% url 'forum:post-create' %}" class="inline-flex items-center gap-3 bg-customGreen hover:bg-customGreenHover text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:-translate-y-1 no-underline">
+              <i class="bi bi-pencil-square text-xl"></i> Criar Primeiro Post
           </a>
         </div>
       </div>
-    </div>
+    {% endfor %}
+  </div>
 
-    <!-- Search and Actions -->
-    <div class="row mb-4 justify-content-center">
-      <div class="col-lg-8">
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-          <div class="card-body p-2">
-            <form method="get" action="." class="d-flex gap-2">
-              <div class="input-group input-group-lg border-0">
-                <span class="input-group-text bg-transparent border-0 pe-0">
-                  <i class="bi bi-search text-muted"></i>
-                </span>
-                <input type="search" name="search_post" class="form-control border-0 shadow-none fs-6" placeholder="O que você está procurando?" value="{{ request.GET.search_post }}">
-              </div>
-              <button type="submit" class="btn btn-custom-green px-4 rounded-3 d-none d-md-block">Pesquisar</button>
-              <button type="submit" class="btn btn-custom-green rounded-3 d-md-none">
-                <i class="bi bi-search"></i>
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+  <!-- Pagination -->
+  {% if page_obj_post.paginator.num_pages > 1 %}
+    <nav class="mt-16 flex justify-center">
+      <ul class="flex items-center gap-2 list-none p-0 m-0 bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 rounded-full p-2">
+        {% if page_obj_post.has_previous %}
+          <li>
+            <a class="flex items-center justify-center w-12 h-12 rounded-full text-slate-500 hover:text-customGreen hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors no-underline" href="?page={{ page_obj_post.previous_page_number }}{% if request.GET.search_post %}&search_post={{ request.GET.search_post }}{% endif %}">
+              <i class="bi bi-chevron-left text-lg"></i>
+            </a>
+          </li>
+        {% endif %}
 
-    <!-- Sticky Create Button (Mobile/Tablet) -->
-    <div class="d-md-none position-fixed bottom-0 end-0 m-4" style="z-index: 999; margin-bottom: 90px !important;">
-        <a href="{% url 'forum:post-create' %}" class="btn btn-custom-green rounded-circle shadow-lg d-flex align-items-center justify-content-center" style="width: 56px; height: 56px;">
-            <i class="bi bi-plus-lg fs-3"></i>
-        </a>
-    </div>
-
-    <!-- Posts Grid -->
-    <div class="row g-4">
-      {% for post in page_obj_post %}
-        <div class="col-md-6 col-lg-4">
-          <div class="card h-100 border-0 shadow-sm rounded-4 transition-hover overflow-hidden">
-            {% if post.image %}
-              <div class="position-relative overflow-hidden" style="height: 180px;">
-                <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-100 h-100 object-fit-cover transition-img" />
-                <div class="position-absolute top-0 start-0 m-3">
-                    <span class="badge bg-blur text-white rounded-pill px-3 py-2 fw-normal" style="background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);">
-                        {{ post.created_at|date:"d M" }}
-                    </span>
-                </div>
-              </div>
-            {% else %}
-              <div class="bg-success-subtle d-flex align-items-center justify-content-center" style="height: 180px;">
-                <i class="bi bi-card-text text-success" style="font-size: 3rem; opacity: 0.5;"></i>
-              </div>
-            {% endif %}
-
-            <div class="card-body p-4 d-flex flex-column">
-              <div class="d-flex align-items-center mb-3">
-                <div class="bg-body-secondary rounded-circle p-1 me-2 shadow-sm" style="width: 32px; height: 32px; overflow: hidden;">
-                    {% if post.user.profile_picture %}
-                        <img src="{{ post.user.profile_picture.url }}" class="w-100 h-100 object-fit-cover rounded-circle">
-                    {% else %}
-                        <i class="bi bi-person-fill text-muted w-100 h-100 d-flex justify-content-center align-items-center"></i>
-                    {% endif %}
-                </div>
-                <div class="user-info">
-                    <span class="small fw-semibold text-body-emphasis d-block">{{ post.user.first_name }} {{ post.user.last_name|default:"" }}</span>
-                </div>
-              </div>
-
-              <h5 class="card-title fw-bold text-body-emphasis mb-2">{{ post.title }}</h5>
-              <p class="card-text text-muted small mb-4 flex-grow-1">
-                {{ post.content|truncatewords:20 }}
-              </p>
-
-              <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
-                <div class="d-flex gap-3 text-muted small">
-                  <span><i class="bi bi-chat-dots me-1"></i> {{ post.total_comments|default:0 }}</span>
-                  <span><i class="bi bi-eye me-1"></i> {{ post.total_views|default:0 }}</span>
-                </div>
-                <a href="{% url 'forum:forum-post-detail' post.id %}" class="btn btn-sm btn-outline-custom-green rounded-pill px-3">
-                  Ler tudo <i class="bi bi-arrow-right list-inline-item"></i>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      {% empty %}
-        <div class="col-12 text-center py-5">
-          <div class="card border-0 shadow-sm rounded-4 p-5">
-            <i class="bi bi-inbox text-muted mb-3" style="font-size: 4rem; opacity: 0.3;"></i>
-            <h3>Ainda não há discussões</h3>
-            <p class="text-muted">Seja o primeiro a compartilhar algo com a comunidade!</p>
-            <div class="mt-3">
-                <a href="{% url 'forum:post-create' %}" class="btn btn-custom-green rounded-pill px-4">
-                    <i class="bi bi-plus-lg me-2"></i> Criar Primeiro Post
-                </a>
-            </div>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-
-    <!-- PAGINAÇÃO -->
-    {% if page_obj_post.paginator.num_pages > 1 %}
-      <nav aria-label="Paginação" class="mt-5">
-        <ul class="pagination justify-content-center gap-2">
-          {% if page_obj_post.has_previous %}
-            <li class="page-item">
-              <a class="page-link border-0 shadow-sm rounded-3" href="?page={{ page_obj_post.previous_page_number }}{% if request.GET.search_post %}&search_post={{ request.GET.search_post }}{% endif %}">
-                <i class="bi bi-chevron-left"></i>
-              </a>
-            </li>
+        {% for num in page_obj_post.paginator.page_range %}
+          {% if page_obj_post.number == num %}
+              <li>
+                  <span class="flex items-center justify-center w-12 h-12 rounded-full bg-customGreen text-white font-black shadow-md">{{ num }}</span>
+              </li>
+          {% elif num > page_obj_post.number|add:'-3' and num < page_obj_post.number|add:'3' %}
+              <li>
+                  <a class="flex items-center justify-center w-12 h-12 rounded-full text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors no-underline" href="?page={{ num }}{% if request.GET.search_post %}&search_post={{ request.GET.search_post }}{% endif %}">{{ num }}</a>
+              </li>
           {% endif %}
+        {% endfor %}
 
-          {% for num in page_obj_post.paginator.page_range %}
-            {% if page_obj_post.number == num %}
-                <li class="page-item active">
-                    <span class="page-link bg-custom-green border-0 shadow-sm rounded-3">{{ num }}</span>
-                </li>
-            {% elif num > page_obj_post.number|add:'-3' and num < page_obj_post.number|add:'3' %}
-                <li class="page-item">
-                    <a class="page-link border-0 shadow-sm rounded-3 text-body" href="?page={{ num }}{% if request.GET.search_post %}&search_post={{ request.GET.search_post }}{% endif %}">{{ num }}</a>
-                </li>
-            {% endif %}
-          {% endfor %}
-
-          {% if page_obj_post.has_next %}
-            <li class="page-item">
-              <a class="page-link border-0 shadow-sm rounded-3" href="?page={{ page_obj_post.next_page_number }}{% if request.GET.search_post %}&search_post={{ request.GET.search_post }}{% endif %}">
-                <i class="bi bi-chevron-right"></i>
-              </a>
-            </li>
-          {% endif %}
-        </ul>
-      </nav>
-    {% endif %}
-  </main>
-
-  <style>
-    .transition-hover {
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
-    }
-    .transition-hover:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 1rem 3rem rgba(32, 201, 151, 0.15) !important;
-    }
-    .transition-img {
-        transition: transform 0.5s ease;
-    }
-    .transition-hover:hover .transition-img {
-        transform: scale(1.05);
-    }
-    .bg-gradient-brand-light {
-        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-    }
-    .btn-outline-custom-green {
-        color: var(--custom-green);
-        border-color: var(--custom-green);
-    }
-    .btn-outline-custom-green:hover {
-        background-color: var(--custom-green);
-        color: white;
-    }
-  </style>
+        {% if page_obj_post.has_next %}
+          <li>
+            <a class="flex items-center justify-center w-12 h-12 rounded-full text-slate-500 hover:text-customGreen hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors no-underline" href="?page={{ page_obj_post.next_page_number }}{% if request.GET.search_post %}&search_post={{ request.GET.search_post }}{% endif %}">
+              <i class="bi bi-chevron-right text-lg"></i>
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+</main>
 {% endblock %}

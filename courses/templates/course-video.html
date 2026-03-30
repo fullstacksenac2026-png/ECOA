@@ -3,343 +3,453 @@
 {% block title %}<title>{{ lesson.title }} - {{ course.name }}</title>{% endblock %}
 
 {% block content %}
-<div class="course-video-container">
-    <!-- Header -->
-    <div class="text-white py-3 sticky-top" style="z-index: 10; background: linear-gradient(135deg, #20c997 0%, #198754 100%);">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h2 class="h5 mb-0">{{ course.name }}</h2>
-                    <small class="text-white-50">{{ lesson.section.title }} → {{ lesson.title }}</small>
+<style>
+    /* PREMIUM VANILLA CSS FOR VIDEO PLAYER */
+    :root {
+        --vid-primary: #10b981;
+        --vid-primary-dark: #047857;
+        --vid-bg: #f1f5f9;
+        --vid-card: #ffffff;
+        --vid-text: #0f172a;
+        --vid-text-muted: #64748b;
+        --vid-border: #e2e8f0;
+        --vid-radius: 1.5rem;
+    }
+
+    [data-bs-theme=dark] {
+        --vid-bg: #020617;
+        --vid-card: #0f172a;
+        --vid-text: #f8fafc;
+        --vid-text-muted: #94a3b8;
+        --vid-border: #1e293b;
+    }
+
+    body {
+        background-color: var(--vid-bg);
+        color: var(--vid-text);
+        font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .v-header {
+        background: #000;
+        color: #fff;
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
+
+    .v-header-title h1 { margin: 0; font-size: 1.1rem; font-weight: 700; }
+    .v-header-title p { margin: 0; font-size: 0.8rem; color: #a1a1aa; }
+    
+    .v-btn-close {
+        background: rgba(255,255,255,0.1);
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: background 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .v-btn-close:hover {
+        background: rgba(255,255,255,0.2);
+        color: white;
+    }
+
+    .v-layout {
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        min-height: calc(100vh - 70px);
+    }
+
+    @media (max-width: 992px) {
+        .v-layout {
+            grid-template-columns: 1fr;
+            display: flex;
+            flex-direction: column;
+        }
+        .v-sidebar {
+            order: 2;
+        }
+        .v-main {
+            order: 1;
+        }
+    }
+
+    /* Video Area */
+    .v-player-container {
+        background: #000;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .v-player-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    .v-player-empty {
+        text-align: center;
+        color: #71717a;
+    }
+    .v-player-empty i { font-size: 4rem; margin-bottom: 1rem; display: block; }
+
+    /* Main Content */
+    .v-main {
+        padding: 2rem;
+        max-width: 1000px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .v-course-nav {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+
+    .v-nav-btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .v-nav-prev {
+        background: var(--vid-card);
+        color: var(--vid-text);
+        border: 1px solid var(--vid-border);
+    }
+    .v-nav-prev:hover { background: var(--vid-bg); }
+
+    .v-nav-next {
+        background: var(--vid-primary);
+        color: white;
+        border: 1px solid var(--vid-primary);
+    }
+    .v-nav-next:hover {
+        background: var(--vid-primary-dark);
+        color: white;
+        transform: translateX(4px);
+    }
+
+    .v-details {
+        background: var(--vid-card);
+        border-radius: var(--vid-radius);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--vid-border);
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+
+    .v-details h2 { margin: 0 0 0.5rem 0; font-size: 1.5rem; font-weight: 800; }
+    .v-meta { color: var(--vid-text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; display: flex; gap: 1rem; }
+    
+    .v-divider { height: 1px; background: var(--vid-border); margin: 1.5rem 0; }
+
+    /* Comments */
+    .v-comments {
+        background: var(--vid-card);
+        border-radius: var(--vid-radius);
+        padding: 2rem;
+        border: 1px solid var(--vid-border);
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+
+    .v-comment-form textarea {
+        width: 100%;
+        padding: 1rem;
+        border: 1px solid var(--vid-border);
+        border-radius: 1rem;
+        background: var(--vid-bg);
+        color: var(--vid-text);
+        margin-bottom: 1rem;
+        resize: vertical;
+        font-family: inherit;
+    }
+
+    .v-comment-form button {
+        background: var(--vid-primary);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .v-comment-list {
+        margin-top: 2rem;
+    }
+
+    .v-comment {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--vid-border);
+    }
+
+    .v-comment:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .v-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .v-comment-body { flex: 1; }
+    .v-comment-head { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+    .v-comment-head h4 { margin: 0; font-size: 0.95rem; font-weight: 700; }
+    .v-comment-head span { font-size: 0.8rem; color: var(--vid-text-muted); }
+    .v-comment-text { margin: 0 0 0.5rem 0; font-size: 0.95rem; line-height: 1.5; }
+
+    .v-comment-actions { display: flex; gap: 1rem; }
+    .v-action-btn {
+        background: none;
+        border: none;
+        color: var(--vid-text-muted);
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0;
+    }
+    .v-action-btn:hover { color: var(--vid-primary); }
+    .v-action-btn.active { color: var(--vid-primary); }
+
+    /* Sidebar Content */
+    .v-sidebar {
+        background: var(--vid-card);
+        border-left: 1px solid var(--vid-border);
+        height: calc(100vh - 70px);
+        overflow-y: auto;
+        position: sticky;
+        top: 70px;
+    }
+
+    .v-sidebar-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--vid-border);
+        font-weight: 800;
+        font-size: 1.1rem;
+    }
+
+    .v-module { border-bottom: 1px solid var(--vid-border); }
+    .v-module:last-child { border-bottom: none; }
+    
+    .v-module-btn {
+        width: 100%;
+        text-align: left;
+        padding: 1rem 1.5rem;
+        background: var(--vid-bg);
+        border: none;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--vid-text);
+        display: flex;
+        justify-content: space-between;
+        cursor: pointer;
+    }
+
+    .v-module-content {
+        display: none;
+    }
+    .v-module.is-open .v-module-content { display: block; }
+    .v-module.is-open .bi-chevron-down { transform: rotate(180deg); }
+
+    .v-lesson-link {
+        display: flex;
+        gap: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        text-decoration: none;
+        color: var(--vid-text);
+        font-size: 0.85rem;
+        transition: background 0.2s;
+    }
+    .v-lesson-link:hover { background: var(--vid-bg); }
+    .v-lesson-link.active {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--vid-primary-dark);
+        border-left: 3px solid var(--vid-primary);
+    }
+</style>
+
+<div class="v-header">
+    <div class="v-header-title">
+        <h1>{{ course.name }}</h1>
+        <p>{{ lesson.section.title }}</p>
+    </div>
+    <a href="{% url 'courses:course-lessons' course.id %}" class="v-btn-close">
+        <i class="bi bi-x-lg"></i> Fechar Sala
+    </a>
+</div>
+
+<div class="v-layout">
+    
+    <div class="v-main-col">
+        <!-- Video Player -->
+        <div class="v-player-container">
+            {% if video %}
+                <iframe src="{{ video.video_url }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            {% else %}
+                <div class="v-player-empty">
+                    <i class="bi bi-camera-video-off"></i>
+                    <p>Conteúdo de vídeo indisponível</p>
                 </div>
-                <a href="{% url 'courses:course-lessons' course.id %}" class="btn btn-sm btn-outline-light">
-                    <i class="bi bi-x"></i> Fechar
+            {% endif %}
+        </div>
+
+        <div class="v-main">
+            <!-- Navigation -->
+            <div class="v-course-nav">
+                {% if previous_lesson %}
+                <a href="{% url 'courses:course-video' previous_lesson.id %}" class="v-nav-btn v-nav-prev">
+                    <i class="bi bi-arrow-left"></i> Anteriror
                 </a>
+                {% else %}
+                <div></div>
+                {% endif %}
+
+                {% if next_lesson %}
+                <a href="{% url 'courses:course-video' next_lesson.id %}" class="v-nav-btn v-nav-next">
+                    Próxima <i class="bi bi-arrow-right"></i>
+                </a>
+                {% endif %}
+            </div>
+
+            <!-- Description -->
+            <div class="v-details">
+                <h2>{{ lesson.title }}</h2>
+                <div class="v-meta">
+                    <span><i class="bi bi-clock"></i> {{ lesson.duration_minutes }} min</span>
+                    <span><i class="bi bi-folder2-open"></i> {{ lesson.section.title }}</span>
+                </div>
+                <div class="v-divider"></div>
+                
+                <div style="line-height: 1.7; font-size: 0.95rem;">
+                    {{ lesson.description }}
+                </div>
+                
+                {% if video.transcript %}
+                <div class="v-divider"></div>
+                <h4 style="margin: 0 0 0.5rem 0; font-size: 1rem;"><i class="bi bi-file-earmark-text"></i> Material Complementar (Transcrição)</h4>
+                <p style="font-size: 0.85rem; color: var(--vid-text-muted); line-height: 1.6;">{{ video.transcript }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Comments -->
+            <div class="v-comments">
+                <h3 style="margin: 0 0 1.5rem 0; font-size: 1.25rem;">Comunidade ({{ comments.count }})</h3>
+                
+                <form method="post" action="{% url 'courses:add-comment' lesson.id %}" class="v-comment-form">
+                    {% csrf_token %}
+                    <textarea name="content" rows="3" placeholder="O que você achou desta aula?" required></textarea>
+                    <button type="submit"><i class="bi bi-send-fill"></i> Enviar Comentário</button>
+                </form>
+
+                <div class="v-comment-list">
+                    {% if comments %}
+                        {% for comment in comments %}
+                        <div class="v-comment">
+                            <img src="https://ui-avatars.com/api/?name={{ comment.user.get_full_name|urlencode }}&background=e2e8f0&color=0f172a" class="v-avatar">
+                            <div class="v-comment-body">
+                                <div class="v-comment-head">
+                                    <h4>{{ comment.user.get_full_name }}</h4>
+                                    <span>{{ comment.created_at|date:"d M Y" }}</span>
+                                </div>
+                                <p class="v-comment-text">{{ comment.content }}</p>
+                                <div class="v-comment-actions">
+                                    <button class="v-action-btn like-comment-btn" data-comment-id="{{ comment.id }}">
+                                        <i class="bi bi-hand-thumbs-up-fill"></i> <span class="like-count">{{ comment.likes_count }}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="text-align: center; padding: 2rem; color: var(--vid-text-muted);">
+                            <i class="bi bi-chat-square-dots" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+                            <p>Seja o primeiro a compartilhar seus pensamentos!</p>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="container-fluid py-4">
-        <div class="row">
-            <!-- Sidebar com Seções e Lições -->
-            <div class="col-lg-3 mb-4 order-lg-2">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="bi bi-list-check"></i> Conteúdo</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="accordion accordion-flush" id="lessonsAccordion">
-                            {% for section in sections %}
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="accordion-button {% if section.id != lesson.section.id %}collapsed{% endif %}" 
-                                            type="button" 
-                                            data-bs-toggle="collapse" 
-                                            data-bs-target="#section{{ section.id }}">
-                                        <strong class="small">{{ section.title }}</strong>
-                                    </button>
-                                </h2>
-                                <div id="section{{ section.id }}" 
-                                     class="accordion-collapse collapse {% if section.id == lesson.section.id %}show{% endif %}" 
-                                     data-bs-parent="#lessonsAccordion">
-                                    <div class="accordion-body p-0">
-                                        <div class="list-group list-group-flush">
-                                            {% for l in section.lessons.all %}
-                                            <a href="{% url 'courses:course-video' l.id %}" 
-                                               class="list-group-item list-group-item-action py-2 px-3 {% if l.id == lesson.id %}active{% endif %}">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="bi bi-play-circle-fill me-2"></i>
-                                                    <small>{{ l.title }}</small>
-                                                </div>
-                                            </a>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
+    <!-- Sidebar Playlist -->
+    <div class="v-sidebar">
+        <div class="v-sidebar-header">
+            Conteúdo do Curso
+        </div>
+        
+        <div>
+            {% for section in sections %}
+            <div class="v-module {% if section.id == lesson.section.id %}is-open{% endif %}">
+                <button class="v-module-btn" onclick="this.parentElement.classList.toggle('is-open')">
+                    {{ section.title }}
+                    <i class="bi bi-chevron-down" style="transition: 0.3s; color: var(--vid-text-muted);"></i>
+                </button>
+                <div class="v-module-content">
+                    {% for l in section.lessons.all %}
+                    <a href="{% url 'courses:course-video' l.id %}" class="v-lesson-link {% if l.id == lesson.id %}active{% endif %}">
+                        <i class="bi bi-play-circle{% if l.id == lesson.id %}-fill{% endif %}"></i>
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 0.2rem;">{{ l.title }}</div>
+                            <div style="font-size: 0.75rem; color: var(--vid-text-muted);">{{ l.duration_minutes }} min</div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Navegação -->
-                <div class="card shadow-sm mt-3">
-                    <div class="card-body p-3">
-                        <div class="d-grid gap-2">
-                            {% if previous_lesson %}
-                            <a href="{% url 'courses:course-video' previous_lesson.id %}" class="btn btn-outline-secondary btn-sm">
-                                <i class="bi bi-chevron-left"></i> Aula Anterior
-                            </a>
-                            {% endif %}
-                            
-                            {% if next_lesson %}
-                            <a href="{% url 'courses:course-video' next_lesson.id %}" class="btn btn-primary btn-sm">
-                                Próxima Aula <i class="bi bi-chevron-right"></i>
-                            </a>
-                            {% endif %}
-                        </div>
-                    </div>
+                    </a>
+                    {% endfor %}
                 </div>
             </div>
-
-            <!-- Video Player e Conteúdo -->
-            <div class="col-lg-9 order-lg-1">
-                <!-- Video Player -->
-                <div class="card shadow-sm mb-4">
-                    <div class="card-body p-0">
-                        <!-- Simulando player de vídeo -->
-                        <div class="ratio ratio-16x9 bg-dark d-flex align-items-center justify-content-center" 
-                             style="background-color: #1a1a1a;">
-                            {% if video %}
-                                <iframe width="100%" height="100%" 
-                                    src="{{ video.video_url }}" 
-                                    title="{{ lesson.title }}"
-                                    frameborder="0" 
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                    allowfullscreen>
-                                </iframe>
-                            {% else %}
-                                <div class="text-white text-center">
-                                    <i class="bi bi-play-circle display-1 mb-3"></i>
-                                    <p>Vídeo não disponível</p>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Lesson Info -->
-                <div class="card shadow-sm mb-4">
-                    <div class="card-body">
-                        <h2 class="h4 mb-2">{{ lesson.title }}</h2>
-                        <p class="text-muted mb-3">
-                            <i class="bi bi-clock"></i> {{ lesson.duration_minutes }} minutos
-                            | <i class="bi bi-tags"></i> {{ lesson.section.title }}
-                        </p>
-                        
-                        <hr>
-                        
-                        <h5>Descrição</h5>
-                        <p>{{ lesson.description }}</p>
-                    </div>
-                </div>
-
-                <!-- Resumo/Transcrição -->
-                {% if video.transcript %}
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-file-text"></i> Transcrição</h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-muted small">{{ video.transcript }}</p>
-                    </div>
-                </div>
-                {% endif %}
-
-                <!-- Comments Section -->
-                <div class="card shadow-sm">
-                    <div class="card-header bg-body-secondary">
-                        <h5 class="mb-0"><i class="bi bi-chat-left-text"></i> Comentários ({{ comments.count }})</h5>
-                    </div>
-                    <div class="card-body">
-                        <!-- Add Comment Form -->
-                        <form method="post" action="{% url 'courses:add-comment' lesson.id %}" class="mb-4">
-                            {% csrf_token %}
-                            <div class="form-group">
-                                <label for="comment-text" class="form-label">Deixe seu comentário:</label>
-                                <textarea class="form-control" id="comment-text" name="content" 
-                                          placeholder="Suas dúvidas, sugestões ou observações..." 
-                                          rows="3" required></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-sm">
-                                <i class="bi bi-plus-circle"></i> Comentar
-                            </button>
-                        </form>
-
-                        <hr>
-
-                        <!-- Comments List -->
-                        {% if comments %}
-                            <div class="comments-list">
-                                {% for comment in comments %}
-                                <div class="comment-item mb-4 pb-4 border-bottom" id="comment-{{ comment.id }}">
-                                    <div class="d-flex">
-                                        <!-- Avatar -->
-                                        <img src="https://ui-avatars.com/api/?name={{ comment.user.get_full_name|urlencode }}&background=random" 
-                                             alt="{{ comment.user.get_full_name }}" 
-                                             class="rounded-circle me-3" 
-                                             width="45" 
-                                             height="45">
-                                        
-                                        <!-- Comment Content -->
-                                        <div class="flex-grow-1">
-                                            <div class="d-flex justify-content-between align-items-start mb-1">
-                                                <div>
-                                                    <h6 class="mb-0 fw-bold">{{ comment.user.get_full_name }}</h6>
-                                                    <small class="text-muted">{{ comment.created_at|date:"d/m/Y à\s H:i" }}</small>
-                                                </div>
-                                            </div>
-                                            
-                                            <p class="mb-3">{{ comment.content }}</p>
-                                            
-                                            <!-- Actions -->
-                                            <div class="comment-actions">
-                                                <button class="btn btn-sm btn-outline-primary like-comment-btn" 
-                                                        data-comment-id="{{ comment.id }}"
-                                                        data-liked="{% if comment.user_liked %}true{% else %}false{% endif %}">
-                                                    <i class="bi bi-hand-thumbs-up"></i> 
-                                                    <span class="like-count">{{ comment.likes_count }}</span>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-secondary" 
-                                                        data-bs-toggle="collapse" 
-                                                        data-bs-target="#reply-form-{{ comment.id }}">
-                                                    <i class="bi bi-reply"></i> Responder
-                                                </button>
-                                            </div>
-
-                                            <!-- Reply Form -->
-                                            <div class="collapse mt-3" id="reply-form-{{ comment.id }}">
-                                                <form method="post" action="{% url 'courses:add-comment' lesson.id %}" class="card card-body">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="parent_id" value="{{ comment.id }}">
-                                                    <textarea class="form-control mb-2" name="content" 
-                                                              placeholder="Sua resposta..." rows="2"></textarea>
-                                                    <div class="d-flex gap-2">
-                                                        <button type="submit" class="btn btn-sm btn-primary">Responder</button>
-                                                        <button type="button" class="btn btn-sm btn-outline-secondary" 
-                                                                data-bs-toggle="collapse" 
-                                                                data-bs-target="#reply-form-{{ comment.id }}">
-                                                            Cancelar
-                                                        </button>
-                                                    </div>
-                                                </form>
-                                            </div>
-
-                                            <!-- Replies -->
-                                            {% if comment.replies.all %}
-                                            <div class="replies mt-3 ps-4 border-start">
-                                                {% for reply in comment.replies.all %}
-                                                <div class="reply-item mb-3 pb-3">
-                                                    <div class="d-flex">
-                                                        <img src="https://ui-avatars.com/api/?name={{ reply.user.get_full_name|urlencode }}&background=random" 
-                                                             alt="{{ reply.user.get_full_name }}" 
-                                                             class="rounded-circle me-2" 
-                                                             width="35" 
-                                                             height="35">
-                                                        <div class="flex-grow-1">
-                                                            <div>
-                                                                <h6 class="mb-0 fw-bold small">{{ reply.user.get_full_name }}</h6>
-                                                                <small class="text-muted">{{ reply.created_at|date:"d/m/Y à\s H:i" }}</small>
-                                                            </div>
-                                                            <p class="mb-0 small mt-1">{{ reply.content }}</p>
-                                                            <small class="text-muted">
-                                                                <button type="button" class="btn btn-link btn-sm p-0">
-                                                                    <i class="bi bi-hand-thumbs-up"></i> 
-                                                                </button>
-                                                            </small>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                {% endfor %}
-                                            </div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="alert alert-info">
-                                <i class="bi bi-info-circle"></i> 
-                                Nenhum comentário ainda. Seja o primeiro a comentar!
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
 
-<style>
-    .course-video-container {
-        background-color: #f8f9fa;
-        min-height: 100vh;
-    }
-
-    .comment-item {
-        transition: all 0.3s ease;
-    }
-
-    .comment-item:hover {
-        background-color: #f5f5f5;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        margin-left: -1rem;
-        margin-right: -1rem;
-    }
-
-    .comment-actions .btn-sm {
-        font-size: 0.85rem;
-        padding: 0.25rem 0.5rem;
-    }
-
-    .ratio {
-        --bs-aspect-ratio: 56.25%;
-        background-color: #1a1a1a;
-    }
-
-    .accordion-button:not(.collapsed) {
-        background-color: #e7f1ff;
-        color: #0d6efd;
-    }
-
-    .list-group-item.active {
-        background-color: #0d6efd;
-        border-color: #0d6efd;
-    }
-
-    .like-comment-btn {
-        transition: all 0.3s ease;
-    }
-
-    .like-comment-btn.liked {
-        background-color: #0d6efd;
-        color: white;
-        border-color: #0d6efd;
-    }
-</style>
-
 <script>
-    // Handle like comment
+    // Handle like comment logic via fetch
     document.querySelectorAll('.like-comment-btn').forEach(btn => {
         btn.addEventListener('click', async function(e) {
             e.preventDefault();
             const commentId = this.dataset.commentId;
-            const isLiked = this.dataset.liked === 'true';
-            
             try {
                 const response = await fetch(`/courses/comment/${commentId}/like/`, {
                     method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json' },
                 });
-                
                 const data = await response.json();
                 this.querySelector('.like-count').textContent = data.likes_count;
-                
-                if (data.liked) {
-                    this.classList.add('liked');
-                    this.dataset.liked = 'true';
-                } else {
-                    this.classList.remove('liked');
-                    this.dataset.liked = 'false';
-                }
-            } catch (error) {
-                console.error('Erro ao dar like:', error);
-            }
+                if (data.liked) this.classList.add('active');
+                else this.classList.remove('active');
+            } catch (error) { console.error(error); }
         });
     });
 </script>

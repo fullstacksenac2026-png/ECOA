@@ -128,6 +128,7 @@ def classify_image_api(request):
 @login_required
 def historic_pictures(request):
     search_query = request.GET.get('search_picture', '')
+    filter_type = request.GET.get('filter_type', 'all')
     
     # Base queryset - showing all active pictures
     pictures = Picture.objects.filter(is_active=True)
@@ -137,6 +138,11 @@ def historic_pictures(request):
             models.Q(title__icontains=search_query) | 
             models.Q(content__icontains=search_query)
         )
+        
+    if filter_type == 'public':
+        pictures = pictures.filter(title__icontains='ambiente público')
+    elif filter_type == 'private':
+        pictures = pictures.filter(title__icontains='ambiente privado')
     
     # Annotate with counts (similar to forum)
     from django.db.models import Count, Q
@@ -153,7 +159,8 @@ def historic_pictures(request):
     return render(request, 'historic-pictures.html', {
         'page_obj': page_obj,
         'pictures': page_obj.object_list,
-        'search_query': search_query
+        'search_query': search_query,
+        'filter_type': filter_type
     })
 
 from django.core.paginator import Paginator
@@ -213,7 +220,13 @@ def create_complaint(request, picture_id):
             picture.save()
             
             messages.success(request, '✅ Queixa postada com sucesso! Sua denúncia está visível para todos.')
-            # Redireciona para o histórico público (feed) ao invés de apenas a foto
+            
+            # Redireciona para o filtro correto
+            if 'público' in picture.title.lower():
+                return redirect('/pictures/historic/?filter_type=public')
+            elif 'privado' in picture.title.lower():
+                return redirect('/pictures/historic/?filter_type=private')
+                
             return redirect('pictures:historic-pictures')
         else:
             messages.error(request, 'Por favor, corrija os erros abaixo.')

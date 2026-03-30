@@ -4,415 +4,593 @@
 {% block title %}<title>Resultados - {{ quiz.title }}</title>{% endblock %}
 
 {% block content %}
-<div class="quiz-results-container">
-    <!-- Header -->
-    <div class="text-white py-4 sticky-top" style="z-index: 10; background: linear-gradient(135deg, #20c997 0%, #198754 100%);">
-        <div class="container">
-            <a href="{% url 'courses:course-lessons' course.id %}" class="btn btn-sm btn-outline-light mb-3">
-                <i class="bi bi-chevron-left"></i> Voltar para Aulas
-            </a>
-            <h1 class="h3 mb-0">{{ course.name }}</h1>
-        </div>
-    </div>
+<style>
+    /* PREMIUM VANILLA CSS FOR QUIZ RESULTS */
+    :root {
+        --qr-primary: #10b981;
+        --qr-primary-light: #d1fae5;
+        --qr-primary-dark: #047857;
+        
+        --qr-success: #22c55e;
+        --qr-success-light: #dcfce7;
+        
+        --qr-danger: #ef4444;
+        --qr-danger-light: #fee2e2;
+        
+        --qr-warning: #f59e0b;
+        --qr-warning-light: #fef3c7;
+        
+        --qr-info: #3b82f6;
+        --qr-info-light: #dbeafe;
 
-    <div class="container py-5">
-        <div class="row">
-            <!-- Resultado Principal -->
-            <div class="col-lg-8">
-                <!-- Score Card -->
-                <div class="card shadow-lg mb-4 border-0">
-                    <div class="card-body p-5 text-center {% if quiz_result.passed %}bg-success{% else %}bg-warning{% endif %} text-white">
-                        <h2 class="card-title mb-3">
-                            {% if quiz_result.passed %}
-                                <i class="bi bi-check-circle display-1"></i>
-                                <br>Parabéns! Quiz Concluído
-                            {% else %}
-                                <i class="bi bi-exclamation-circle display-1"></i>
-                                <br>Quiz Não Passou
-                            {% endif %}
-                        </h2>
-                        
-                        <div class="score-display my-4">
-                            <div class="score-circle mx-auto mb-3" 
-                                 style="width: 200px; height: 200px; border-radius: 50%; 
-                                        display: flex; align-items: center; justify-content: center;
-                                        background-color: rgba(255,255,255,0.2); border: 5px solid white;">
-                                <div>
-                                    <div class="display-1 fw-bold">{{ quiz_result.percentage|floatformat:0 }}%</div>
-                                    <small>Nota Final</small>
-                                </div>
-                            </div>
-                        </div>
+        --qr-bg: #f8fafc;
+        --qr-card: #ffffff;
+        --qr-text: #1e293b;
+        --qr-text-muted: #64748b;
+        --qr-border: #e2e8f0;
+        --qr-radius: 1.5rem;
+    }
 
-                        <p class="lead mb-0">
-                            Você acertou <strong>{{ quiz_result.score }}</strong> de 
-                            <strong>{{ quiz_result.quiz.questions.count }} questões</strong>
-                        </p>
-                        {% if quiz_result.passed %}
-                        <p class="small mt-2">
-                            Pontuação mínima: {{ quiz.passing_score }}%
-                        </p>
-                        {% endif %}
-                    </div>
-                </div>
+    [data-bs-theme=dark] {
+        --qr-bg: #0f172a;
+        --qr-card: #1e293b;
+        --qr-text: #f8fafc;
+        --qr-text-muted: #94a3b8;
+        --qr-border: #334155;
+        
+        --qr-success-light: rgba(34, 197, 94, 0.1);
+        --qr-danger-light: rgba(239, 68, 68, 0.1);
+        --qr-info-light: rgba(59, 130, 246, 0.1);
+        --qr-warning-light: rgba(245, 158, 11, 0.1);
+    }
 
-                <!-- Statistics -->
-                <div class="row mb-4">
-                    <div class="col-md-6 mb-3">
-                        <div class="card h-100">
-                            <div class="card-body text-center">
-                                <i class="bi bi-clock-history display-4 text-info mb-2"></i>
-                                <h6 class="card-title">Tempo Gasto</h6>
-                                <p class="card-text h5 mb-0">
-                                    {% if quiz_result.time_taken_seconds %}
-                                        {% with mins=quiz_result.time_taken_seconds|add:0|floatformat:0 %}
-                                            {{ mins|add:0|stringformat:"d" }}s
-                                        {% endwith %}
-                                    {% else %}
-                                        N/A
-                                    {% endif %}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="card h-100">
-                            <div class="card-body text-center">
-                                <i class="bi bi-lightning-fill display-4 text-warning mb-2"></i>
-                                <h6 class="card-title">Tentativa</h6>
-                                <p class="card-text h5 mb-0">{{ quiz_result.attempt_number }}/{{ max_attempts }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    body {
+        background-color: var(--qr-bg);
+        color: var(--qr-text);
+        font-family: 'Inter', system-ui, sans-serif;
+    }
 
-                <!-- Detailed Results -->
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-body-secondary">
-                        <h5 class="mb-0"><i class="bi bi-list-check"></i> Detalhes das Respostas</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="accordion" id="questionsAccordion">
-                            {% for question in questions %}
-                            {% with answer=answers_by_question|get_item:question.id %}
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %} 
-                                                {% if answer.is_correct %}bg-success-light{% else %}bg-danger-light{% endif %}"
-                                            type="button" 
-                                            data-bs-toggle="collapse" 
-                                            data-bs-target="#question{{ question.id }}">
-                                        <span class="me-3">
-                                            {% if answer.is_correct %}
-                                                <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i></span>
-                                            {% else %}
-                                                <span class="badge bg-danger"><i class="bi bi-x-circle-fill"></i></span>
-                                            {% endif %}
-                                        </span>
-                                        <strong>Questão {{ forloop.counter }}</strong>
-                                        <span class="ms-auto text-muted small">
-                                            {% if answer.is_correct %}
-                                                Acertou ({{ answer.question.points }} ponto{% if answer.question.points > 1 %}s{% endif %})
-                                            {% else %}
-                                                Errou (0 pontos)
-                                            {% endif %}
-                                        </span>
-                                    </button>
-                                </h2>
-                                <div id="question{{ question.id }}" 
-                                     class="accordion-collapse collapse {% if forloop.first %}show{% endif %}"
-                                     data-bs-parent="#questionsAccordion">
-                                    <div class="accordion-body">
-                                        <h6 class="mb-3">{{ question.text }}</h6>
+    /* Header */
+    .qr-header {
+        background: linear-gradient(135deg, var(--qr-primary) 0%, var(--qr-primary-dark) 100%);
+        padding: 2rem 1.5rem;
+        color: white;
+        position: relative;
+    }
 
-                        <!-- Display answers based on type -->
-                                        {% if question.question_type in 'multiple|true_false' %}
-                                            <div class="mb-3">
-                                                <small class="text-muted d-block mb-2">Opções:</small>
-                                                <div class="list-group list-group-sm">
-                                                    {% for ans in question.answers.all %}
-                                                    <div class="list-group-item 
-                                                        {% if answer.selected_answer.id == ans.id %}
-                                                            {% if ans.is_correct %}bg-success-light{% else %}bg-danger-light{% endif %}
-                                                        {% elif ans.is_correct %}
-                                                            bg-info-light
-                                                        {% endif %}">
-                                                        {% if answer.selected_answer.id == ans.id %}
-                                                            {% if ans.is_correct %}
-                                                                <i class="bi bi-check-circle-fill text-success"></i>
-                                                            {% else %}
-                                                                <i class="bi bi-x-circle-fill text-danger"></i>
-                                                            {% endif %}
-                                                        {% elif ans.is_correct %}
-                                                            <i class="bi bi-info-circle-fill text-info"></i>
-                                                        {% endif %}
-                                                        <span class="ms-2">{{ ans.text }}</span>
-                                                        {% if ans.is_correct %}
-                                                            <span class="badge bg-success ms-2">Resposta correta</span>
-                                                        {% endif %}
-                                                    </div>
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
+    .qr-header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
 
-                                        {% elif question.question_type == 'short_answer' %}
-                                            <div class="mb-3">
-                                                <small class="text-muted d-block mb-2">Sua resposta:</small>
-                                                <div class="alert alert-info">
-                                                    <p class="mb-0">{{ answer.answer_text }}</p>
-                                                </div>
-                                                <p class="text-muted small">
-                                                    <i class="bi bi-info-circle"></i> 
-                                                    Respostas curtas precisam de revisão manual do instrutor.
-                                                </p>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                            {% endwith %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
+    .qr-btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+        backdrop-filter: blur(4px);
+        transition: background 0.2s;
+    }
 
-                <!-- Historical Results -->
-                {% if previous_attempts.count > 1 %}
-                <div class="card shadow-sm">
-                    <div class="card-header bg-body-secondary">
-                        <h5 class="mb-0"><i class="bi bi-graph-up"></i> Histórico de Tentativas</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Tentativa</th>
-                                        <th>Pontuação</th>
-                                        <th>Status</th>
-                                        <th>Data</th>
-                                        <th>Ação</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for attempt in previous_attempts %}
-                                    <tr>
-                                        <td>#{{ attempt.attempt_number }}</td>
-                                        <td>{{ attempt.percentage|floatformat:0 }}%</td>
-                                        <td>
-                                            {% if attempt.passed %}
-                                                <span class="badge bg-success">Aprovado</span>
-                                            {% else %}
-                                                <span class="badge bg-danger">Reprovado</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>{{ attempt.taken_at|date:"d/m/Y à\s H:i" }}</td>
-                                        <td>
-                                            <a href="{% url 'courses:quiz-results-detail' quiz.id attempt.id %}" 
-                                               class="btn btn-sm btn-outline-primary">
-                                                Ver
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
+    .qr-btn-back:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+    }
 
-            <!-- Sidebar -->
-            <div class="col-lg-4">
-                <!-- Next Steps Card -->
-                <div class="card shadow-sm mb-4 border-left border-primary" style="border-left: 5px solid #0d6efd;">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="bi bi-arrow-right"></i> Próximos Passos</h5>
-                    </div>
-                    <div class="card-body">
-                        {% if quiz_result.passed %}
-                            <div class="alert alert-success mb-3">
-                                <i class="bi bi-check-circle"></i> Parabéns! Você passou nesse quiz!
-                            </div>
-                            <p class="text-muted small mb-3">
-                                Você pode agora passar para o próximo tópico ou revisar o conteúdo anterior.
-                            </p>
-                            <div class="d-grid gap-2">
-                                <a href="{% url 'courses:course-lessons' course.id %}" class="btn btn-primary">
-                                    <i class="bi bi-play-fill"></i> Próxima Aula
-                                </a>
-                            </div>
-                        {% else %}
-                            {% if can_retry %}
-                                <div class="alert alert-warning mb-3">
-                                    <i class="bi bi-exclamation-circle"></i> 
-                                    Você pode tentar novamente!
-                                </div>
-                                <p class="text-muted small mb-3">
-                                    Revise o material e tente novamente. Você ainda tem 
-                                    {{ max_attempts|add:"-1"|add:"-attempts" }} tentativa(s) restante(s).
-                                </p>
-                                <div class="d-grid gap-2">
-                                    <a href="{% url 'courses:course-quiz' quiz.id %}" class="btn btn-warning">
-                                        <i class="bi bi-arrow-repeat"></i> Tentar Novamente
-                                    </a>
-                                    <a href="{% url 'courses:course-lessons' course.id %}" class="btn btn-outline-secondary">
-                                        <i class="bi bi-chevron-left"></i> Voltar para Aulas
-                                    </a>
-                                </div>
-                            {% else %}
-                                <div class="alert alert-danger mb-3">
-                                    <i class="bi bi-x-circle"></i> 
-                                    Máximo de tentativas atingido!
-                                </div>
-                                <p class="text-muted small mb-3">
-                                    Você utilizou todas as suas tentativas. 
-                                    Contate o instrutor para mais ajuda.
-                                </p>
-                                <div class="d-grid gap-2">
-                                    <a href="{% url 'courses:course-lessons' course.id %}" class="btn btn-secondary">
-                                        <i class="bi bi-chevron-left"></i> Voltar para Aulas
-                                    </a>
-                                </div>
-                            {% endif %}
-                        {% endif %}
-                    </div>
-                </div>
+    .qr-header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 800;
+    }
 
-                <!-- Performance Summary -->
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-body-secondary">
-                        <h5 class="mb-0"><i class="bi bi-speedometer2"></i> Resumo de Desempenho</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <small><strong>Pontuação Final</strong></small>
-                                <small><strong>{{ quiz_result.percentage|floatformat:0 }}%</strong></small>
-                            </div>
-                            <div class="progress" style="height: 20px;">
-                                <div class="progress-bar {% if quiz_result.passed %}bg-success{% else %}bg-danger{% endif %}" 
-                                     role="progressbar" 
-                                     style="width: {{ quiz_result.percentage }}%"
-                                     aria-valuenow="{{ quiz_result.percentage }}" 
-                                     aria-valuemin="0" 
-                                     aria-valuemax="100"></div>
-                            </div>
-                        </div>
+    /* Layout Grid */
+    .qr-layout {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1.5rem;
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 2rem;
+    }
 
-                        <hr>
+    @media (max-width: 992px) {
+        .qr-layout { grid-template-columns: 1fr; }
+    }
 
-                        <div class="mb-2">
-                            <small class="text-muted">
-                                <i class="bi bi-check-circle-fill text-success"></i> 
-                                Corretas: {{ answers_by_question|length|add:"-1"|add:"-incorrect_count" }}
-                            </small>
-                        </div>
-                        <div class="mb-2">
-                            <small class="text-muted">
-                                <i class="bi bi-x-circle-fill text-danger"></i> 
-                                Incorretas: Veja acima
-                            </small>
-                        </div>
-                        <div>
-                            <small class="text-muted">
-                                <i class="bi bi-alarm"></i> 
-                                Mínimo para passar: {{ quiz.passing_score }}%
-                            </small>
-                        </div>
-                    </div>
-                </div>
+    /* Cards */
+    .qr-card {
+        background: var(--qr-card);
+        border: 1px solid var(--qr-border);
+        border-radius: var(--qr-radius);
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
 
-                <!-- Tips Card -->
-                <div class="card shadow-sm">
-                    <div class="card-header bg-body-secondary">
-                        <h5 class="mb-0"><i class="bi bi-lightbulb"></i> Dicas para Melhorar</h5>
-                    </div>
-                    <div class="card-body small">
-                        <ul class="list-unstyled">
-                            <li class="mb-2">
-                                <i class="bi bi-book"></i> Revise as aulas sobre os tópicos que errou
-                            </li>
-                            <li class="mb-2">
-                                <i class="bi bi-chat-dots"></i> Deixe dúvidas nos comentários das aulas
-                            </li>
-                            <li class="mb-2">
-                                <i class="bi bi-people"></i> Discuta com outros alunos no fórum
-                            </li>
-                            <li>
-                                <i class="bi bi-arrows-repeat"></i> Pratique e faça o quiz novamente
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
+    .qr-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--qr-border);
+    }
+    
+    .qr-card-header h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--qr-text);
+    }
+
+    /* Main Result Card */
+    .qr-result-main {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: white;
+        border: none;
+    }
+
+    .qr-result-main.passed {
+        background: linear-gradient(135deg, var(--qr-success) 0%, #16a34a 100%);
+    }
+
+    .qr-result-main.failed {
+        background: linear-gradient(135deg, var(--qr-warning) 0%, #d97706 100%);
+    }
+
+    .qr-result-icon {
+        font-size: 5rem;
+        line-height: 1;
+        margin-bottom: 1rem;
+    }
+
+    .qr-result-title {
+        font-size: 2rem;
+        font-weight: 900;
+        margin: 0 0 2rem 0;
+    }
+
+    .qr-score-circle {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        border: 6px solid white;
+        margin: 0 auto 2rem auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .qr-score-val {
+        font-size: 4rem;
+        font-weight: 900;
+        line-height: 1;
+    }
+
+    .qr-score-lbl {
+        font-size: 0.9rem;
+        font-weight: 600;
+        opacity: 0.9;
+    }
+
+    .qr-result-main p {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    /* Stats Row */
+    .qr-stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .qr-stat {
+        background: var(--qr-card);
+        border: 1px solid var(--qr-border);
+        border-radius: var(--qr-radius);
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .qr-stat i {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    .qr-stat .bi-clock-history { color: var(--qr-info); }
+    .qr-stat .bi-lightning-fill { color: var(--qr-warning); }
+
+    .qr-stat h6 { margin: 0 0 0.25rem 0; font-size: 0.9rem; color: var(--qr-text-muted); }
+    .qr-stat h4 { margin: 0; font-size: 1.5rem; font-weight: 800; color: var(--qr-text); }
+
+    /* Detailed Answers Accordion */
+    .qr-acc-item {
+        border: 1px solid var(--qr-border);
+        border-radius: 1rem;
+        margin-bottom: 1rem;
+        overflow: hidden;
+    }
+
+    .qr-acc-btn {
+        width: 100%;
+        text-align: left;
+        padding: 1.25rem 1.5rem;
+        background: var(--qr-card);
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--qr-text);
+        transition: background 0.2s;
+    }
+
+    .qr-acc-btn:hover { background: var(--qr-bg); }
+
+    .qr-acc-btn.correct { background: var(--qr-success-light); }
+    .qr-acc-btn.incorrect { background: var(--qr-danger-light); }
+
+    .qr-acc-left { display: flex; align-items: center; gap: 1rem; }
+    .qr-acc-icon { font-size: 1.25rem; }
+    .qr-acc-icon.correct { color: var(--qr-success); }
+    .qr-acc-icon.incorrect { color: var(--qr-danger); }
+
+    .qr-acc-pts {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--qr-text-muted);
+    }
+
+    .qr-acc-content {
+        display: none;
+        padding: 1.5rem;
+        background: var(--qr-card);
+        border-top: 1px solid var(--qr-border);
+    }
+
+    .qr-acc-item.is-open .qr-acc-content { display: block; }
+
+    .qr-q-text {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0 0 1.5rem 0;
+        line-height: 1.5;
+    }
+
+    /* Options List */
+    .qr-opt-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .qr-opt-item {
+        padding: 1rem;
+        border-radius: 0.75rem;
+        border: 1px solid var(--qr-border);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .qr-opt-item.bg-success-light { background: var(--qr-success-light); border-color: var(--qr-success); }
+    .qr-opt-item.bg-danger-light { background: var(--qr-danger-light); border-color: var(--qr-danger); }
+    .qr-opt-item.bg-info-light { background: var(--qr-info-light); border-color: var(--qr-info); }
+
+    /* Tables */
+    .qr-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+    .qr-table th, .qr-table td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--qr-border);
+        font-size: 0.9rem;
+    }
+    .qr-table th {
+        font-weight: 700;
+        color: var(--qr-text-muted);
+        background: var(--qr-bg);
+    }
+    .qr-table tr:last-child td { border-bottom: none; }
+
+    /* Sidebar Custom Cards */
+    .qr-next-steps {
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .qr-ns-header {
+        padding: 1.5rem;
+        color: white;
+    }
+
+    .qr-ns-header.passed { background: var(--qr-success); }
+    .qr-ns-header.failed { background: var(--qr-warning); }
+    .qr-ns-header.max-failed { background: var(--qr-danger); }
+
+    .qr-ns-header h3 { margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
+
+    .qr-ns-body { padding: 1.5rem; }
+
+    .qr-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 1rem;
+        border-radius: 2rem;
+        font-weight: 700;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 0.75rem;
+    }
+
+    .qr-btn:last-child { margin-bottom: 0; }
+
+    .qr-btn-primary { background: var(--qr-primary); color: white; }
+    .qr-btn-primary:hover { background: var(--qr-primary-dark); }
+    
+    .qr-btn-warning { background: var(--qr-warning); color: white; }
+    
+    .qr-btn-outline { background: transparent; border: 2px solid var(--qr-border); color: var(--qr-text); }
+    .qr-btn-outline:hover { background: var(--qr-bg); }
+
+    /* Summary Bar */
+    .qr-summary-bar { background: var(--qr-bg); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 1.5rem; }
+    .qr-summary-fill { height: 100%; transition: width 1s; }
+    .qr-summary-fill.passed { background: var(--qr-success); }
+    .qr-summary-fill.failed { background: var(--qr-danger); }
+    
+    .qr-list { list-style: none; padding: 0; margin: 0; }
+    .qr-list li { margin-bottom: 0.75rem; display: flex; gap: 0.75rem; font-size: 0.9rem; color: var(--qr-text-muted); }
+    .qr-list li i { font-size: 1.1rem; }
+</style>
+
+<div class="qr-header">
+    <div class="qr-header-content">
+        <a href="{% url 'courses:course-lessons' course.id %}" class="qr-btn-back">
+            <i class="bi bi-arrow-left"></i> Voltar à Sala de Aula
+        </a>
+        <h1>{{ course.name }}</h1>
     </div>
 </div>
 
-<style>
-    .quiz-results-container {
-        background-color: #f8f9fa;
-        min-height: 100vh;
-    }
+<div class="qr-layout">
+    
+    <!-- Main Area -->
+    <main>
+        
+        <!-- Result Highlight -->
+        <div class="qr-card qr-result-main {% if quiz_result.passed %}passed{% else %}failed{% endif %}">
+            <div class="qr-result-icon">
+                {% if quiz_result.passed %}<i class="bi bi-check-circle-fill"></i>{% else %}<i class="bi bi-exclamation-triangle-fill"></i>{% endif %}
+            </div>
+            <h2 class="qr-result-title">
+                {% if quiz_result.passed %}Aprovado!{% else %}Tente Novamente{% endif %}
+            </h2>
+            
+            <div class="qr-score-circle">
+                <div class="qr-score-val">{{ quiz_result.percentage|floatformat:0 }}%</div>
+                <div class="qr-score-lbl">Nota Alcançada</div>
+            </div>
+            
+            <p>Você acertou {{ quiz_result.score }} de {{ quiz_result.quiz.questions.count }} questões.</p>
+            {% if quiz_result.passed %}
+            <span style="display: block; margin-top: 1rem; opacity: 0.8; font-size: 0.9rem;">
+                Mínimo exigido: {{ quiz.passing_score }}%
+            </span>
+            {% endif %}
+        </div>
 
-    .score-circle {
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    }
+        <!-- Quick Stats -->
+        <div class="qr-stats-grid">
+            <div class="qr-stat">
+                <i class="bi bi-stopwatch"></i>
+                <h6>Tempo Registrado</h6>
+                <h4>
+                    {% if quiz_result.time_taken_seconds %}
+                        {% with mins=quiz_result.time_taken_seconds|add:0|floatformat:0 %}
+                            {{ mins|add:0|stringformat:"d" }}s
+                        {% endwith %}
+                    {% else %}N/A{% endif %}
+                </h4>
+            </div>
+            <div class="qr-stat">
+                <i class="bi bi-arrow-repeat"></i>
+                <h6>Tentativa Atual</h6>
+                <h4>{{ quiz_result.attempt_number }}/{{ max_attempts }}</h4>
+            </div>
+        </div>
 
-    .bg-success-light {
-        background-color: #d4edda !important;
-    }
+        <!-- Detailed Feedback -->
+        <div class="qr-card" style="padding: 0; overflow: hidden;">
+            <div class="qr-card-header" style="margin: 0; padding: 1.5rem; background: var(--qr-bg); border-bottom: 1px solid var(--qr-border);">
+                <h2><i class="bi bi-list-check" style="color: var(--qr-primary);"></i> Gaba rito e Correção</h2>
+            </div>
+            
+            <div style="padding: 1.5rem;">
+                {% for question in questions %}
+                {% with answer=answers_by_question|get_item:question.id %}
+                <div class="qr-acc-item {% if forloop.first %}is-open{% endif %}">
+                    <button class="qr-acc-btn {% if answer.is_correct %}correct{% else %}incorrect{% endif %}" onclick="this.parentElement.classList.toggle('is-open')">
+                        <div class="qr-acc-left">
+                            <i class="bi {% if answer.is_correct %}bi-check-circle-fill correct{% else %}bi-x-circle-fill incorrect{% endif %} qr-acc-icon"></i>
+                            Questão {{ forloop.counter }}
+                        </div>
+                        <div class="qr-acc-pts">
+                            {% if answer.is_correct %}{{ answer.question.points }} pts{% else %}0 pts{% endif %}
+                            <i class="bi bi-chevron-down" style="margin-left: 0.5rem;"></i>
+                        </div>
+                    </button>
+                    
+                    <div class="qr-acc-content">
+                        <h4 class="qr-q-text">{{ question.text }}</h4>
 
-    .bg-danger-light {
-        background-color: #f8d7da !important;
-    }
+                        {% if question.question_type in 'multiple|true_false' %}
+                            <div class="qr-opt-list">
+                                {% for ans in question.answers.all %}
+                                <div class="qr-opt-item 
+                                    {% if answer.selected_answer.id == ans.id %}
+                                        {% if ans.is_correct %}bg-success-light{% else %}bg-danger-light{% endif %}
+                                    {% elif ans.is_correct %}
+                                        bg-info-light
+                                    {% endif %}">
+                                    
+                                    {% if answer.selected_answer.id == ans.id %}
+                                        {% if ans.is_correct %}
+                                            <i class="bi bi-check-circle-fill" style="color: var(--qr-success); font-size: 1.2rem;"></i>
+                                        {% else %}
+                                            <i class="bi bi-x-circle-fill" style="color: var(--qr-danger); font-size: 1.2rem;"></i>
+                                        {% endif %}
+                                    {% elif ans.is_correct %}
+                                        <i class="bi bi-check-circle" style="color: var(--qr-info); font-size: 1.2rem;"></i>
+                                    {% else %}
+                                        <i class="bi bi-circle" style="color: var(--qr-border); font-size: 1.2rem;"></i>
+                                    {% endif %}
+                                    
+                                    <span style="flex-grow: 1;">{{ ans.text }}</span>
+                                    
+                                    {% if ans.is_correct %}
+                                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--qr-success); padding: 0.25rem 0.5rem; background: var(--qr-card); border-radius: 1rem;">Correta</span>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% elif question.question_type == 'short_answer' %}
+                            <div style="background: var(--qr-info-light); border: 1px solid var(--qr-info); padding: 1rem; border-radius: 1rem;">
+                                <span style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--qr-info); margin-bottom: 0.5rem; text-transform: uppercase;">Resposta Enviada</span>
+                                <p style="margin: 0; font-weight: 500;">{{ answer.answer_text }}</p>
+                            </div>
+                            <small style="display: block; margin-top: 1rem; color: var(--qr-text-muted);"><i class="bi bi-info-circle"></i> Necessita revisão do professor.</small>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endwith %}
+                {% endfor %}
+            </div>
+        </div>
 
-    .bg-info-light {
-        background-color: #d1ecf1 !important;
-    }
+        <!-- History -->
+        {% if previous_attempts.count > 1 %}
+        <div class="qr-card" style="padding: 0; overflow: hidden;">
+            <div class="qr-card-header" style="margin: 0; padding: 1.5rem; background: var(--qr-bg); border-bottom: 1px solid var(--qr-border);">
+                <h2><i class="bi bi-clock-history" style="color: var(--qr-primary);"></i> Histórico Geral</h2>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="qr-table">
+                    <thead>
+                        <tr>
+                            <th>Tentativa</th>
+                            <th>Aproveitamento</th>
+                            <th>Status</th>
+                            <th>Data</th>
+                            <th>Ver</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for attempt in previous_attempts %}
+                        <tr>
+                            <td>#{{ attempt.attempt_number }}</td>
+                            <td><strong>{{ attempt.percentage|floatformat:0 }}%</strong></td>
+                            <td>
+                                {% if attempt.passed %}
+                                    <span style="color: var(--qr-success); font-weight: 700;"><i class="bi bi-check-circle"></i> Aprovado</span>
+                                {% else %}
+                                    <span style="color: var(--qr-danger); font-weight: 700;"><i class="bi bi-x-circle"></i> Reprovado</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ attempt.taken_at|date:"d/m/Y H:i" }}</td>
+                            <td><a href="{% url 'courses:quiz-results-detail' quiz.id attempt.id %}" style="color: var(--qr-primary); font-weight: 700; text-decoration: none;">Abrir</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
 
-    .accordion-button:not(.collapsed) {
-        background-color: #e7f1ff;
-    }
+    </main>
 
-    .card {
-        transition: all 0.3s ease;
-    }
+    <!-- Sidebar -->
+    <aside>
+        
+        <div class="qr-card qr-next-steps">
+            <div class="qr-ns-header {% if quiz_result.passed %}passed{% elif can_retry %}failed{% else %}max-failed{% endif %}">
+                <h3>
+                    <i class="bi bi-map"></i> Ações Recomendadas
+                </h3>
+            </div>
+            
+            <div class="qr-ns-body">
+                {% if quiz_result.passed %}
+                    <p style="font-size: 0.95rem; margin: 0 0 1.5rem 0; color: var(--qr-text); line-height: 1.5;">
+                        Excelente trabalho! Você absorveu o conteúdo com sucesso e está pronto para prosseguir.
+                    </p>
+                    <a href="{% url 'courses:course-lessons' course.id %}" class="qr-btn qr-btn-primary">
+                        Completar e Avançar <i class="bi bi-arrow-right"></i>
+                    </a>
+                {% else %}
+                    {% if can_retry %}
+                        <p style="font-size: 0.95rem; margin: 0 0 1.5rem 0; color: var(--qr-text); line-height: 1.5;">
+                            Nenhum problema! Revise os materiais e encare o quiz novamente. Você tem <strong>{{ max_attempts|add:"-1"|add:"-attempts" }} tentativa(s) restante(s)</strong>.
+                        </p>
+                        <a href="{% url 'courses:course-quiz' quiz.id %}" class="qr-btn qr-btn-warning">
+                            <i class="bi bi-arrow-repeat"></i> Fazer Novamente
+                        </a>
+                        <a href="{% url 'courses:course-lessons' course.id %}" class="qr-btn qr-btn-outline">
+                            Voltar às Leituras
+                        </a>
+                    {% else %}
+                        <p style="font-size: 0.95rem; margin: 0 0 1.5rem 0; color: var(--qr-text); line-height: 1.5;">
+                            Infelizmente, todas as suas tentativas foram esgotadas. Converse com um instrutor.
+                        </p>
+                        <a href="{% url 'courses:course-lessons' course.id %}" class="qr-btn qr-btn-outline">
+                            Voltar à Sala
+                        </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
 
-    .card:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-    }
+        <div class="qr-card">
+            <div class="qr-card-header">
+                <h2><i class="bi bi-graph-up-arrow" style="color: var(--qr-primary);"></i> Diagnóstico</h2>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                <span>Percentual</span>
+                <span>{{ quiz_result.percentage|floatformat:0 }}%</span>
+            </div>
+            <div class="qr-summary-bar">
+                <div class="qr-summary-fill {% if quiz_result.passed %}passed{% else %}failed{% endif %}" style="width: {{ quiz_result.percentage|floatformat:0 }}%;"></div>
+            </div>
 
-    .table-hover tbody tr:hover {
-        background-color: #f5f5f5;
-    }
+            <ul class="qr-list" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--qr-border);">
+                <li><i class="bi bi-check-circle" style="color: var(--qr-success);"></i> <span>Respostas Corretas: {{ answers_by_question|length|add:"-1"|add:"-incorrect_count" }}</span></li>
+                <li><i class="bi bi-x-circle" style="color: var(--qr-danger);"></i> <span>Respostas Erradas: Revise ao lado</span></li>
+                <li><i class="bi bi-flag" style="color: var(--qr-info);"></i> <span>Mínimo necessário: {{ quiz.passing_score }}%</span></li>
+            </ul>
+        </div>
 
-    .badge {
-        font-weight: 500;
-    }
+    </aside>
 
-    .list-group-item {
-        border: none;
-        border-bottom: 1px solid #e0e0e0;
-        padding: 0.75rem;
-    }
-
-    .list-group-item:last-child {
-        border-bottom: none;
-    }
-</style>
-
-<!-- Template tag para get_item em dicts -->
-<script>
-    // Fallback para template tag não funcionando
-    document.addEventListener('DOMContentLoaded', function() {
-        const questionsAccordion = document.getElementById('questionsAccordion');
-        if (!questionsAccordion) {
-            console.log('Quiz results page loaded');
-        }
-    });
-</script>
+</div>
 
 {% endblock %}

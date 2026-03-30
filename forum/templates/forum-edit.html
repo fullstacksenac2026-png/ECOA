@@ -1,51 +1,56 @@
 {% extends "app-base.html" %}
 
-{% block title %}Editar Postagem{% endblock %}
+{% block title %}Editar Postagem - ECOÁ{% endblock %}
 
 {% block content %}
-<main class="container">
-    <section class="py-4">
-        <div class="d-flex align-items-center mb-4">
-            <a href="{% url 'forum:forum-post-detail' post.id %}" class="btn btn-outline-secondary rounded-circle me-3" style="width: 40px; height: 40px; padding: 0.5rem 0.2rem;">
-                <i class="bi bi-arrow-left"></i>
-            </a>
-            <h1 class="h3 mb-0">Editar Postagem</h1>
-        </div>
-
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-            <div class="card-body p-4">
-                <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-
-                    <div class="mb-3">
-                        <label for="title" class="form-label fw-bold">Título</label>
-                        <input type="text" name="title" id="title" class="form-control rounded-3 py-2" value="{{ post.title }}" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="content" class="form-label fw-bold">Conteúdo</label>
-                        <textarea name="content" id="content" rows="6" class="form-control rounded-3" required>{{ post.content }}</textarea>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="image" class="form-label fw-bold">Alterar Imagem (Opcional)</label>
-                        {% if post.image %}
-                        <div class="mb-2">
-                            <img src="{{ post.image.url }}" alt="Atual" class="img-thumbnail" style="max-height: 150px;">
-                        </div>
-                        {% endif %}
-                        <input type="file" name="image" id="image" class="form-control rounded-3" accept="image/*">
-                    </div>
-
-                    <div class="d-flex gap-2">
-                        <a href="{% url 'forum:forum-post-detail' post.id %}" class="btn btn-outline-secondary btn-lg flex-grow-1 rounded-pill fw-bold py-3">Cancelar</a>
-                        <button type="submit" class="btn btn-primary btn-lg flex-grow-1 rounded-pill fw-bold py-3" style="background-color: #20c997; border: none;">
-                            <i class="bi bi-save me-2"></i> Salvar Alterações
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+<main class="w-full max-w-3xl mx-auto py-8 px-4">
+    <section class="mb-6 flex items-center gap-4">
+        <a href="{% url 'forum:forum-post-detail' post.id %}" class="flex items-center justify-center w-12 h-12 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-full transition-colors font-bold shadow-sm no-underline">
+            <i class="bi bi-arrow-left text-xl"></i>
+        </a>
+        <h1 class="text-3xl font-black text-slate-800 dark:text-white m-0 tracking-tight">Editar Postagem</h1>
     </section>
+
+    <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+        <div class="p-8 md:p-12">
+            <form method="POST" enctype="multipart/form-data" class="flex flex-col gap-6">
+                {% csrf_token %}
+
+                <div>
+                    <label for="title" class="block text-slate-800 dark:text-white font-bold mb-3 text-lg">Título</label>
+                    <input type="text" name="title" id="title" class="w-full bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-slate-800 dark:text-white text-lg transition-all" value="{{ post.title }}" required>
+                </div>
+
+                <div>
+                    <label for="content" class="block text-slate-800 dark:text-white font-bold mb-3 text-lg">Conteúdo</label>
+                    <textarea name="content" id="content" rows="6" class="w-full bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-slate-800 dark:text-white text-lg transition-all resize-none" required>{{ post.content }}</textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label for="image" class="block text-slate-800 dark:text-white font-bold mb-3 text-lg">Alterar Imagem <span class="text-slate-400 font-normal text-sm ml-2">(Opcional)</span></label>
+                    
+                    {% if post.image %}
+                    <div class="mb-4 relative rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 inline-block shadow-sm">
+                        <img src="{{ post.image.url }}" alt="Atual" class="h-32 w-auto object-cover">
+                        <div class="absolute inset-x-0 bottom-0 bg-black/60 backdrop-blur-sm text-center py-1">
+                            <span class="text-white text-xs font-bold tracking-widest uppercase">Atual</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <input type="file" name="image" id="image" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors cursor-pointer" accept="image/*">
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-slate-100 dark:border-slate-700 mt-2">
+                    <a href="{% url 'forum:forum-post-detail' post.id %}" class="flex-1 text-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold rounded-full py-4 transition-colors no-underline">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="flex-1 bg-customGreen hover:bg-customGreenHover text-white font-bold rounded-full py-4 shadow-lg shadow-customGreen/30 transition-transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                        <i class="bi bi-cloud-arrow-up-fill text-lg"></i> Salvar Alterações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </main>
 {% endblock %}

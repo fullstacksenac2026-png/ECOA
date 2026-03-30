@@ -89,13 +89,16 @@ def course_checkout(request, course_id):
         return redirect('courses:course-lessons', course_id=course.id)
 
     # configure Mercado Pago
-    mp_access = os.environ.get('MERCADO_PAGO_ACCESS_TOKEN')
-    mp_public = os.environ.get('MERCADO_PAGO_PUBLIC_KEY')
+    from django.conf import settings
+    mp_access = settings.MERCADO_PAGO_ACCESS_TOKEN
+    mp_public = settings.MERCADO_PAGO_PUBLIC_KEY
 
     if not mp_access or not mp_public:
         return HttpResponseBadRequest('Mercado Pago keys not configured')
 
     sdk = mercadopago.SDK(mp_access)
+    success_url = request.build_absolute_uri(reverse('courses:payment_success'))
+    
     preference_data = {
         "items": [
             {
@@ -106,16 +109,36 @@ def course_checkout(request, course_id):
             }
         ],
         "back_urls": {
-            "success": request.build_absolute_uri(reverse('courses:payment_success')),
+            "success": success_url,
             "failure": request.build_absolute_uri(reverse('courses:payment_failure')),
             "pending": request.build_absolute_uri(reverse('courses:payment_pending')),
         },
-        "auto_return": "approved",
         "metadata": {"course_id": course.id},
         # you can also set notification_url for webhooks if needed
     }
+    
+    # Mercado Pago validation strictly requires public URLs for auto_return
+    if "127.0.0.1" not in success_url and "localhost" not in success_url:
+        preference_data["auto_return"] = "approved"
+
+    print(f"DEBUG back_urls: {preference_data['back_urls']}")
     preference_response = sdk.preference().create(preference_data)
-    preference_id = preference_response['response'].get('id')
+    
+    # Extract preference_id and handle potential API errors
+    if preference_response and 'response' in preference_response and 'id' in preference_response['response']:
+        preference_id = preference_response['response']['id']
+    else:
+        # Log the error details for debugging
+        error_details = preference_response.get('response', {})
+        print(f"Mercado Pago API Error: {preference_response}")
+        
+        # Provide a more informative error message to the user
+        error_msg = error_details.get('message', 'Erro desconhecido na integração com Mercado Pago.')
+        if "back_urls" in str(error_details):
+             error_msg += " Verifique se a URL de callback (back_urls) é válida."
+        
+        return HttpResponseBadRequest(f"Erro ao inicializar o pagamento: {error_msg}. Verifique as credenciais no .env e a configuração da API.")
+
 
     context = {
         'course': course,
@@ -135,7 +158,8 @@ def payment_success(request):
     if not payment_id:
         return HttpResponseBadRequest('Missing payment_id')
 
-    mp_access = os.environ.get('MERCADO_PAGO_ACCESS_TOKEN')
+    from django.conf import settings
+    mp_access = settings.MERCADO_PAGO_ACCESS_TOKEN
     sdk = mercadopago.SDK(mp_access)
     payment_info = sdk.payment().get(payment_id)
     response = payment_info.get('response', {})
