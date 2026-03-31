@@ -19,19 +19,10 @@ import json
 
 logger = logging.getLogger(__name__)
 
-# ML packages - optional, app works without them
-try:
-    import torch
-    TORCH_AVAILABLE = True
-except ImportError:
-    TORCH_AVAILABLE = False
 
-try:
-    import tensorflow as tf
-    import tensorflow_hub as hub
-    TENSORFLOW_AVAILABLE = True
-except ImportError:
-    TENSORFLOW_AVAILABLE = False
+# ML packages - optional, app works without them (already handled in ai_model.py)
+TORCH_AVAILABLE = False
+TENSORFLOW_AVAILABLE = False
 
 
 
