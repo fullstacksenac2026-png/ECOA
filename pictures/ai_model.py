@@ -25,7 +25,7 @@ FACE_RECOGNITION_AVAILABLE = False
 MP_AVAILABLE = False
 
 def _ensure_torch():
-    global TORCH_AVAILABLE
+    global TORCH_AVAILABLE, torch, nn, transforms, resnet50
     if TORCH_AVAILABLE: return True
     try:
         import torch
@@ -38,7 +38,7 @@ def _ensure_torch():
         return False
 
 def _ensure_transformers():
-    global TRANSFORMERS_AVAILABLE
+    global TRANSFORMERS_AVAILABLE, pipeline
     if TRANSFORMERS_AVAILABLE: return True
     try:
         from transformers import pipeline
@@ -48,10 +48,11 @@ def _ensure_transformers():
         return False
 
 def _ensure_tf():
-    global TF_AVAILABLE
+    global TF_AVAILABLE, tf, hub, EfficientNetB0, keras_image
     if TF_AVAILABLE: return True
     try:
         import tensorflow as tf
+        import tensorflow_hub as hub
         from tensorflow.keras.applications import EfficientNetB0
         from tensorflow.keras.preprocessing import image as keras_image
         TF_AVAILABLE = True
@@ -60,7 +61,7 @@ def _ensure_tf():
         return False
 
 def _ensure_mediapipe():
-    global MEDIAPIPE_AVAILABLE, MP_AVAILABLE
+    global MEDIAPIPE_AVAILABLE, MP_AVAILABLE, mp
     if MEDIAPIPE_AVAILABLE: return True
     try:
         import mediapipe as mp
@@ -71,7 +72,7 @@ def _ensure_mediapipe():
         return False
 
 def _ensure_face_recognition():
-    global FACE_RECOGNITION_AVAILABLE
+    global FACE_RECOGNITION_AVAILABLE, face_recognition, sklearn, RandomForestClassifier
     if FACE_RECOGNITION_AVAILABLE: return True
     try:
         import face_recognition
@@ -81,6 +82,7 @@ def _ensure_face_recognition():
         return True
     except ImportError:
         return False
+
 
 # Fallback logic moved to ensures
 
@@ -613,6 +615,9 @@ class AIModelManager:
         
         try:
             # Usar modelo conversacional
+            if not _ensure_transformers():
+                return None
+            
             device = "cuda" if _ensure_torch() and torch.cuda.is_available() else "cpu"
             from transformers import pipeline
             chatbot = pipeline(
@@ -626,6 +631,7 @@ class AIModelManager:
         except Exception as e:
             logger.error(f"Erro ao carregar chatbot: {e}")
             return None
+
     
     @staticmethod
     def chat(message, context=None):
