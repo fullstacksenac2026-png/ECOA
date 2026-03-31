@@ -18,11 +18,11 @@ logger = logging.getLogger(__name__)
 # Deferred imports to save memory in production
 TORCH_AVAILABLE = False
 TRANSFORMERS_AVAILABLE = False
-TF_AVAILABLE = False
 MEDIAPIPE_AVAILABLE = False
 DLIB_AVAILABLE = False
 FACE_RECOGNITION_AVAILABLE = False
 MP_AVAILABLE = False
+
 
 def _ensure_torch():
     global TORCH_AVAILABLE, torch, nn, transforms, resnet50
@@ -47,18 +47,6 @@ def _ensure_transformers():
     except ImportError:
         return False
 
-def _ensure_tf():
-    global TF_AVAILABLE, tf, hub, EfficientNetB0, keras_image
-    if TF_AVAILABLE: return True
-    try:
-        import tensorflow as tf
-        import tensorflow_hub as hub
-        from tensorflow.keras.applications import EfficientNetB0
-        from tensorflow.keras.preprocessing import image as keras_image
-        TF_AVAILABLE = True
-        return True
-    except ImportError:
-        return False
 
 def _ensure_mediapipe():
     global MEDIAPIPE_AVAILABLE, MP_AVAILABLE, mp
@@ -127,9 +115,8 @@ class FaceRecognitionManager:
     @staticmethod
     def load_kaggle_model():
         """Carrega modelo treinado com dataset Kaggle para detecção de deepfakes"""
-        if not FACE_RECOGNITION_AVAILABLE and not MP_AVAILABLE:
-            return None
-            
+        # Modelo Kaggle agora usa scikit-learn (RandomForest), sem necessidade de TF
+        
         if _cache.get('kaggle_model') is not None:
             return _cache['kaggle_model']
             
@@ -146,6 +133,7 @@ class FaceRecognitionManager:
         except Exception as e:
             logger.error(f"Erro ao carregar modelo Kaggle: {e}")
             return None
+
     
     @staticmethod
     def extract_face_features(image):
