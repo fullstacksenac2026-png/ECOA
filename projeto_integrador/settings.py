@@ -27,8 +27,18 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-eg7$e41o7=(byz
 # configure via environment variable, treat 'False' string as False
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') != 'False'
 
-# allow hosts from comma-separated env var, default localhost and local IP
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,ecoa.onrender.com').split(',')
+# allow hosts from environment variables, default localhost and local IP
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'ecoa.onrender.com']
+# include render specific hostname if present
+render_host = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if render_host:
+    ALLOWED_HOSTS.append(render_host)
+# include other provided hosts from comma-separated env var
+extra_hosts = os.environ.get('DJANGO_ALLOWED_HOSTS')
+if extra_hosts:
+    ALLOWED_HOSTS.extend(extra_hosts.split(','))
+# ensure it's a unique list
+ALLOWED_HOSTS = list(set(ALLOWED_HOSTS))
 
 
 # Application definition
@@ -172,7 +182,9 @@ STATICFILES_DIRS = [
 ]
 
 # whitenoise storage compresses and caches files
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Using the non-strict version to avoid 500 errors if some static files are missing references
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+WHITENOISE_MANIFEST_STRICT = False
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
