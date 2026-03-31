@@ -1,8 +1,8 @@
-# Projeto Integrador - Plataforma Educacional
+# Projeto Integrador - Plataforma Educacional ECOA - Senac Sergipe
 
 ## Descrição do Projeto
 
-Este é um projeto Django que implementa uma plataforma educacional completa, desenvolvida como trabalho integrador. A plataforma oferece funcionalidades para cursos, fórum de discussão, sistema de pagamentos, notificações, e integração com IA para análise de imagens.
+Este é um projeto desenvolvido no curso de Programador Full Stack com o framework Django que implementa uma plataforma educacional completa, desenvolvida como trabalho integrador. A plataforma oferece funcionalidades para cursos, fórum de discussão, sistema de pagamentos, notificações, e integração com IA para análise de imagens.
 
 ## Funcionalidades Principais
 
@@ -238,5 +238,20 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 Este projeto está sob a licença MIT.
 
 ## Contato
+
+### Professor
+
+- Sérgio Santana
+
+### Alunos
+
+- Leon Mendonça
+- João Batista
+- Max Gomes
+- Guilherme Anthony
+- Daniel Henrique
+- Danilo Augusto
+- Grazielle Feitosa
+
 
 Para dúvidas ou sugestões, entre em contato com a equipe de desenvolvimento.

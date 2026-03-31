@@ -16,5 +16,5 @@ class Notification(models.Model):
     content = models.TextField()
     type_message = models.CharField(max_length=10, choices=TYPE_MESSAGE_CHOICES)
     is_read = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_created=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
