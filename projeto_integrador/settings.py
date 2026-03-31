@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 import os
 from pathlib import Path
-from django.db import models
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -39,6 +39,12 @@ if extra_hosts:
     ALLOWED_HOSTS.extend(extra_hosts.split(','))
 # ensure it's a unique list
 ALLOWED_HOSTS = list(set(ALLOWED_HOSTS))
+
+# Add CSRF trusted origins for production
+CSRF_TRUSTED_ORIGINS = ['https://ecoa.onrender.com']
+if render_host:
+    CSRF_TRUSTED_ORIGINS.append(f'https://{render_host}')
+
 
 
 # Application definition
@@ -105,6 +111,8 @@ if DEBUG and not os.environ.get('DATABASE_URL'):
     }
     DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 else:
+    # Import models here to avoid early initialization issues
+    from django.db import models
     # Patch models to use MongoDB ObjectId for all automatic IDs (Admin, Auth, etc)
     import django_mongodb_backend.fields
     models.AutoField = django_mongodb_backend.fields.ObjectIdAutoField
@@ -118,6 +126,34 @@ else:
         }
     }
     DEFAULT_AUTO_FIELD = 'django_mongodb_backend.fields.ObjectIdAutoField'
+
+# Logging configuration for production to help find 500 errors
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'django': {
+        'handlers': ['console'],
+        'level': os.environ.get('DJANGO_LOG_LEVEL', 'INFO'),
+        'propagate': True,
+    },
+}
+
 
 #cache
 CACHES = {
@@ -144,6 +180,35 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# Logging configuration for production (stdout)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.environ.get('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+    },
+}
 
 AUTH_USER_MODEL = 'authorization.User'
 
@@ -183,7 +248,14 @@ STATICFILES_DIRS = [
 
 # whitenoise storage compresses and caches files
 # Using the non-strict version to avoid 500 errors if some static files are missing references
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 WHITENOISE_MANIFEST_STRICT = False
 
 MEDIA_URL = '/media/'

@@ -15,57 +15,74 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-try:
-    import torch
-    import torch.nn as nn
-    import torchvision.transforms as transforms
-    from torchvision.models import resnet50
-    TORCH_AVAILABLE = True
-except ImportError:
-    TORCH_AVAILABLE = False
+# Deferred imports to save memory in production
+TORCH_AVAILABLE = False
+TRANSFORMERS_AVAILABLE = False
+TF_AVAILABLE = False
+MEDIAPIPE_AVAILABLE = False
+DLIB_AVAILABLE = False
+FACE_RECOGNITION_AVAILABLE = False
+MP_AVAILABLE = False
 
-try:
-    from transformers import pipeline
-    TRANSFORMERS_AVAILABLE = True
-except ImportError:
-    TRANSFORMERS_AVAILABLE = False
+def _ensure_torch():
+    global TORCH_AVAILABLE
+    if TORCH_AVAILABLE: return True
+    try:
+        import torch
+        import torch.nn as nn
+        import torchvision.transforms as transforms
+        from torchvision.models import resnet50
+        TORCH_AVAILABLE = True
+        return True
+    except ImportError:
+        return False
 
-try:
-    import tensorflow as tf
-    from tensorflow.keras.applications import EfficientNetB0
-    from tensorflow.keras.preprocessing import image as keras_image
-    TF_AVAILABLE = True
-except ImportError:
-    TF_AVAILABLE = False
+def _ensure_transformers():
+    global TRANSFORMERS_AVAILABLE
+    if TRANSFORMERS_AVAILABLE: return True
+    try:
+        from transformers import pipeline
+        TRANSFORMERS_AVAILABLE = True
+        return True
+    except ImportError:
+        return False
 
-try:
-    import mediapipe as mp
-    MEDIAPIPE_AVAILABLE = True
-except ImportError:
-    MEDIAPIPE_AVAILABLE = False
+def _ensure_tf():
+    global TF_AVAILABLE
+    if TF_AVAILABLE: return True
+    try:
+        import tensorflow as tf
+        from tensorflow.keras.applications import EfficientNetB0
+        from tensorflow.keras.preprocessing import image as keras_image
+        TF_AVAILABLE = True
+        return True
+    except ImportError:
+        return False
 
-try:
-    import dlib
-    from imutils import face_utils
-    DLIB_AVAILABLE = True
-except ImportError:
-    DLIB_AVAILABLE = False
-
-try:
-    import face_recognition
-    import sklearn
-    from sklearn.ensemble import RandomForestClassifier
-    FACE_RECOGNITION_AVAILABLE = True
-except ImportError:
-    FACE_RECOGNITION_AVAILABLE = False
-
-# Fallback: usar MediaPipe para reconhecimento facial básico se face_recognition não estiver disponível
-if not FACE_RECOGNITION_AVAILABLE:
+def _ensure_mediapipe():
+    global MEDIAPIPE_AVAILABLE, MP_AVAILABLE
+    if MEDIAPIPE_AVAILABLE: return True
     try:
         import mediapipe as mp
+        MEDIAPIPE_AVAILABLE = True
         MP_AVAILABLE = True
+        return True
     except ImportError:
-        MP_AVAILABLE = False
+        return False
+
+def _ensure_face_recognition():
+    global FACE_RECOGNITION_AVAILABLE
+    if FACE_RECOGNITION_AVAILABLE: return True
+    try:
+        import face_recognition
+        import sklearn
+        from sklearn.ensemble import RandomForestClassifier
+        FACE_RECOGNITION_AVAILABLE = True
+        return True
+    except ImportError:
+        return False
+
+# Fallback logic moved to ensures
 
 # Cache global dos modelos
 _cache = {
@@ -84,15 +101,17 @@ class FaceRecognitionManager:
     @staticmethod
     def load_openface_model():
         """Carrega o modelo OpenFace para reconhecimento facial"""
-        if FACE_RECOGNITION_AVAILABLE:
+        if _ensure_face_recognition():
             try:
+                import face_recognition
                 # O face_recognition já usa OpenFace por padrão
                 return face_recognition
             except Exception as e:
                 logger.error(f"Erro ao carregar modelo OpenFace: {e}")
                 return None
-        elif MP_AVAILABLE:
+        elif _ensure_mediapipe():
             try:
+                import mediapipe as mp
                 # Fallback para MediaPipe
                 mp_face_detection = mp.solutions.face_detection
                 return mp_face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.5)
@@ -129,8 +148,9 @@ class FaceRecognitionManager:
     @staticmethod
     def extract_face_features(image):
         """Extrai features faciais usando OpenFace ou MediaPipe"""
-        if FACE_RECOGNITION_AVAILABLE:
+        if _ensure_face_recognition():
             try:
+                import face_recognition
                 # Usar face_recognition (OpenFace)
                 # Converter PIL para numpy array
                 if isinstance(image, Image.Image):
@@ -233,8 +253,8 @@ class AIModelManager:
         """Verifica se está em ambiente de baixa capacidade"""
         try:
             import psutil
-            # Se menos de 2GB de RAM disponível
-            return psutil.virtual_memory().available < 2e9
+            # Se menos de 1GB de RAM total (Render Free tem 512MB)
+            return psutil.virtual_memory().total < 1e9
         except:
             return False
     
@@ -377,10 +397,11 @@ class AIModelManager:
     @staticmethod
     def _face_consistency_check(image):
         """Verifica consistência de faces usando MediaPipe"""
-        if not MEDIAPIPE_AVAILABLE:
+        if not _ensure_mediapipe():
             return None
         
         try:
+            import mediapipe as mp
             mp_face_detection = mp.solutions.face_detection
             
             # Converter PIL para array numpy
@@ -509,13 +530,18 @@ class AIModelManager:
         if _cache['image_classifier'] is not None:
             return _cache['image_classifier']
         
-        if not TRANSFORMERS_AVAILABLE:
+        if not _ensure_transformers():
             logger.warning("Transformers não disponível")
+            return None
+        
+        if AIModelManager.is_low_capacity():
+            logger.warning("Ambiente de baixa capacidade detectado. Ignorando carregamento do classificador pesado.")
             return None
         
         try:
             # CLIP para classificação zero-shot (versão lite)
-            device = "cuda" if TORCH_AVAILABLE and torch.cuda.is_available() else "cpu"
+            device = "cuda" if _ensure_torch() and torch.cuda.is_available() else "cpu"
+            from transformers import pipeline
             classifier = pipeline(
                 "zero-shot-image-classification",
                 model="openai/clip-vit-base-patch16",
@@ -577,13 +603,18 @@ class AIModelManager:
         if _cache['chatbot'] is not None:
             return _cache['chatbot']
         
-        if not TRANSFORMERS_AVAILABLE:
+        if not _ensure_transformers():
             logger.warning("Transformers não disponível para chatbot")
+            return None
+
+        if AIModelManager.is_low_capacity():
+            logger.warning("Ambiente de baixa capacidade detectado. Ignorando carregamento do chatbot pesado.")
             return None
         
         try:
             # Usar modelo conversacional
-            device = "cuda" if TORCH_AVAILABLE and torch.cuda.is_available() else "cpu"
+            device = "cuda" if _ensure_torch() and torch.cuda.is_available() else "cpu"
+            from transformers import pipeline
             chatbot = pipeline(
                 "text2text-generation",
                 model="google/flan-t5-small",
