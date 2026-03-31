@@ -78,7 +78,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Middleware customizado para segurança (IP e Bloqueio)
+    'core.middleware.UserSecurityMiddleware',
 ]
+
 
 ROOT_URLCONF = 'projeto_integrador.urls'
 

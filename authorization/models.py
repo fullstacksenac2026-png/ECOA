@@ -28,6 +28,10 @@ class User(AbstractUser):
     gender = models.CharField(max_length=20, choices=GENDER_CHOICES)
     sexuality = models.CharField(max_length=20, choices=SEXUALITY_CHOICES)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    
+    # Novos campos de segurança
+    is_blocked = models.BooleanField(default=False, verbose_name="Está Bloqueado?")
+    last_ip = models.GenericIPAddressField(null=True, blank=True, verbose_name="Último IP de Acesso")
 
     USERNAME_FIELD = 'cpf'
     REQUIRED_FIELDS = []
