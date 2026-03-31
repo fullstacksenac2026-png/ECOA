@@ -128,6 +128,20 @@ projeto_integrador/
    python manage.py runserver
    ```
 
+## 🛠️ Painel Administrativo Avançado
+
+A plataforma possui um dashboard administrativo premium com gráficos dinâmicos (estilo Recharts) acessível em:
+`http://127.0.0.1:8000/admin/`
+
+### Funcionalidades:
+- **Gráficos Dinâmicos**: Distribuição de usuários (Ativos vs Bloqueados).
+- **Métricas de Engajamento**: Gráficos de barras para imagens e denúncias.
+- **Vanilla JS & ApexCharts**: Estética moderna com alta performance.
+
+### Acesso Rápido (Superadmin):
+- **CPF:** `97591432591`
+- **Senha:** `admin123` (Ou a senha definida durante o `createsuperuser`)
+
 ## Funcionamento da IA
 
 ### Detecção de Imagens Manipuladas

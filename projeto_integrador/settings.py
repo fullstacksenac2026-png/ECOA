@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'reports',
     'chatbot',
     'django_mongodb_backend',
+    'admin_dashboard',
 ]
 
 MIDDLEWARE = [

@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-br" class="light">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,25 +26,38 @@
         }
     </script>
 </head>
-<body class="bg-gray-50 text-slate-800 dark:bg-slate-900 dark:text-gray-100 transition-colors duration-300 pt-20 pb-24" id="appBody">
+
+<body class="bg-gray-50 text-slate-800 dark:bg-slate-900 dark:text-gray-100 transition-colors duration-300 pt-20 pb-24"
+    id="appBody">
 
     <!-- Top Bar -->
-    <div class="fixed top-0 left-0 right-0 flex justify-between items-center px-4 shadow-sm border-b border-white/20 dark:border-slate-700/50 h-[70px] z-[1000] bg-gradient-to-br from-customGreen to-customGreenHover backdrop-blur-md" id="topBar">
+    <div class="fixed top-0 left-0 right-0 flex justify-between items-center px-4 shadow-sm border-b border-white/20 dark:border-slate-700/50 h-[70px] z-[1000] bg-gradient-to-br from-customGreen to-customGreenHover backdrop-blur-md"
+        id="topBar">
         <a href="/" class="flex items-center no-underline h-full">
             <div class="">
                 <img src="{% static 'assets/logo.png' %}" alt="ECOA" class="h-[90px] brightness-0 invert">
             </div>
         </a>
         <div class="flex items-center gap-5 text-white">
-            <i class="bi bi-moon-fill text-xl cursor-pointer transition-transform duration-500 brightness-0 invert hover:scale-110" id="themeToggle" title="Alternar tema"></i>
-            <div class="relative text-xl cursor-pointer brightness-0 invert hover:scale-110 transition-transform" id="notificationBtn" title="Notificações">
+            <i class="bi bi-moon-fill text-xl cursor-pointer transition-transform duration-500 brightness-0 invert hover:scale-110"
+                id="themeToggle" title="Alternar tema"></i>
+            <div class="relative text-xl cursor-pointer brightness-0 invert hover:scale-110 transition-transform"
+                id="notificationBtn" title="Notificações">
                 <i class="bi bi-bell-fill"></i>
                 {% if notifications %}
-                <span class="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 bg-red-600 text-white text-[10px] rounded-full px-1.5 min-w-[18px] text-center font-bold">
+                <span
+                    class="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 bg-red-600 text-white text-[10px] rounded-full px-1.5 min-w-[18px] text-center font-bold">
                     {{ notifications|length }}
                 </span>
                 {% endif %}
             </div>
+            {% if user.is_authenticated and user.is_superuser %}
+            <a href="{% url 'admin_dashboard:admin_dashboard' %}"
+                class="btn-login-enhanced no-underline from-indigo-600 to-blue-700 shadow-indigo-500/20 mr-2">
+                <span>Dashboard Admin</span>
+                <i class="bi bi-speedometer2"></i>
+            </a>
+            {% endif %}
         </div>
     </div>
 
@@ -54,58 +68,73 @@
     </div>
 
     <!-- Bottom Bar -->
-    <div class="fixed bottom-0 left-0 right-0 flex justify-around items-center shadow-[0_-4px_15px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_15px_rgba(0,0,0,0.5)] bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 h-[70px] z-[1000] transition-colors duration-300" id="bottomBar">
-        
-        <a href="{% url 'pictures:historic-pictures' %}" class="flex flex-col items-center no-underline nav-link-custom {% if request.resolver_match.app_name == 'pictures' %}active text-customGreen{% else %}text-slate-500 dark:text-slate-400{% endif %} hover:text-customGreen dark:hover:text-customGreen transition-colors">
+    <div class="fixed bottom-0 left-0 right-0 flex justify-around items-center shadow-[0_-4px_15px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_15px_rgba(0,0,0,0.5)] bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 h-[70px] z-[1000] transition-colors duration-300"
+        id="bottomBar">
+
+        <a href="{% url 'pictures:historic-pictures' %}"
+            class="flex flex-col items-center no-underline nav-link-custom {% if request.resolver_match.app_name == 'pictures' %}active text-customGreen{% else %}text-slate-500 dark:text-slate-400{% endif %} hover:text-customGreen dark:hover:text-customGreen transition-colors">
             <i class="bi bi-camera text-2xl mb-0"></i>
             <span class="text-xs font-semibold">Câmera</span>
         </a>
-        
-        <a href="{% url 'courses:list-courses-and-categories' %}" class="flex flex-col items-center no-underline nav-link-custom {% if request.resolver_match.app_name == 'courses' %}active text-customGreen{% else %}text-slate-500 dark:text-slate-400{% endif %} hover:text-customGreen dark:hover:text-customGreen transition-colors">
+
+        <a href="{% url 'courses:list-courses-and-categories' %}"
+            class="flex flex-col items-center no-underline nav-link-custom {% if request.resolver_match.app_name == 'courses' %}active text-customGreen{% else %}text-slate-500 dark:text-slate-400{% endif %} hover:text-customGreen dark:hover:text-customGreen transition-colors">
             <i class="bi bi-book text-2xl mb-0"></i>
             <span class="text-xs font-semibold">Cursos</span>
         </a>
-        
+
         <div class="relative -top-6">
-            <div class="rounded-full flex justify-center items-center text-white shadow-lg w-[60px] h-[60px] bg-customGreen border-[4px] border-gray-50 dark:border-slate-900 text-3xl cursor-pointer transition-transform duration-200 hover:scale-110" 
-                 id="fabButton">
+            <div class="rounded-full flex justify-center items-center text-white shadow-lg w-[60px] h-[60px] bg-customGreen border-[4px] border-gray-50 dark:border-slate-900 text-3xl cursor-pointer transition-transform duration-200 hover:scale-110"
+                id="fabButton">
                 <i class="bi bi-plus"></i>
             </div>
         </div>
 
-        <a href="{% url 'forum:forum-list' %}" class="flex flex-col items-center no-underline nav-link-custom {% if request.resolver_match.app_name == 'forum' %}active text-customGreen{% else %}text-slate-500 dark:text-slate-400{% endif %} hover:text-customGreen dark:hover:text-customGreen transition-colors">
+        <a href="{% url 'forum:forum-list' %}"
+            class="flex flex-col items-center no-underline nav-link-custom {% if request.resolver_match.app_name == 'forum' %}active text-customGreen{% else %}text-slate-500 dark:text-slate-400{% endif %} hover:text-customGreen dark:hover:text-customGreen transition-colors">
             <i class="bi bi-chat-dots text-2xl mb-0"></i>
             <span class="text-xs font-semibold">Fórum</span>
         </a>
-        
-        <a href="{% url 'authorization:profile' %}" class="flex flex-col items-center no-underline nav-link-custom {% if request.resolver_match.url_name == 'profile' %}active text-customGreen{% else %}text-slate-500 dark:text-slate-400{% endif %} hover:text-customGreen dark:hover:text-customGreen transition-colors">
+
+        <a href="{% url 'authorization:profile' %}"
+            class="flex flex-col items-center no-underline nav-link-custom {% if request.resolver_match.url_name == 'profile' %}active text-customGreen{% else %}text-slate-500 dark:text-slate-400{% endif %} hover:text-customGreen dark:hover:text-customGreen transition-colors">
             <i class="bi bi-person text-2xl mb-0"></i>
             <span class="text-xs font-semibold">Perfil</span>
         </a>
     </div>
 
     <!-- Modals Background Overlay -->
-    <div id="modalOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[1040] hidden opacity-0 transition-opacity duration-300"></div>
+    <div id="modalOverlay"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[1040] hidden opacity-0 transition-opacity duration-300">
+    </div>
 
     <!-- Action Modal -->
-    <div id="actionModal" class="fixed inset-0 z-[1050] hidden items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-sm shadow-2xl scale-95 transition-transform duration-300 transform" id="actionModalInner">
+    <div id="actionModal"
+        class="fixed inset-0 z-[1050] hidden items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-sm shadow-2xl scale-95 transition-transform duration-300 transform"
+            id="actionModalInner">
             <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
-                <h5 class="text-lg font-bold text-slate-800 dark:text-gray-100 w-full text-center">O que deseja fazer?</h5>
-                <button type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-gray-300 text-xl absolute right-4" id="closeActionModal">&times;</button>
+                <h5 class="text-lg font-bold text-slate-800 dark:text-gray-100 w-full text-center">O que deseja fazer?
+                </h5>
+                <button type="button"
+                    class="text-slate-400 hover:text-slate-600 dark:hover:text-gray-300 text-xl absolute right-4"
+                    id="closeActionModal">&times;</button>
             </div>
             <div class="p-5 flex flex-col gap-4">
-                <a href="{% url 'pictures:take-picture' %}" class="flex items-center justify-start p-4 no-underline rounded-xl border-2 border-customGreen text-customGreen hover:bg-customGreen hover:text-white transition-colors group">
+                <a href="{% url 'pictures:take-picture' %}"
+                    class="flex items-center justify-start p-4 no-underline rounded-xl border-2 border-customGreen text-customGreen hover:bg-customGreen hover:text-white transition-colors group">
                     <i class="bi bi-camera-fill text-2xl mr-4 ml-2 group-hover:scale-110 transition-transform"></i>
                     <span class="text-lg font-semibold">Tirar Foto</span>
                 </a>
-                
-                <a href="{% url 'forum:post-create' %}" class="flex items-center justify-start p-4 no-underline rounded-xl border-2 border-customGreen text-customGreen hover:bg-customGreen hover:text-white transition-colors group">
+
+                <a href="{% url 'forum:post-create' %}"
+                    class="flex items-center justify-start p-4 no-underline rounded-xl border-2 border-customGreen text-customGreen hover:bg-customGreen hover:text-white transition-colors group">
                     <i class="bi bi-pencil-square text-2xl mr-4 ml-2 group-hover:scale-110 transition-transform"></i>
                     <span class="text-lg font-semibold">Escrever no Fórum</span>
                 </a>
 
-                <a href="{% url 'pictures:historic-pictures' %}" class="flex items-center justify-start p-4 no-underline rounded-xl border-2 border-customGreen text-customGreen hover:bg-customGreen hover:text-white transition-colors group">
+                <a href="{% url 'pictures:historic-pictures' %}"
+                    class="flex items-center justify-start p-4 no-underline rounded-xl border-2 border-customGreen text-customGreen hover:bg-customGreen hover:text-white transition-colors group">
                     <i class="bi bi-images text-2xl mr-4 ml-2 group-hover:scale-110 transition-transform"></i>
                     <span class="text-lg font-semibold">Ver Todas as Queixas</span>
                 </a>
@@ -114,11 +143,14 @@
     </div>
 
     <!-- Notification Modal -->
-    <div id="notificationModal" class="fixed inset-0 z-[1050] hidden items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-md shadow-2xl max-h-[80vh] flex flex-col scale-95 transition-transform duration-300 transform" id="notifModalInner">
+    <div id="notificationModal"
+        class="fixed inset-0 z-[1050] hidden items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-md shadow-2xl max-h-[80vh] flex flex-col scale-95 transition-transform duration-300 transform"
+            id="notifModalInner">
             <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center shrink-0">
                 <h5 class="text-lg font-bold text-slate-800 dark:text-gray-100">Notificações</h5>
-                <button type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-gray-300 text-xl" id="closeNotifModal">&times;</button>
+                <button type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-gray-300 text-xl"
+                    id="closeNotifModal">&times;</button>
             </div>
             <div class="p-0 overflow-y-auto">
                 <div class="flex flex-col">
@@ -142,22 +174,25 @@
                         <p class="m-0 mt-1 text-sm text-slate-600 dark:text-slate-300">{{ notification.content }}</p>
                     </a>
                     {% empty %}
-                    <p class="text-center text-slate-500 dark:text-slate-400 p-8 my-4">Nenhuma notificação no momento.</p>
+                    <p class="text-center text-slate-500 dark:text-slate-400 p-8 my-4">Nenhuma notificação no momento.
+                    </p>
                     {% endfor %}
                 </div>
             </div>
             {% if notifications %}
             <div class="p-4 border-t border-slate-100 dark:border-slate-700 text-center shrink-0">
-                <a href="{% url 'notifications:notification-list' %}" class="inline-block px-6 py-2 rounded-full border border-customGreen text-customGreen font-semibold hover:bg-customGreen hover:text-white transition-colors text-sm">Ver Todas</a>
+                <a href="{% url 'notifications:notification-list' %}"
+                    class="inline-block px-6 py-2 rounded-full border border-customGreen text-customGreen font-semibold hover:bg-customGreen hover:text-white transition-colors text-sm">Ver
+                    Todas</a>
             </div>
             {% endif %}
         </div>
     </div>
-    
+
     <script>
         const themeToggle = document.getElementById('themeToggle');
         const rootElement = document.documentElement;
-        
+
         function applyDarkMode() {
             rootElement.classList.add('dark');
             themeToggle.classList.replace('bi-moon-fill', 'bi-sun-fill');
@@ -169,7 +204,7 @@
             themeToggle.classList.replace('bi-sun-fill', 'bi-moon-fill');
             themeToggle.style.transform = 'rotate(0deg)';
         }
-        
+
         const currentTheme = localStorage.getItem('theme');
         if (currentTheme === 'dark-mode') {
             applyDarkMode();
@@ -189,13 +224,13 @@
 
         // Modals Logic since we dropped Bootstrap JS
         const overlay = document.getElementById('modalOverlay');
-        
+
         // Action Modal
         const actionBtn = document.getElementById('fabButton');
         const actionModal = document.getElementById('actionModal');
         const closeAction = document.getElementById('closeActionModal');
         const actionInner = document.getElementById('actionModalInner');
-        
+
         // Notification Modal
         const notifBtn = document.getElementById('notificationBtn');
         const notifModal = document.getElementById('notificationModal');
@@ -228,7 +263,7 @@
 
         actionBtn.addEventListener('click', () => openModal(actionModal, actionInner));
         closeAction.addEventListener('click', () => closeModal(actionModal, actionInner));
-        
+
         if (notifBtn) notifBtn.addEventListener('click', () => openModal(notifModal, notifInner));
         if (closeNotif) closeNotif.addEventListener('click', () => closeModal(notifModal, notifInner));
 
@@ -238,4 +273,5 @@
         });
     </script>
 </body>
+
 </html>

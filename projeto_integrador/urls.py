@@ -32,6 +32,7 @@ urlpatterns = [
     path('notifications/', include('notifications.urls')),
     path('reports/', include('reports.urls')),
     path('chatbot/', include('chatbot.urls')),
+    path('admin-dashboard/', include('admin_dashboard.urls')),
 ]
 
 if settings.DEBUG:

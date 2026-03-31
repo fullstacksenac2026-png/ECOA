@@ -236,6 +236,8 @@ def take_picture(request):
         image_data = request.POST.get('image')
         latitude = request.POST.get('latitude')
         longitude = request.POST.get('longitude')
+        title_key = request.POST.get('title')
+        user_content = request.POST.get('content', '')
 
         if not image_data:
             messages.error(request, 'Imagem não fornecida.')
@@ -255,78 +257,72 @@ def take_picture(request):
             return redirect('pictures:take-picture')
 
         buffer = BytesIO()
-        # Converte para RGB se tiver transparência (JPEG não suporta RGBA)
         if image.mode in ("RGBA", "P"):
             image = image.convert("RGB")
         image.save(buffer, format='JPEG', quality=85)
         buffer.seek(0)
         
-        # Criar nome único para arquivo
         import time
         timestamp = int(time.time() * 1000)
         image_file = ContentFile(buffer.getvalue(), name=f'picture_{request.user.id}_{timestamp}.jpg')
 
-        # Usar IA para análise (com fallback)
         is_fake = False
         ai_message = "Imagem recebida"
         detected_place = "Localização detectada"
         
         try:
-            logger.info("Iniciando análise de IA da imagem...")
-            
-            # Verificar se é imagem fake (deepfake detection)
             verify_result = verify_image(image)
-            logger.info(f"Resultado da verificação: {verify_result}")
-            
             is_fake = verify_result.get('is_fake', False)
             ai_message = verify_result.get('message', "Análise concluída")
             
-            # Classificar imagem (poluição, etc.)
             classifications = classify_image_pollution(image)
-            logger.info(f"Classificações: {classifications}")
-            
             if classifications and len(classifications) > 0:
                 detected_place = classifications[0].get('label', detected_place)
         except Exception as e:
             logger.error(f"Erro na análise de IA: {e}", exc_info=True)
-            ai_message = f"Análise simplificada realizada"
 
         try:
+            # Título amigável para a Picture
+            picture_title = dict(TITLE_COMPLAINT_CHOICES).get(title_key, "Nova Ocorrência")
+            
             # Criar imagem na base de dados
             picture = Picture.objects.create(
                 user=request.user,
                 image=image_file,
-                title="Aguardando queixa...",
-                content=f"Local: {detected_place}"
+                title=picture_title,
+                content=f"Local: {detected_place}. {user_content}"[:250]
             )
-            logger.info(f"Picture criada: {picture.id}")
 
-            # Criar geolocalização
+            # Criar queixa inicial se o título foi informado
+            if title_key:
+                Complaint.objects.create(
+                    picture=picture,
+                    title=title_key,
+                    content=user_content or f"Ocorrência detectada em {detected_place}."
+                )
+
             if latitude and longitude:
                 Geolocation.objects.create(
                     picture=picture,
                     latitude=float(latitude),
                     longitude=float(longitude)
                 )
-                logger.info(f"Geolocalização criada para: {picture.id}")
 
-            # Criar registro de verificação
             Verify.objects.create(
                 picture=picture,
                 is_fake=is_fake,
                 verify_message=ai_message
             )
-            logger.info(f"Verificação criada para: {picture.id}")
 
-            messages.info(request, f'✅ Foto recebida e analisada! Complete as informações para postar no feed.')
-            return redirect('pictures:create-complaint', picture_id=picture.id)
+            messages.info(request, f'✅ Foto recebida e analisada!')
+            return redirect('pictures:details-picture', picture_id=picture.id)
             
         except Exception as e:
             logger.error(f"Erro ao criar imagem no banco: {e}", exc_info=True)
             messages.error(request, f'Erro ao salvar imagem: {str(e)}')
             return redirect('pictures:take-picture')
 
-    return render(request, 'take-picture.html')
+    return render(request, 'take-picture.html', {'categories': TITLE_COMPLAINT_CHOICES})
 
 @login_required
 def create_picture(request):
