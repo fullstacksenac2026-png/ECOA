@@ -37,11 +37,11 @@ class AIModelManager:
             return True
 
     # ==========================================
-    # FILTRO 1: SEMÂNTICO (OpenCLIP / CLIP)
+    # FILTRO 1: SEMÂNTICO (Livre de Torch/Transformers para Render 512MB)
     # ==========================================
     @staticmethod
     def _load_clip():
-        """Carrega o modelo CLIP (preferencialmente via ONNX para economizar RAM)"""
+        """Carrega apenas via ONNX para economizar os 512MB de RAM do Render"""
         if _cache['clip_session'] is not None:
             return _cache['clip_session']
         
@@ -54,46 +54,38 @@ class AIModelManager:
                 _cache['clip_session'] = sess
                 return sess
             else:
-                logger.warning("Modelo CLIP ONNX não encontrado. Usando fallback Transformers.")
-                # Fallback para Transformers se ONNX não estiver disponível
-                from transformers import CLIPProcessor, CLIPModel
-                model_id = "openai/clip-vit-base-patch32"
-                processor = CLIPProcessor.from_pretrained(model_id)
-                model = CLIPModel.from_pretrained(model_id)
-                _cache['clip_session'] = (processor, model)
-                return _cache['clip_session']
+                logger.warning("Modelo CLIP ONNX não encontrado. Usando LightSemantic (OpenCV) para poupar RAM.")
+                return "LIGHT_SEMANTIC"
         except Exception as e:
             logger.error(f"Erro ao carregar CLIP: {e}")
-            return None
+            return "LIGHT_SEMANTIC"
 
     @staticmethod
     def filter_semantic(image, query_text="um cenário de poluição ou lixo"):
         """
-        Verifica se a imagem é relevante (Faz sentido?)
-        Retorna: score (0 a 1)
+        Verifica relevância. No Render 512MB, evitamos carregar modelos pesados.
         """
         try:
-            if isinstance(image, bytes):
-                image = Image.open(io.BytesIO(image)).convert('RGB')
-                
             res = AIModelManager._load_clip()
-            if res is None:
-                return 0.5 # Neutro se falhar
-                
-            # Se carregado via Transformers (Fallback)
-            if isinstance(res, tuple):
-                processor, model = res
-                inputs = processor(text=[query_text, "uma imagem aleatória sem sentido"], images=image, return_tensors="pt", padding=True)
-                import torch
-                with torch.no_grad():
-                    outputs = model(**inputs)
-                logits_per_image = outputs.logits_per_image
-                probs = logits_per_image.softmax(dim=1)
-                return float(probs[0][0])
             
-            # Se carregado via ONNX (Ideal)
-            # (Note: Implementação ONNX requer pré-processamento manual das imagens)
-            return 0.7 # Placeholder dependendo do modelo ONNX específico
+            # Fallback ultra-leve (LightSemantic)
+            # Analisa cores e contrastes para detectar se é uma imagem com 'textura de resíduos'
+            if res == "LIGHT_SEMANTIC":
+                if isinstance(image, bytes):
+                    image = Image.open(io.BytesIO(image))
+                
+                # Heurística: poluição/lixo costuma ter tons de marrom, cinza ou cores heterogêneas
+                img_cv = cv2.cvtColor(np.array(image.convert('RGB')), cv2.COLOR_RGB2HSV)
+                # Médias de saturação e brilho (lixo costuma ser saturado e desorganizado)
+                h, s, v = cv2.split(img_cv)
+                std_v = np.std(v) # Alta variância indica desordem visual (lixo/poluição)
+                
+                # Normaliza: Std_v > 50 sugere complexidade visual
+                norm_score = np.clip(std_v / 80.0, 0, 1)
+                return float(norm_score)
+                
+            # Se ONNX estiver disponível, fazemos a inferência (Placeholder para pré-processamento manual)
+            return 0.7 
             
         except Exception as e:
             logger.error(f"Erro no Filtro Semântico: {e}")

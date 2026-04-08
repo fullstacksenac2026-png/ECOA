@@ -29,7 +29,8 @@ class FakeDetectorNN(nn.Module):
 
 def train_deepfake_model(source_type="camera"):
     suffix = "Camera" if source_type == "camera" else "Galeria"
-    print(f"🚀 Iniciando treinamento para {suffix} (100 Épocas) com Ruído...")
+    epochs = 1000
+    print(f"🚀 Iniciando treinamento para {suffix} ({epochs} Épocas) com Ruído...")
     
     # === PASSO 1: Gerar Dataset com Ruído ===
     n_samples = 5000
@@ -59,16 +60,25 @@ def train_deepfake_model(source_type="camera"):
     model = FakeDetectorNN()
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
+    # Scheduler para diminuir o LR em treinos longos (1000 épocas)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=300, gamma=0.1)
     
-    epochs = 100
+    epochs = 1000
     model.train()
     for epoch in range(epochs):
+        running_loss = 0.0
         for inputs, labels in train_dataloader:
             optimizer.zero_grad()
             outputs = model(inputs)
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
+            running_loss += loss.item()
+        
+        scheduler.step()
+        
+        if (epoch + 1) % 100 == 0:
+            print(f"[{suffix}] Época {epoch+1}/{epochs} | Loss: {running_loss/len(train_dataloader):.4f}")
 
     # === PASSO 4: Salvar e Exportar (ONNX) ===
     save_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'models')
