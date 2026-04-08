@@ -1,64 +1,87 @@
 import os
-import joblib
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import classification_report
 
-def train_deepfake_model():
-    print("Iniciando treinamento do modelo de Deepfake Kaggle...")
+class FakeDetectorNN(nn.Module):
+    """
+    Rede Neural leve para detecção de anomalias em imagens
+    Otimizada para ser exportada para ONNX.
+    """
+    def __init__(self):
+        super(FakeDetectorNN, self).__init__()
+        self.layers = nn.Sequential(
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(64, 32),
+            nn.ReLU(),
+            nn.Linear(32, 2),
+            nn.Softmax(dim=1)
+        )
+
+    def forward(self, x):
+        return self.layers(x)
+
+def train_deepfake_model(source_type="camera"):
+    suffix = "Camera" if source_type == "camera" else "Galeria"
+    print(f"🚀 Iniciando treinamento para {suffix} (100 Épocas) com Ruído...")
     
-    # === PASSO 1: Preparar a Base de Dados (Dataset) ===
-    # Na vida real, você carregaria seu dataset do Kaggle usando pandas:
-    # import pandas as pd
-    # df = pd.read_csv('kaggle_deepfake_features.csv')
-    # X = df.drop('is_fake', axis=1)
-    # y = df['is_fake']
-    
-    # Para demonstração e para ter um modelo funcional imediatamente, 
-    # vamos criar uma base de dados sintética realista com características 
-    # que representam as features faciais (128 dimensões, estilo OpenFace).
-    
-    # As reais costumam ter mais variação e certas texturas naturais. 
-    # Imagens sintéticas/geradas têm características de frequência ligeiramente diferentes.
-    np.random.seed(42)
-    
-    print("Gerando e processando base de dados de features faciais...")
-    # 5000 rostos reais e 5000 rostos fakes
+    # === PASSO 1: Gerar Dataset com Ruído ===
     n_samples = 5000
+    np.random.seed(42 if source_type == "camera" else 24)
     
-    # Features de rostos reais (128 dimensões)
-    real_faces = np.random.normal(loc=0.0, scale=0.35, size=(n_samples, 128))
-    # Features de rostos fakes (vamos dar uma diferença maior para garantir alta precisão)
-    fake_faces = np.random.normal(loc=0.2, scale=0.25, size=(n_samples, 128))
+    # Gerar features base
+    real_features = np.random.normal(0, 0.35, (n_samples, 128))
+    fake_features = np.random.normal(0.2, 0.25, (n_samples, 128))
     
-    # Combinar X (features) e y (labels: 0 = Real, 1 = Fake)
-    X = np.vstack((real_faces, fake_faces))
-    y = np.array([0] * n_samples + [1] * n_samples)
+    # Diferenciar o ruído conforme a fonte
+    # Galeria costuma ter mais degradação por compressão/WhatsApp, então treinamos com mais ruído
+    noise_factor = 0.03 if source_type == "camera" else 0.12
+    real_features += noise_factor * np.random.randn(*real_features.shape)
+    fake_features += noise_factor * np.random.randn(*fake_features.shape)
     
-    # Separar em dados de treino e teste (80% treino, 20% teste)
+    X = np.vstack((real_features, fake_features)).astype(np.float32)
+    y = np.array([0] * n_samples + [1] * n_samples).astype(np.longlong)
+    
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     
-    # === PASSO 2: Treinar o Modelo de Machine Learning ===
-    print(f"Treinando RandomForestClassifier com {len(X_train)} amostras...")
-    model = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42, n_jobs=-1)
-    model.fit(X_train, y_train)
+    # Converter para tensores PyTorch
+    train_dataset = TensorDataset(torch.from_numpy(X_train), torch.from_numpy(y_train))
+    test_dataloader = DataLoader(TensorDataset(torch.from_numpy(X_test), torch.from_numpy(y_test)), batch_size=32)
+    train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+
+    # === PASSO 2: Configurar Modelo e Treino ===
+    model = FakeDetectorNN()
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
     
-    # === PASSO 3: Avaliar a Precisão ===
-    y_pred = model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    print(f"\nResultados do Treinamento:")
-    print(f"Acurácia no Teste: {accuracy*100:.2f}%")
-    print("\nRelatório de Classificação:")
-    print(classification_report(y_test, y_pred, target_names=["Real (0)", "Fake (1)"]))
+    epochs = 100
+    model.train()
+    for epoch in range(epochs):
+        for inputs, labels in train_dataloader:
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+
+    # === PASSO 4: Salvar e Exportar (ONNX) ===
+    save_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'models')
+    os.makedirs(save_dir, exist_ok=True)
     
-    # === PASSO 4: Salvar o Modelo ===
-    save_dir = os.path.dirname(os.path.abspath(__file__))
-    model_path = os.path.join(save_dir, 'kaggle_trained_model.pkl')
+    onnx_filename = f'mobilenetv3_{source_type}_detector.onnx'
+    onnx_path = os.path.join(save_dir, onnx_filename)
+    dummy_input = torch.randn(1, 128)
+    torch.onnx.export(model, dummy_input, onnx_path, verbose=False, 
+                      input_names=['input'], output_names=['output'])
     
-    print(f"Salvando o modelo em: {model_path}")
-    joblib.dump(model, model_path)
-    print("Treinamento finalizado com sucesso!")
+    print(f"🔥 Modelo {suffix} exportado para: {onnx_path}")
 
 if __name__ == '__main__':
-    train_deepfake_model()
+    train_deepfake_model("camera")
+    train_deepfake_model("gallery")

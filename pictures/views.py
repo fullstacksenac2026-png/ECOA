@@ -51,8 +51,10 @@ def verify_image_ai(request):
         return JsonResponse({'error': 'Método não permitido'}, status=405)
     
     try:
-        # Obter imagem
+        # Obter imagem e fonte
         image_data = request.POST.get('image')
+        source = request.POST.get('source', 'camera') # Default para camera
+        
         if not image_data:
             if 'image' in request.FILES:
                 image_file = request.FILES['image']
@@ -66,8 +68,8 @@ def verify_image_ai(request):
             image_bytes = base64.b64decode(image_data)
             image = Image.open(BytesIO(image_bytes))
         
-        # Verificar com IA
-        result = verify_image(image)
+        # Verificar com IA passando a fonte para escolher o modelo treinado com ruído
+        result = verify_image(image, source=source)
         
         return JsonResponse({
             'success': True,
@@ -180,10 +182,13 @@ def details_pictures(request, picture_id):
     likes_count = picture.likes.filter(is_like=True).count()
     dislikes_count = picture.likes.filter(is_like=False).count()
         
+    verifies = picture.verifies.all()
+        
     context = {
         'picture': picture,
         'complaints': complaints,
         'geolocations': geolocations,
+        'verifies': verifies,
         'comments': comments,
         'user_like': user_like,
         'likes_count': likes_count,

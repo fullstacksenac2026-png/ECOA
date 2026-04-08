@@ -35,6 +35,17 @@
                         <div class="relative inline-block border-4 border-slate-100 dark:border-slate-800 rounded-2xl shadow-lg overflow-hidden mb-4 bg-slate-900">
                             <img id="imagePreview" src="#" alt="Preview" class="max-h-72 object-contain">
                         </div>
+
+                        <!-- AI Live Feedback -->
+                        <div id="ai-live-feedback" class="hidden w-full mb-6 p-5 rounded-3xl border border-customGreen/20 bg-customGreen/5 dark:bg-customGreen/10 flex items-center gap-4 transition-all animate-in fade-in slide-in-from-top-4 duration-500">
+                            <div id="ai-spinner" class="w-12 h-12 rounded-full border-4 border-customGreen/30 border-t-customGreen animate-spin shrink-0"></div>
+                            <div id="ai-icon" class="hidden w-12 h-12 rounded-full flex items-center justify-center shrink-0"></div>
+                            <div class="flex-1 text-left">
+                                <p id="ai-status-text" class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-0">Analisando imagem com ECOA AI...</p>
+                                <p id="ai-detail-text" class="text-xs text-slate-500 dark:text-slate-400 mb-0">Nossos filtros estão verificando a autenticidade e relevância.</p>
+                            </div>
+                        </div>
+
                         <div class="flex justify-center flex-col items-center">
                             <p class="text-customGreen font-bold mb-3 flex items-center justify-center gap-2"><i class="bi bi-check-circle-fill"></i> Imagem anexada com sucesso!</p>
                             <button type="button" class="bg-red-50 hover:bg-red-100 text-red-500 font-bold px-5 py-2.5 rounded-full text-sm transition-colors shadow-sm inline-flex items-center gap-2" onclick="resetImage()">
@@ -74,16 +85,79 @@
     imageInput.onchange = function(e) {
         const [file] = imageInput.files;
         if (file) {
-            previewImage.src = URL.createObjectURL(file);
+            const dataUrl = URL.createObjectURL(file);
+            previewImage.src = dataUrl;
             previewContainer.classList.remove('hidden');
             dropZone.classList.add('hidden');
+            
+            // Read as data URL for the AI API
+            const reader = new FileReader();
+            reader.onload = function(re) {
+                performAIAnalysis(re.target.result, "gallery"); // Passa gallery aqui
+            };
+            reader.readAsDataURL(file);
         }
     };
+
+    function performAIAnalysis(dataUrl, source = "gallery") {
+        const feedbackArea = document.getElementById('ai-live-feedback');
+        const spinner = document.getElementById('ai-spinner');
+        const iconArea = document.getElementById('ai-icon');
+        const statusText = document.getElementById('ai-status-text');
+        const detailText = document.getElementById('ai-detail-text');
+
+        feedbackArea.classList.remove('hidden');
+        spinner.classList.remove('hidden');
+        iconArea.classList.add('hidden');
+        statusText.innerText = "Analisando imagem com ECOA AI...";
+        detailText.innerText = `Lendo características da fonte: ${source}...`;
+        feedbackArea.className = feedbackArea.className.replace(/bg-\w+-50|border-\w+-200|text-\w+-800/g, 'bg-customGreen/5 border-customGreen/20 text-slate-800');
+
+        const formData = new FormData();
+        formData.append('image', dataUrl);
+        formData.append('source', source);
+        
+        fetch('/pictures/api/verify-image/', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinner.classList.add('hidden');
+            iconArea.classList.remove('hidden');
+            
+            if (data.is_fake) {
+                if (data.message.includes('NADA A VER')) {
+                    iconArea.innerHTML = '<i class="bi bi-question-circle-fill text-2xl text-yellow-600"></i>';
+                    iconArea.className = iconArea.className.replace(/bg-\w+-\d+/g, '') + ' bg-yellow-100';
+                    statusText.innerText = "Imagem Irrelevante";
+                    feedbackArea.classList.add('bg-yellow-50', 'border-yellow-200', 'text-yellow-800');
+                } else {
+                    iconArea.innerHTML = '<i class="bi bi-shield-x text-2xl text-red-600"></i>';
+                    iconArea.className = iconArea.className.replace(/bg-\w+-\d+/g, '') + ' bg-red-100';
+                    statusText.innerText = `Manipulada (${source})`;
+                    feedbackArea.classList.add('bg-red-50', 'border-red-200', 'text-red-800');
+                }
+            } else {
+                iconArea.innerHTML = '<i class="bi bi-shield-check text-2xl text-emerald-600"></i>';
+                iconArea.className = iconArea.className.replace(/bg-\w+-\d+/g, '') + ' bg-emerald-100';
+                statusText.innerText = `Autêntica (${source})`;
+                feedbackArea.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-800');
+            }
+            detailText.innerText = data.message;
+        })
+        .catch(err => {
+            feedbackArea.classList.add('hidden');
+            console.error("AI Analysis error:", err);
+        });
+    }
 
     function resetImage() {
         imageInput.value = '';
         previewContainer.classList.add('hidden');
         dropZone.classList.remove('hidden');
+        document.getElementById('ai-live-feedback').classList.add('hidden');
     }
 
     // Get location
