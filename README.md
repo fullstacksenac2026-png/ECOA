@@ -1,2 +1,2 @@
 # ECOA
-Projeto Integrado do alunos do curos de fulstack 2026 Senac - Aracaju - Sergipe
+Projeto Integrador dos alunos do curso de fullstack 2026 Senac - Aracaju - Sergipe
