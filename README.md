@@ -1,4 +1,4 @@
-# Projeto Integrador - Plataforma de Participação Cidadã para Monitoramento Ambiental e Gestão de Resíduos".ECOA - Senac Sergipe
+# Projeto Integrador - Plataforma de Participação Cidadã para Monitoramento Ambiental e Gestão de Resíduos -ECOA / Senac - Sergipe.
 
 ## Descrição do Projeto
 
