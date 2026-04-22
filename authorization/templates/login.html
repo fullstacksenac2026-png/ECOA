@@ -6,27 +6,27 @@
 {% block content %}
 <main class="mt-20 container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-[75vh]">
     <div class="w-full max-w-md md:max-w-lg lg:max-w-xl">
-        <div class="bg-white shadow-2xl rounded-2xl border-t-4 border-customGreen overflow-hidden">
+        <div class="bg-white shadow-2xl rounded-2xl border-t-4 border-customGreen overflow-hidden dark:bg-slate-800 dark:border-slate-700 dark:shadow-[0_25px_60px_rgba(15,23,42,0.35)]">
             <div class="p-8 sm:p-10">
                 <div class="text-center mb-8">
                     <div class="bg-customGreen text-white rounded-full inline-flex items-center justify-center mb-4 w-16 h-16 shadow-lg shadow-customGreen/30">
                         <i class="bi bi-person-fill text-3xl"></i>
                     </div>
-                    <h2 class="text-2xl font-bold text-slate-800">Bem-vindo de volta!</h2>
-                    <p class="text-slate-500 mt-1">Por favor, faça login na sua conta.</p>
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-gray-100">Bem-vindo de volta!</h2>
+                    <p class="text-slate-500 mt-1 dark:text-slate-400">Por favor, faça login na sua conta.</p>
                 </div>
 
                 <form method="post" class="space-y-6">
                     {% csrf_token %}
                     
                     {% if message %}
-                        <div class="bg-red-50 text-red-600 p-4 rounded-xl border border-red-200 shadow-sm" role="alert">
+                        <div class="bg-red-50 text-red-600 p-4 rounded-xl border border-red-200 shadow-sm dark:bg-red-950/40 dark:text-red-200 dark:border-red-800" role="alert">
                             <i class="bi bi-exclamation-triangle-fill mr-2"></i>{{ message }}
                         </div>
                     {% endif %}
 
                     <div class="relative">
-                        <div class="mb-1 text-sm font-semibold text-slate-700">{{ login_form.cpf.label_tag }}</div>
+                        <div class="mb-1 text-sm font-semibold text-slate-700 dark:text-slate-200">{{ login_form.cpf.label_tag }}</div>
                         <div class="mt-1">
                             {{ login_form.cpf }}
                         </div>
@@ -38,7 +38,7 @@
                     </div>
 
                     <div class="relative">
-                        <div class="mb-1 text-sm font-semibold text-slate-700">{{ login_form.password.label_tag }}</div>
+                        <div class="mb-1 text-sm font-semibold text-slate-700 dark:text-slate-200">{{ login_form.password.label_tag }}</div>
                         <div class="mt-1">
                             {{ login_form.password }}
                         </div>
@@ -52,9 +52,9 @@
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             {{ login_form.remember_me }}
-                            <span class="text-sm font-medium text-slate-600">{{ login_form.remember_me.label_tag }}</span>
+                            <span class="text-sm font-medium text-slate-600 dark:text-slate-300">{{ login_form.remember_me.label_tag }}</span>
                         </div>
-                        <a href="{% url 'authorization:password-reset' %}" class="text-sm font-semibold text-customGreen hover:text-customGreenHover transition-colors">Esqueceu a senha?</a>
+                        <a href="{% url 'authorization:password-reset' %}" class="text-sm font-semibold text-customGreen dark:text-customGreen hover:text-customGreenHover transition-colors">Esqueceu a senha?</a>
                     </div>
 
                     <div>
@@ -66,8 +66,8 @@
                 </form>
             </div>
             
-            <div class="bg-slate-50 border-t border-slate-100 py-4 text-center">
-                <p class="mb-0 text-slate-500 text-sm">Não tem uma conta? <a href="{% url 'authorization:register' %}" class="text-customGreen font-bold hover:underline transition-all">Cadastre-se</a></p>
+            <div class="bg-slate-50 border-t border-slate-100 py-4 text-center dark:bg-slate-900 dark:border-slate-700">
+                <p class="mb-0 text-slate-500 text-sm dark:text-slate-400">Não tem uma conta? <a href="{% url 'authorization:register' %}" class="text-customGreen font-bold hover:underline transition-all">Cadastre-se</a></p>
             </div>
         </div>
     </div>
@@ -75,6 +75,7 @@
 
 <style>
     /* Styling injected Django form inputs */
+    input.form-control[type="text"], input.form-control[type="password"], input.form-control[type="email"],
     input[type="text"], input[type="password"], input[type="email"] {
         width: 100%;
         padding: 0.75rem 1rem;
@@ -84,7 +85,13 @@
         background-color: #f8fafc;
         transition: all 0.3s;
         font-size: 1rem;
+        color: #0f172a;
     }
+    input.form-control[type="text"]::placeholder, input.form-control[type="password"]::placeholder, input.form-control[type="email"]::placeholder,
+    input[type="text"]::placeholder, input[type="password"]::placeholder, input[type="email"]::placeholder {
+        color: #94a3b8;
+    }
+    input.form-control[type="text"]:focus, input.form-control[type="password"]:focus, input.form-control[type="email"]:focus,
     input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
         border-color: #20c997;
         box-shadow: 0 0 0 3px rgba(32, 201, 151, 0.2);
@@ -95,6 +102,22 @@
         width: 1.125rem;
         height: 1.125rem;
         cursor: pointer;
+    }
+    html.dark input.form-control[type="text"], html.dark input.form-control[type="password"], html.dark input.form-control[type="email"],
+    html.dark input[type="text"], html.dark input[type="password"], html.dark input[type="email"] {
+        border-color: #334155;
+        background-color: #0f172a;
+        color: #e2e8f0;
+    }
+    html.dark input.form-control[type="text"]::placeholder, html.dark input.form-control[type="password"]::placeholder, html.dark input.form-control[type="email"]::placeholder,
+    html.dark input[type="text"]::placeholder, html.dark input[type="password"]::placeholder, html.dark input[type="email"]::placeholder {
+        color: #94a3b8;
+    }
+    html.dark input.form-control[type="text"]:focus, html.dark input.form-control[type="password"]:focus, html.dark input.form-control[type="email"]:focus,
+    html.dark input[type="text"]:focus, html.dark input[type="password"]:focus, html.dark input[type="email"]:focus {
+        border-color: #20c997;
+        box-shadow: 0 0 0 3px rgba(32, 201, 151, 0.12);
+        background-color: #111827;
     }
 </style>
 {% endblock %}
