@@ -22,6 +22,25 @@
         scrollbar-width: none;
     }
 
+    #teamCarouselTrack {
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+    }
+
+    .team-card {
+        scroll-snap-align: center;
+        flex-shrink: 0;
+        min-width: min(350px, 90vw);
+    }
+
+    .team-indicator {
+        transition: background-color .25s ease;
+    }
+
+    .team-indicator.active {
+        background-color: #10b981;
+    }
+
     @keyframes slideUp {
         from {
             opacity: 0;
@@ -197,7 +216,50 @@
                 indicator.addEventListener('click', () => { showSlide(index); resetAutoSlide(); });
             });
 
-            startAutoSlide();
+            const teamTrack = document.getElementById('teamCarouselTrack');
+            const teamCards = Array.from(document.querySelectorAll('.team-card'));
+            const teamIndicators = Array.from(document.querySelectorAll('.team-indicator'));
+            const teamPrevBtn = document.getElementById('teamPrev');
+            const teamNextBtn = document.getElementById('teamNext');
+            let currentTeamSlide = 0;
+
+            function updateTeamIndicators() {
+                teamIndicators.forEach((indicator, index) => {
+                    const isActive = index === currentTeamSlide;
+                    indicator.classList.toggle('active', isActive);
+                    indicator.classList.toggle('bg-slate-300', !isActive);
+                    indicator.classList.toggle('dark:bg-slate-600', !isActive);
+                    if (isActive) {
+                        indicator.classList.remove('bg-slate-300', 'dark:bg-slate-600');
+                    }
+                });
+            }
+
+            function updateTeamButtons() {
+                if (teamPrevBtn && teamNextBtn) {
+                    teamPrevBtn.disabled = currentTeamSlide === 0;
+                    teamNextBtn.disabled = currentTeamSlide === teamCards.length - 1;
+                }
+            }
+
+            function showTeamSlide(index) {
+                if (!teamTrack || teamCards.length === 0) return;
+                currentTeamSlide = ((index % teamCards.length) + teamCards.length) % teamCards.length;
+                const card = teamCards[currentTeamSlide];
+                card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                updateTeamIndicators();
+                updateTeamButtons();
+            }
+
+            document.getElementById('teamNext')?.addEventListener('click', () => showTeamSlide(currentTeamSlide + 1));
+            document.getElementById('teamPrev')?.addEventListener('click', () => showTeamSlide(currentTeamSlide - 1));
+            teamIndicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', () => showTeamSlide(index));
+            });
+
+            if (teamCards.length) {
+                showTeamSlide(0);
+            }
         });
     </script>
 
@@ -304,102 +366,180 @@
                     acontecer</h2>
             </div>
 
-            <!-- Horizontal scroll container -->
-            <div
-                class="flex overflow-x-auto gap-8 pb-8 snap-x snap-mandatory hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
-                <!-- Member 1 -->
-                <div
-                    class="min-w-[300px] md:min-w-[350px] snap-center bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-2xl hover:-translate-y-2 transition-all text-center group">
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 flex items-center justify-center md:justify-start px-2">
+                    <button id="teamPrev"
+                        class="hidden md:inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/90 dark:bg-slate-800/95 text-slate-700 dark:text-slate-200 shadow-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-customGreen disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label="Anterior" disabled>
+                        <i class="bi bi-chevron-left text-xl"></i>
+                    </button>
+                </div>
+
+                <div id="teamCarouselTrack"
+                    class="flex flex-nowrap overflow-x-auto gap-8 pb-8 hide-scrollbar scroll-smooth px-4 sm:px-0 justify-start snap-x snap-mandatory">
+                    <!-- Member 1 -->
                     <div
-                        class="relative w-32 h-32 mx-auto mb-6 rounded-full p-2 border-2 border-blue-100 dark:border-blue-900 group-hover:border-blue-500 transition-colors">
-                        <img src="https://ui-avatars.com/api/?name=Ana+Silva&background=0D6EFD&color=fff&size=256"
-                            class="w-full h-full rounded-full object-cover shadow-inner" alt="Ana Silva">
+                        class="team-card min-w-[300px] md:min-w-[350px] snap-center bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-2xl hover:-translate-y-2 transition-all text-center group">
+                        <div
+                            class="relative w-32 h-32 mx-auto mb-6 rounded-full p-2 border-2 border-blue-100 dark:border-blue-900 group-hover:border-blue-500 transition-colors">
+                            <img src="{% static 'assets/squad-1.jpg' %}"
+                                class="w-full h-full rounded-full object-cover shadow-inner" alt="Sérgio Santana">
+                        </div>
+                        <h5 class="text-xl font-bold text-slate-800 dark:text-white mb-1">Sérgio Santana</h5>
+                        <p class="text-blue-500 text-sm font-bold uppercase tracking-wider mb-4">Instrutor TI - Senac SE</p>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mb-6 line-clamp-3">Docente Sénior</p>
+                        <div class="flex justify-center gap-4">
+                            <a href="#"
+                                class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-colors"><i
+                                    class="bi bi-linkedin"></i></a>
+                            <a href="#"
+                                class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"><i
+                                    class="bi bi-envelope-fill"></i></a>
+                        </div>
                     </div>
-                    <h5 class="text-xl font-bold text-slate-800 dark:text-white mb-1">Ana Silva</h5>
-                    <p class="text-blue-500 text-sm font-bold uppercase tracking-wider mb-4">Diretora Geral</p>
-                    <p class="text-slate-500 dark:text-slate-400 text-sm mb-6 line-clamp-3">Liderança visionária com
-                        foco em expansão e impacto social sustentável.</p>
-                    <div class="flex justify-center gap-4">
-                        <a href="#"
-                            class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-colors"><i
-                                class="bi bi-linkedin"></i></a>
-                        <a href="#"
-                            class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"><i
-                                class="bi bi-envelope-fill"></i></a>
+
+                    <!-- Member 2 -->
+                    <div
+                        class="team-card min-w-[300px] md:min-w-[350px] snap-center bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-2xl hover:-translate-y-2 transition-all text-center group">
+                        <div
+                            class="relative w-32 h-32 mx-auto mb-6 rounded-full p-2 border-2 border-customGreen/20 dark:border-customGreen/10 group-hover:border-customGreen transition-colors">
+                            <img src="{% static 'assets/squad-2.jpg' %}"
+                                class="w-full h-full rounded-full object-cover shadow-inner" alt="Leon Trindade">
+                        </div>
+                        <h5 class="text-xl font-bold text-slate-800 dark:text-white mb-1">Leon Trindade</h5>
+                        <p class="text-customGreen text-sm font-bold uppercase tracking-wider mb-4">Desenvolvedor Full Stack</p>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mb-6 line-clamp-3">Especialista em desenvolvimento web e arquitetura de sistemas.</p>
+                        <div class="flex justify-center gap-4">
+                            <a href="#"
+                                class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-colors"><i
+                                    class="bi bi-linkedin"></i></a>
+                            <a href="#"
+                                class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"><i
+                                    class="bi bi-envelope-fill"></i></a>
+                        </div>
+                    </div>
+
+                    <div
+                        class="team-card min-w-[300px] md:min-w-[350px] snap-center bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-2xl hover:-translate-y-2 transition-all text-center group">
+                        <div
+                            class="relative w-32 h-32 mx-auto mb-6 rounded-full p-2 border-2 border-purple-100 dark:border-purple-900 group-hover:border-purple-500 transition-colors">
+                            <img src="{% static 'assets/squad-6.jpg' %}"
+                                class="w-full h-full rounded-full object-cover shadow-inner" alt="João Batista">
+                        </div>
+                        <h5 class="text-xl font-bold text-slate-800 dark:text-white mb-1">João Batista</h5>
+                        <p class="text-customGreen text-sm font-bold uppercase tracking-wider mb-4">Desenvolvedor Full Stack</p>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mb-6 line-clamp-3">Especialista em desenvolvimento web e arquitetura de sistemas.</p>
+                        <div class="flex justify-center gap-4">
+                            <a href="#"
+                                class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-colors"><i
+                                    class="bi bi-linkedin"></i></a>
+                            <a href="#"
+                                class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"><i
+                                    class="bi bi-envelope-fill"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Member 3 -->
+                    <div
+                        class="team-card min-w-[300px] md:min-w-[350px] snap-center bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-2xl hover:-translate-y-2 transition-all text-center group">
+                        <div
+                            class="relative w-32 h-32 mx-auto mb-6 rounded-full p-2 border-2 border-amber-100 dark:border-amber-900 group-hover:border-amber-500 transition-colors">
+                            <img src="{% static 'assets/squad-3.jpg' %}"
+                                class="w-full h-full rounded-full object-cover shadow-inner" alt="Danilo Augusto">
+                        </div>
+                        <h5 class="text-xl font-bold text-slate-800 dark:text-white mb-1">Danilo Augusto</h5>
+                        <p class="text-customGreen text-sm font-bold uppercase tracking-wider mb-4">Desenvolvedor Full Stack</p>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mb-6 line-clamp-3">Especialista em desenvolvimento web e arquitetura de sistemas.</p>
+                        <div class="flex justify-center gap-4">
+                            <a href="#"
+                                class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-colors"><i
+                                    class="bi bi-linkedin"></i></a>
+                            <a href="#"
+                                class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"><i
+                                    class="bi bi-envelope-fill"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Member 4 -->
+                    <div
+                        class="team-card min-w-[300px] md:min-w-[350px] snap-center bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-2xl hover:-translate-y-2 transition-all text-center group">
+                        <div
+                            class="relative w-32 h-32 mx-auto mb-6 rounded-full p-2 border-2 border-red-100 dark:border-red-900 group-hover:border-red-500 transition-colors">
+                            <img src="{% static 'assets/squad-4.jpg' %}"
+                                class="w-full h-full rounded-full object-cover shadow-inner" alt="Grazielle Feitosa">
+                        </div>
+                        <h5 class="text-xl font-bold text-slate-800 dark:text-white mb-1">Grazielle Feitosa</h5>
+                        <p class="text-customGreen text-sm font-bold uppercase tracking-wider mb-4">Desenvolvedor Full Stack</p>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mb-6 line-clamp-3">Especialista em desenvolvimento web e arquitetura de sistemas.</p>
+                        <div class="flex justify-center gap-4">
+                            <a href="#"
+                                class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-colors"><i
+                                    class="bi bi-linkedin"></i></a>
+                            <a href="#"
+                                class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"><i
+                                    class="bi bi-envelope-fill"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Member 5 -->
+                    <div
+                        class="team-card min-w-[300px] md:min-w-[350px] snap-center bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-2xl hover:-translate-y-2 transition-all text-center group">
+                        <div
+                            class="relative w-32 h-32 mx-auto mb-6 rounded-full p-2 border-2 border-purple-100 dark:border-purple-900 group-hover:border-purple-500 transition-colors">
+                            <img src="{% static 'assets/squad-5.jpg' %}"
+                                class="w-full h-full rounded-full object-cover shadow-inner" alt="Guilherme Antony">
+                        </div>
+                        <h5 class="text-xl font-bold text-slate-800 dark:text-white mb-1">Guilherme Antony</h5>
+                        <p class="text-customGreen text-sm font-bold uppercase tracking-wider mb-4">Desenvolvedor Full Stack</p>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mb-6 line-clamp-3">Especialista em desenvolvimento web e arquitetura de sistemas.</p>
+                        <div class="flex justify-center gap-4">
+                            <a href="#"
+                                class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-colors"><i
+                                    class="bi bi-linkedin"></i></a>
+                            <a href="#"
+                                class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"><i
+                                    class="bi bi-envelope-fill"></i></a>
+                        </div>
+                    </div>
+
+                    <div
+                        class="team-card min-w-[300px] md:min-w-[350px] snap-center bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-2xl hover:-translate-y-2 transition-all text-center group">
+                        <div
+                            class="relative w-32 h-32 mx-auto mb-6 rounded-full p-2 border-2 border-purple-100 dark:border-purple-900 group-hover:border-purple-500 transition-colors">
+                            <img src="{% static 'assets/squad-7.jpg' %}"
+                                class="w-full h-full rounded-full object-cover shadow-inner" alt="Yaccil Max">
+                        </div>
+                        <h5 class="text-xl font-bold text-slate-800 dark:text-white mb-1">Yaccil Max</h5>
+                        <p class="text-customGreen text-sm font-bold uppercase tracking-wider mb-4">Desenvolvedor Full Stack</p>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mb-6 line-clamp-3">Especialista em desenvolvimento web e arquitetura de sistemas.</p>
+                        <div class="flex justify-center gap-4">
+                            <a href="#"
+                                class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-colors"><i
+                                    class="bi bi-linkedin"></i></a>
+                            <a href="#"
+                                class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"><i
+                                    class="bi bi-envelope-fill"></i></a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Member 2 -->
-                <div
-                    class="min-w-[300px] md:min-w-[350px] snap-center bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-2xl hover:-translate-y-2 transition-all text-center group">
-                    <div
-                        class="relative w-32 h-32 mx-auto mb-6 rounded-full p-2 border-2 border-customGreen/20 dark:border-customGreen/10 group-hover:border-customGreen transition-colors">
-                        <img src="https://ui-avatars.com/api/?name=Carlos+Souza&background=20C997&color=fff&size=256"
-                            class="w-full h-full rounded-full object-cover shadow-inner" alt="Carlos Souza">
-                    </div>
-                    <h5 class="text-xl font-bold text-slate-800 dark:text-white mb-1">Carlos Souza</h5>
-                    <p class="text-customGreen text-sm font-bold uppercase tracking-wider mb-4">Gerente de Projetos</p>
-                    <p class="text-slate-500 dark:text-slate-400 text-sm mb-6 line-clamp-3">Especialista em gestão ágil
-                        e execução de iniciativas ambientais complexas.</p>
-                    <div class="flex justify-center gap-4">
-                        <a href="#"
-                            class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-colors"><i
-                                class="bi bi-linkedin"></i></a>
-                        <a href="#"
-                            class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"><i
-                                class="bi bi-envelope-fill"></i></a>
-                    </div>
-                </div>
-
-                <!-- Member 3 -->
-                <div
-                    class="min-w-[300px] md:min-w-[350px] snap-center bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-2xl hover:-translate-y-2 transition-all text-center group">
-                    <div
-                        class="relative w-32 h-32 mx-auto mb-6 rounded-full p-2 border-2 border-amber-100 dark:border-amber-900 group-hover:border-amber-500 transition-colors">
-                        <img src="https://ui-avatars.com/api/?name=Mariana+O&background=FFC107&color=000&size=256"
-                            class="w-full h-full rounded-full object-cover shadow-inner" alt="Mariana Oliveira">
-                    </div>
-                    <h5 class="text-xl font-bold text-slate-800 dark:text-white mb-1">Mariana Oliveira</h5>
-                    <p class="text-amber-500 text-sm font-bold uppercase tracking-wider mb-4">Espec. Sustentabilidade
-                    </p>
-                    <p class="text-slate-500 dark:text-slate-400 text-sm mb-6 line-clamp-3">Consultora técnica focada em
-                        inovação e redução de pegada de carbono.</p>
-                    <div class="flex justify-center gap-4">
-                        <a href="#"
-                            class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-colors"><i
-                                class="bi bi-linkedin"></i></a>
-                        <a href="#"
-                            class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"><i
-                                class="bi bi-envelope-fill"></i></a>
-                    </div>
-                </div>
-
-                <!-- Member 4 -->
-                <div
-                    class="min-w-[300px] md:min-w-[350px] snap-center bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-2xl hover:-translate-y-2 transition-all text-center group">
-                    <div
-                        class="relative w-32 h-32 mx-auto mb-6 rounded-full p-2 border-2 border-red-100 dark:border-red-900 group-hover:border-red-500 transition-colors">
-                        <img src="https://ui-avatars.com/api/?name=Pedro+Santos&background=DC3545&color=fff&size=256"
-                            class="w-full h-full rounded-full object-cover shadow-inner" alt="Pedro Santos">
-                    </div>
-                    <h5 class="text-xl font-bold text-slate-800 dark:text-white mb-1">Pedro Santos</h5>
-                    <p class="text-red-500 text-sm font-bold uppercase tracking-wider mb-4">Coord. Voluntariado</p>
-                    <p class="text-slate-500 dark:text-slate-400 text-sm mb-6 line-clamp-3">Apaixonado por pessoas e por
-                        conectar talentos a causas nobres.</p>
-                    <div class="flex justify-center gap-4">
-                        <a href="#"
-                            class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-colors"><i
-                                class="bi bi-linkedin"></i></a>
-                        <a href="#"
-                            class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"><i
-                                class="bi bi-envelope-fill"></i></a>
-                    </div>
+                <div class="absolute inset-y-0 right-0 flex items-center justify-center md:justify-end px-2">
+                    <button id="teamNext"
+                        class="hidden md:inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/90 dark:bg-slate-800/95 text-slate-700 dark:text-slate-200 shadow-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-customGreen disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label="Próximo" disabled>
+                        <i class="bi bi-chevron-right text-xl"></i>
+                    </button>
                 </div>
             </div>
 
-            <div
-                class="text-center mt-6 text-slate-500 dark:text-slate-400 flex items-center justify-center gap-2 md:hidden">
-                <i class="bi bi-arrow-left"></i> Deslize para ver mais <i class="bi bi-arrow-right"></i>
+            <div class="mt-6 flex items-center justify-center gap-3">
+                <button type="button" class="team-indicator active w-3 h-3 rounded-full" data-index="0" aria-label="Equipe slide 1"></button>
+                <button type="button" class="team-indicator bg-slate-300 dark:bg-slate-600 w-3 h-3 rounded-full" data-index="1" aria-label="Equipe slide 2"></button>
+                <button type="button" class="team-indicator bg-slate-300 dark:bg-slate-600 w-3 h-3 rounded-full" data-index="2" aria-label="Equipe slide 3"></button>
+                <button type="button" class="team-indicator bg-slate-300 dark:bg-slate-600 w-3 h-3 rounded-full" data-index="3" aria-label="Equipe slide 4"></button>
+                <button type="button" class="team-indicator bg-slate-300 dark:bg-slate-600 w-3 h-3 rounded-full" data-index="4" aria-label="Equipe slide 5"></button>
+                <button type="button" class="team-indicator bg-slate-300 dark:bg-slate-600 w-3 h-3 rounded-full" data-index="5" aria-label="Equipe slide 6"></button>
+                <button type="button" class="team-indicator bg-slate-300 dark:bg-slate-600 w-3 h-3 rounded-full" data-index="6" aria-label="Equipe slide 7"></button>
             </div>
         </div>
     </section>
